@@ -1,74 +1,79 @@
-from flask import Blueprint, render_template, request, jsonify, send_file, current_app
+from flask import Blueprint, render_template, request, jsonify, send_file, current_app, redirect, url_for, flash
+from flask_security import login_required, current_user
 from app import db
-from app.models import Screenplay, Scene, Character
+from app.models import Screenplay, Scene, Character, User, ScreenplayChange
 from app.screenplay import FountainParser
 from app.pdf_generator import ScreenplayPDFGenerator
 from app.ai_assistant import OllamaAssistant
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
 parser = FountainParser()
 pdf_generator = ScreenplayPDFGenerator()
 ai_assistant = OllamaAssistant()
 
+# Main application routes
 @main.route('/')
+@login_required
 def index():
-    """Main editor page"""
-    screenplays = Screenplay.query.order_by(Screenplay.updated_at.desc()).all()
+    """Main page with user's screenplays"""
+    screenplays = Screenplay.query.filter_by(user_id=current_user.id).order_by(Screenplay.updated_at.desc()).all()
     return render_template('index.html', screenplays=screenplays)
 
 @main.route('/screenplay/<int:screenplay_id>')
+@login_required
 def edit_screenplay(screenplay_id):
-    """Edit specific screenplay"""
-    screenplay = Screenplay.query.get_or_404(screenplay_id)
+    """Edit specific screenplay (user must own it)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     return render_template('editor.html', screenplay=screenplay)
 
 @main.route('/characters/<int:screenplay_id>')
+@login_required
 def characters(screenplay_id):
-    """Character management page"""
-    screenplay = Screenplay.query.get_or_404(screenplay_id)
+    """Character management page (user must own screenplay)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     return render_template('characters.html', screenplay=screenplay)
 
 @main.route('/scenes/<int:screenplay_id>')
+@login_required
 def scenes(screenplay_id):
-    """Scene organization page"""
-    screenplay = Screenplay.query.get_or_404(screenplay_id)
+    """Scene organization page (user must own screenplay)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     return render_template('scenes.html', screenplay=screenplay)
 
 # API Routes
-
 @main.route('/api/screenplays', methods=['GET', 'POST'])
+@login_required
 def api_screenplays():
-    """Get all screenplays or create new one"""
+    """Get user's screenplays or create new one"""
     if request.method == 'POST':
         data = request.json
         screenplay = Screenplay(
             title=data.get('title', 'Untitled'),
-            author=data.get('author', ''),
-            content=data.get('content', '')
+            content=data.get('content', ''),
+            user_id=current_user.id
         )
         db.session.add(screenplay)
         db.session.commit()
         return jsonify({
             'id': screenplay.id,
             'title': screenplay.title,
-            'author': screenplay.author,
             'created_at': screenplay.created_at.isoformat()
         }), 201
     
-    screenplays = Screenplay.query.order_by(Screenplay.updated_at.desc()).all()
+    screenplays = Screenplay.query.filter_by(user_id=current_user.id).order_by(Screenplay.updated_at.desc()).all()
     return jsonify([{
         'id': s.id,
         'title': s.title,
-        'author': s.author,
         'updated_at': s.updated_at.isoformat()
     } for s in screenplays])
 
 @main.route('/api/screenplay/<int:screenplay_id>', methods=['GET', 'PUT', 'DELETE'])
+@login_required
 def api_screenplay(screenplay_id):
-    """Get, update, or delete screenplay"""
-    screenplay = Screenplay.query.get_or_404(screenplay_id)
+    """Get, update, or delete screenplay (user must own it)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     
     if request.method == 'DELETE':
         db.session.delete(screenplay)
@@ -77,25 +82,41 @@ def api_screenplay(screenplay_id):
     
     if request.method == 'PUT':
         data = request.json
+        old_content = screenplay.content
+        
         screenplay.title = data.get('title', screenplay.title)
-        screenplay.author = data.get('author', screenplay.author)
         screenplay.content = data.get('content', screenplay.content)
         screenplay.updated_at = datetime.utcnow()
+        
+        # Track changes for undo/redo (only if content actually changed)
+        if old_content != screenplay.content:
+            change = ScreenplayChange(
+                screenplay_id=screenplay.id,
+                content=old_content,
+                change_type='auto_save'
+            )
+            db.session.add(change)
+            
+            # Clean up old changes (keep only last 50)
+            old_changes = ScreenplayChange.query.filter_by(screenplay_id=screenplay.id).order_by(ScreenplayChange.created_at.desc()).offset(50).all()
+            for old_change in old_changes:
+                db.session.delete(old_change)
+        
         db.session.commit()
     
     return jsonify({
         'id': screenplay.id,
         'title': screenplay.title,
-        'author': screenplay.author,
         'content': screenplay.content,
         'created_at': screenplay.created_at.isoformat(),
         'updated_at': screenplay.updated_at.isoformat()
     })
 
 @main.route('/api/screenplay/<int:screenplay_id>/parse', methods=['POST'])
+@login_required
 def api_parse_screenplay(screenplay_id):
-    """Parse screenplay and extract scenes/characters"""
-    screenplay = Screenplay.query.get_or_404(screenplay_id)
+    """Parse screenplay and extract scenes/characters (user must own screenplay)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     
     # Extract scenes
     scenes_data = parser.extract_scenes(screenplay.content)
@@ -137,13 +158,14 @@ def api_parse_screenplay(screenplay_id):
     })
 
 @main.route('/api/screenplay/<int:screenplay_id>/pdf', methods=['GET'])
+@login_required
 def api_generate_pdf(screenplay_id):
-    """Generate PDF for screenplay"""
-    screenplay = Screenplay.query.get_or_404(screenplay_id)
+    """Generate PDF for screenplay (user must own it)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     
     screenplay_data = {
         'title': screenplay.title,
-        'author': screenplay.author,
+        'author': current_user.username,
         'content': screenplay.content
     }
     
@@ -157,9 +179,10 @@ def api_generate_pdf(screenplay_id):
     )
 
 @main.route('/api/characters/<int:screenplay_id>', methods=['GET', 'POST'])
+@login_required
 def api_characters(screenplay_id):
-    """Get or create characters"""
-    screenplay = Screenplay.query.get_or_404(screenplay_id)
+    """Get or create characters (user must own screenplay)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     
     if request.method == 'POST':
         data = request.json
@@ -186,10 +209,22 @@ def api_characters(screenplay_id):
         'arc_notes': c.arc_notes
     } for c in characters])
 
-@main.route('/api/character/<int:character_id>', methods=['PUT', 'DELETE'])
+@main.route('/api/character/<int:character_id>', methods=['GET', 'PUT', 'DELETE'])
+@login_required
 def api_character(character_id):
-    """Update or delete character"""
-    character = Character.query.get_or_404(character_id)
+    """Get, update, or delete character (user must own screenplay)"""
+    character = Character.query.join(Screenplay).filter(
+        Character.id == character_id,
+        Screenplay.user_id == current_user.id
+    ).first_or_404()
+    
+    if request.method == 'GET':
+        return jsonify({
+            'id': character.id,
+            'name': character.name,
+            'description': character.description,
+            'arc_notes': character.arc_notes
+        })
     
     if request.method == 'DELETE':
         db.session.delete(character)
@@ -210,6 +245,7 @@ def api_character(character_id):
     })
 
 @main.route('/api/ai/character-arc', methods=['POST'])
+@login_required
 def api_ai_character_arc():
     """Get AI suggestion for character arc"""
     if not ai_assistant.is_available():
@@ -225,6 +261,7 @@ def api_ai_character_arc():
     return jsonify({'suggestion': suggestion})
 
 @main.route('/api/ai/plot-development', methods=['POST'])
+@login_required
 def api_ai_plot_development():
     """Get AI suggestion for plot development"""
     if not ai_assistant.is_available():
@@ -239,6 +276,7 @@ def api_ai_plot_development():
     return jsonify({'suggestion': suggestion})
 
 @main.route('/api/ai/enhance-dialogue', methods=['POST'])
+@login_required
 def api_ai_enhance_dialogue():
     """Get AI suggestion for dialogue enhancement"""
     if not ai_assistant.is_available():
@@ -254,6 +292,17 @@ def api_ai_enhance_dialogue():
     return jsonify({'suggestion': suggestion})
 
 @main.route('/api/ai/status', methods=['GET'])
+@login_required
 def api_ai_status():
     """Check if AI assistant is available"""
     return jsonify({'available': ai_assistant.is_available()})
+
+@main.route('/api/config', methods=['GET'])
+@login_required
+def api_config():
+    """Get configuration for frontend"""
+    return jsonify({
+        'auto_save_interval': current_app.config['AUTO_SAVE_INTERVAL'],
+        'username': current_user.username,
+        'is_demo': current_user.is_demo
+    })

@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 from typing import List, Dict, Optional
 
 class OllamaAssistant:
@@ -7,7 +8,8 @@ class OllamaAssistant:
     
     def __init__(self, base_url: str = "http://localhost:11434"):
         self.base_url = base_url
-        self.model = "llama2"  # Default model, can be configured
+        self.model = os.environ.get('OLLAMA_MODEL', 'llama2')  # Configurable model
+        self.timeout = int(os.environ.get('OLLAMA_TIMEOUT', '120'))  # Default 2 minutes
     
     def is_available(self) -> bool:
         """Check if Ollama is running"""
@@ -29,7 +31,7 @@ class OllamaAssistant:
                     "prompt": full_prompt,
                     "stream": False
                 },
-                timeout=30
+                timeout=self.timeout
             )
             
             if response.status_code == 200:

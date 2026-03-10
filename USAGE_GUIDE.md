@@ -1,4 +1,4 @@
-# Screenplay Editor - Usage Guide
+# Awen Screenplay Editor - Usage Guide
 
 ## Getting Started
 
@@ -10,13 +10,20 @@ python3 run.py
 
 The application will be available at http://localhost:5000
 
-### 2. Create Your First Screenplay
+### 2. Login
+
+The Awen Screenplay Editor requires authentication to protect your screenplays. You can:
+
+- **Use the demo account**: Username `demo`, Password `demo123`
+- **Create a new account**: Click "Create Account" to register
+
+### 3. Create Your First Screenplay
 
 1. Click "New Screenplay" on the home page
 2. Enter a title and author name
 3. Click "Create"
 
-### 3. Write Using Fountain Format
+### 4. Write Using Fountain Format
 
 The editor uses Fountain format, which is simple and intuitive:
 

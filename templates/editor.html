@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ screenplay.title }} - Editor{% endblock %}
+{% block title %}{{ screenplay.title }} - Awen Screenplay Editor{% endblock %}
 
 {% block content %}
 <div class="editor-container">
@@ -91,7 +91,11 @@ FADE OUT.">{{ screenplay.content }}</textarea>
 <script>
 const screenplayId = {{ screenplay.id }};
 let autoSaveTimer = null;
+let autoSaveInterval = 15000; // Default 15 seconds, will be updated from config
 let lastSavedContent = document.getElementById('screenplay-content').value;
+
+// Load configuration on page load
+loadConfig();
 
 // Auto-save functionality
 document.getElementById('screenplay-content').addEventListener('input', function() {
@@ -100,13 +104,25 @@ document.getElementById('screenplay-content').addEventListener('input', function
     
     autoSaveTimer = setTimeout(() => {
         saveScreenplay(true);
-    }, 3000);
+    }, autoSaveInterval);
     
     updateStats();
 });
 
 document.getElementById('screenplay-title').addEventListener('change', () => saveScreenplay(true));
 document.getElementById('screenplay-author').addEventListener('change', () => saveScreenplay(true));
+
+async function loadConfig() {
+    try {
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        autoSaveInterval = config.auto_save_interval * 1000; // Convert to milliseconds
+        console.log(`Auto-save interval set to ${config.auto_save_interval} seconds`);
+    } catch (error) {
+        console.error('Error loading config:', error);
+        autoSaveInterval = 15000; // Fallback to 15 seconds
+    }
+}
 
 async function saveScreenplay(isAutoSave = false) {
     const title = document.getElementById('screenplay-title').value;

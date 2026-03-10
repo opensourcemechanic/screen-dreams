@@ -39,6 +39,28 @@ body {
     align-items: center;
 }
 
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1rem;
+}
+
+.user-welcome {
+    color: #ecf0f1;
+    font-weight: 500;
+}
+
+.demo-badge {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 .nav-links a {
     color: white;
     text-decoration: none;

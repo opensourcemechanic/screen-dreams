@@ -1,4 +1,4 @@
-# Screenplay Editor
+# Awen Screenplay Editor
 
 A simplified Python-based screenplay editor with Fountain format support and professional PDF output.
 
@@ -9,7 +9,7 @@ A simplified Python-based screenplay editor with Fountain format support and pro
 - **Character Management**: Track characters, descriptions, and character arcs
 - **Scene Organization**: Automatic scene parsing and organization
 - **AI Assistant**: Ollama integration for character arc and plot suggestions
-- **Auto-save**: Automatic saving every 3 seconds
+- **Auto-save**: Automatic saving every 15 seconds (configurable)
 - **Industry Standard**: Follows screenplay formatting conventions
 
 ## Installation
@@ -23,13 +23,20 @@ pip install -r requirements.txt
 - Download from https://ollama.ai
 - Run: `ollama pull llama2`
 
-## Running the Application
+## Quick Start
 
+1. Start the application:
 ```bash
-python run.py
+python3 run.py
 ```
 
-The application will be available at http://localhost:5000
+2. Open your browser to `http://localhost:5000`
+
+3. Login with the demo account:
+   - Username: `demo`
+   - Password: `demo123`
+
+4. Create your first screenplay!
 
 ## Fountain Format Quick Reference
 
