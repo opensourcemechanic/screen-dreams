@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}{{ screenplay.title }} - Characters{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Characters - {{ screenplay.title }}</h1>
+        <div>
+            <button onclick="addCharacter()" class="btn btn-primary">Add Character</button>
+            <a href="/screenplay/{{ screenplay.id }}" class="btn btn-secondary">Back to Editor</a>
+        </div>
+    </div>
+    
+    <div class="characters-grid" id="characters-grid">
+        {% for character in screenplay.characters %}
+        <div class="character-card" data-id="{{ character.id }}">
+            <h3>{{ character.name }}</h3>
+            <p class="character-description">{{ character.description or 'No description' }}</p>
+            <div class="character-arc">
+                <strong>Arc Notes:</strong>
+                <p>{{ character.arc_notes or 'No arc notes' }}</p>
+            </div>
+            <div class="character-actions">
+                <button onclick="editCharacter({{ character.id }})" class="btn btn-secondary btn-sm">Edit</button>
+                <button onclick="getArcSuggestion({{ character.id }})" class="btn btn-secondary btn-sm">AI Suggestion</button>
+                <button onclick="deleteCharacter({{ character.id }})" class="btn btn-danger btn-sm">Delete</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="characterModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2 id="modal-title">Add Character</h2>
+        <form id="characterForm">
+            <input type="hidden" id="character-id">
+            <div class="form-group">
+                <label for="character-name">Name:</label>
+                <input type="text" id="character-name" required>
+            </div>
+            <div class="form-group">
+                <label for="character-description">Description:</label>
+                <textarea id="character-description" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="character-arc">Arc Notes:</label>
+                <textarea id="character-arc" rows="4"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const screenplayId = {{ screenplay.id }};
+
+function addCharacter() {
+    document.getElementById('modal-title').textContent = 'Add Character';
+    document.getElementById('character-id').value = '';
+    document.getElementById('character-name').value = '';
+    document.getElementById('character-description').value = '';
+    document.getElementById('character-arc').value = '';
+    document.getElementById('characterModal').style.display = 'flex';
+}
+
+async function editCharacter(characterId) {
+    try {
+        const response = await fetch(`/api/character/${characterId}`);
+        const character = await response.json();
+        
+        document.getElementById('modal-title').textContent = 'Edit Character';
+        document.getElementById('character-id').value = character.id;
+        document.getElementById('character-name').value = character.name;
+        document.getElementById('character-description').value = character.description || '';
+        document.getElementById('character-arc').value = character.arc_notes || '';
+        document.getElementById('characterModal').style.display = 'flex';
+    } catch (error) {
+        console.error('Error loading character:', error);
+    }
+}
+
+function closeModal() {
+    document.getElementById('characterModal').style.display = 'none';
+}
+
+document.getElementById('characterForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const characterId = document.getElementById('character-id').value;
+    const data = {
+        name: document.getElementById('character-name').value,
+        description: document.getElementById('character-description').value,
+        arc_notes: document.getElementById('character-arc').value
+    };
+    
+    try {
+        let response;
+        if (characterId) {
+            response = await fetch(`/api/character/${characterId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+        } else {
+            response = await fetch(`/api/characters/${screenplayId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+        }
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error saving character:', error);
+        alert('Failed to save character');
+    }
+});
+
+async function deleteCharacter(characterId) {
+    if (!confirm('Are you sure you want to delete this character?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/character/${characterId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error deleting character:', error);
+        alert('Failed to delete character');
+    }
+}
+
+async function getArcSuggestion(characterId) {
+    const card = document.querySelector(`[data-id="${characterId}"]`);
+    const name = card.querySelector('h3').textContent;
+    const description = card.querySelector('.character-description').textContent;
+    
+    const arcDiv = card.querySelector('.character-arc p');
+    arcDiv.textContent = 'Generating suggestion...';
+    
+    try {
+        const response = await fetch('/api/ai/character-arc', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                character_name: name,
+                character_description: description,
+                screenplay_context: ''
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            arcDiv.textContent = result.suggestion || 'AI assistant not available';
+        } else {
+            arcDiv.textContent = 'AI assistant not available';
+        }
+    } catch (error) {
+        arcDiv.textContent = 'Error getting suggestion';
+    }
+}
+</script>
+{% endblock %}

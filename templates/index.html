@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Screenplay Editor - Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Your Screenplays</h1>
+        <button onclick="createNewScreenplay()" class="btn btn-primary">New Screenplay</button>
+    </div>
+    
+    <div class="screenplay-list">
+        {% if screenplays %}
+            {% for screenplay in screenplays %}
+            <div class="screenplay-card">
+                <div class="screenplay-info">
+                    <h3>{{ screenplay.title }}</h3>
+                    <p class="author">by {{ screenplay.author or 'Unknown' }}</p>
+                    <p class="meta">Last updated: {{ screenplay.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+                <div class="screenplay-actions">
+                    <a href="/screenplay/{{ screenplay.id }}" class="btn btn-secondary">Edit</a>
+                    <a href="/characters/{{ screenplay.id }}" class="btn btn-secondary">Characters</a>
+                    <a href="/scenes/{{ screenplay.id }}" class="btn btn-secondary">Scenes</a>
+                    <button onclick="downloadPDF({{ screenplay.id }})" class="btn btn-secondary">PDF</button>
+                    <button onclick="deleteScreenplay({{ screenplay.id }})" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No screenplays yet. Create your first screenplay to get started!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="newScreenplayModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Create New Screenplay</h2>
+        <form id="newScreenplayForm">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function createNewScreenplay() {
+    document.getElementById('newScreenplayModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('newScreenplayModal').style.display = 'none';
+}
+
+document.getElementById('newScreenplayForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {
+        title: formData.get('title'),
+        author: formData.get('author'),
+        content: ''
+    };
+    
+    try {
+        const response = await fetch('/api/screenplays', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            const screenplay = await response.json();
+            window.location.href = `/screenplay/${screenplay.id}`;
+        }
+    } catch (error) {
+        console.error('Error creating screenplay:', error);
+        alert('Failed to create screenplay');
+    }
+});
+
+async function downloadPDF(screenplayId) {
+    window.location.href = `/api/screenplay/${screenplayId}/pdf`;
+}
+
+async function deleteScreenplay(screenplayId) {
+    if (!confirm('Are you sure you want to delete this screenplay?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/screenplay/${screenplayId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error deleting screenplay:', error);
+        alert('Failed to delete screenplay');
+    }
+}
+</script>
+{% endblock %}
