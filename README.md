@@ -25,6 +25,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Clone and setup
 git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
 cd awen-screenplay-editor
+# Note: The app is branded as "Screen Dreams Screenwriter" inside
 
 # Create virtual environment and install dependencies
 uv venv
@@ -44,6 +45,7 @@ Traditional setup using Python's built-in virtual environment:
 # Clone and setup
 git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
 cd awen-screenplay-editor
+# Note: The app is branded as "Screen Dreams Screenwriter" inside
 
 # Create virtual environment
 python3 -m venv .venv

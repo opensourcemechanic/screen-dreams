@@ -17,8 +17,9 @@ Or follow the official uv installation guide: https://docs.astral.sh/uv/getting-
 ### Quick Setup with uv
 ```bash
 # Clone the repository
-git clone https://github.com/opensourcemechanic/screen-dreams.git
-cd screen-dreams
+git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
+cd awen-screenplay-editor
+# Note: The app is branded as "Screen Dreams Screenwriter" inside
 
 # Create virtual environment and install dependencies
 uv venv
@@ -41,8 +42,9 @@ uv pip install -e .
 ### Quick Setup with Python venv
 ```bash
 # Clone the repository
-git clone https://github.com/opensourcemechanic/screen-dreams.git
-cd screen-dreams
+git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
+cd awen-screenplay-editor
+# Note: The app is branded as "Screen Dreams Screenwriter" inside
 
 # Create virtual environment
 python3 -m venv .venv
