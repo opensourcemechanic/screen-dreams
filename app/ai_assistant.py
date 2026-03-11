@@ -9,13 +9,25 @@ class OllamaAssistant:
     def __init__(self, base_url: str = "http://localhost:11434"):
         self.base_url = base_url
         self.model = os.environ.get('OLLAMA_MODEL', 'llama2')  # Configurable model
-        self.timeout = int(os.environ.get('OLLAMA_TIMEOUT', '120'))  # Default 2 minutes
+        self.timeout = int(os.environ.get('OLLAMA_TIMEOUT', '300'))  # Increased to 5 minutes
+        self.check_timeout = int(os.environ.get('OLLAMA_CHECK_TIMEOUT', '5'))  # Faster check timeout
     
     def is_available(self) -> bool:
         """Check if Ollama is running"""
         try:
-            response = requests.get(f"{self.base_url}/api/tags", timeout=2)
+            response = requests.get(f"{self.base_url}/api/tags", timeout=self.check_timeout)
             return response.status_code == 200
+        except:
+            return False
+    
+    def check_model(self) -> bool:
+        """Check if the specific model is available"""
+        try:
+            response = requests.get(f"{self.base_url}/api/tags", timeout=self.check_timeout)
+            if response.status_code == 200:
+                models = response.json().get('models', [])
+                return any(model.get('name', '').startswith(self.model) for model in models)
+            return False
         except:
             return False
     
@@ -39,6 +51,14 @@ class OllamaAssistant:
             return ""
         except Exception as e:
             print(f"Error generating with Ollama: {e}")
+            if "timed out" in str(e).lower():
+                return "AI assistant timed out. Please ensure Ollama is running and try again."
+            elif "connection refused" in str(e).lower():
+                return "Cannot connect to Ollama. Please start Ollama with 'ollama run'."
+            elif "context canceled" in str(e).lower():
+                return "AI request was canceled. Please try again."
+            else:
+                return f"AI assistant error: {str(e)}"
             return ""
     
     def suggest_character_arc(self, character_name: str, character_description: str, screenplay_context: str) -> str:

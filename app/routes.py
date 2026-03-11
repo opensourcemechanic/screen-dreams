@@ -327,7 +327,16 @@ def api_ai_enhance_dialogue():
 @login_required
 def api_ai_status():
     """Check if AI assistant is available"""
-    return jsonify({'available': ai_assistant.is_available()})
+    available = ai_assistant.is_available()
+    model_available = ai_assistant.check_model() if available else False
+    
+    return jsonify({
+        'available': available,
+        'model_available': model_available,
+        'model': ai_assistant.model,
+        'base_url': ai_assistant.base_url,
+        'timeout': ai_assistant.timeout
+    })
 
 @main.route('/api/config', methods=['GET'])
 @login_required

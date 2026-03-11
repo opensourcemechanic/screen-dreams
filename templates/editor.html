@@ -217,11 +217,25 @@ async function checkAIStatus() {
         const result = await response.json();
         const statusEl = document.getElementById('ai-status');
         if (statusEl) {
-            statusEl.textContent = result.available ? '🤖 AI Ready' : '🤖 AI Offline';
-            statusEl.className = result.available ? 'ai-status ai-online' : 'ai-status ai-offline';
+            if (result.available && result.model_available) {
+                statusEl.textContent = '🤖 AI Ready';
+                statusEl.className = 'ai-status ai-online';
+            } else if (result.available && !result.model_available) {
+                statusEl.textContent = '🤖 Model Missing';
+                statusEl.className = 'ai-status ai-warning';
+            } else {
+                statusEl.textContent = '🤖 AI Offline';
+                statusEl.className = 'ai-status ai-offline';
+            }
+            console.log('AI Status:', result);
         }
     } catch (error) {
         console.error('Error checking AI status:', error);
+        const statusEl = document.getElementById('ai-status');
+        if (statusEl) {
+            statusEl.textContent = '🤖 AI Error';
+            statusEl.className = 'ai-status ai-offline';
+        }
     }
 }
 
@@ -244,6 +258,12 @@ setInterval(checkAIStatus, 30000); // Check every 30 seconds
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
+}
+
+.ai-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
 }
 
 .ai-offline {
