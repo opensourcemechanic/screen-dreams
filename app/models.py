@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=True)  # Make optional for now
     password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
@@ -33,7 +33,13 @@ class User(db.Model, UserMixin):
     screenplays = db.relationship('Screenplay', backref='author', lazy=True, cascade='all, delete-orphan')
     
     def __str__(self):
-        return self.username
+        return self.username or self.email.split('@')[0]
+    
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.email and not self.username:
+            # Auto-generate username from email
+            self.username = self.email.split('@')[0]
 
 # Association table for user-role many-to-many relationship
 user_roles = db.Table('user_roles',

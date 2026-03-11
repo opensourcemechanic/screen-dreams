@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Test</title>
+</head>
+<body>
+    <h1>Minimal Registration Test</h1>
+    
+    <form action="/register" method="POST">
+        <div>
+            <label>Email:</label>
+            <input type="text" name="email" value="test@example.com">
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="text" name="password" value="password123">
+        </div>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        // Prevent any form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Submit via fetch to bypass browser validation
+            fetch('/register', {
+                method: 'POST',
+                body: formData,
+                redirect: 'follow'
+            })
+            .then(response => {
+                document.getElementById('result').innerHTML = 
+                    '<h3>Response received!</h3><p>Status: ' + response.status + '</p>';
+                
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = 
+                    '<h3>Error:</h3><p>' + error + '</p>';
+            });
+        });
+    </script>
+</body>
+</html>

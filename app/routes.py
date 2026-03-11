@@ -13,6 +13,38 @@ parser = FountainParser()
 pdf_generator = ScreenplayPDFGenerator()
 ai_assistant = OllamaAssistant()
 
+# Debug route to check users
+@main.route('/debug/users')
+def debug_users():
+    from app.models import User
+    users = User.query.all()
+    user_list = []
+    for user in users:
+        user_list.append({
+            'email': user.email,
+            'username': user.username,
+            'active': user.active,
+            'confirmed_at': str(user.confirmed_at) if user.confirmed_at else None
+        })
+    return jsonify({'users': user_list, 'count': len(user_list)})
+
+# Debug route to test form submission
+@main.route('/debug/register-test', methods=['POST'])
+def debug_register_test():
+    return jsonify({
+        'status': 'success',
+        'message': 'Form submission received',
+        'data': request.form.to_dict()
+    })
+
+# Test registration page
+@main.route('/debug/test-register')
+def test_register():
+    from flask import current_app
+    from flask_security.forms import RegisterForm
+    form = RegisterForm()
+    return render_template('test_register.html', register_user_form=form)
+
 # Main application routes
 @main.route('/')
 @login_required
