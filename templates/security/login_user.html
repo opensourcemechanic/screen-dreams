@@ -20,18 +20,6 @@
         <form method="POST">
             {{ login_user_form.hidden_tag() }}
             
-            {% if login_user_form.email.errors %}
-                {% for error in login_user_form.email.errors %}
-                    <div class="alert alert-error">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-            
-            {% if login_user_form.password.errors %}
-                {% for error in login_user_form.password.errors %}
-                    <div class="alert alert-error">{{ error }}</div>
-                {% endfor %}
-            {% endif %}
-            
             <div class="form-group">
                 <label for="email">Email:</label>
                 {{ login_user_form.email(class="form-control", required=true, autofocus=true) }}
@@ -46,7 +34,7 @@
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Login</button>
-                <a href="{{ url_for('security.register') }}" class="btn btn-secondary">Create Account</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Create Account</a>
             </div>
         </form>
         
@@ -77,6 +65,41 @@
     text-align: center;
     margin-bottom: 1.5rem;
     color: #2c3e50;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.form-check-input {
+    margin-right: 0.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
 }
 
 .alert {
@@ -114,6 +137,7 @@
 .demo-info h3 {
     margin-bottom: 0.5rem;
     color: #2c3e50;
+    font-size: 1rem;
 }
 
 .demo-credentials {
@@ -122,10 +146,6 @@
     padding: 0.5rem;
     border-radius: 4px;
     margin-top: 0.5rem;
-}
-
-.form-check-input {
-    margin-right: 0.5rem;
 }
 </style>
 {% endblock %}

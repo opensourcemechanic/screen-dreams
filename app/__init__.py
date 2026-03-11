@@ -22,7 +22,7 @@ def create_app():
     app.config['AUTO_SAVE_INTERVAL'] = int(os.environ.get('AUTO_SAVE_INTERVAL', '15'))  # Default 15 seconds
     
     # Flask-Security-Too configuration
-    app.config['SECURITY_REGISTERABLE'] = True
+    app.config['SECURITY_REGISTERABLE'] = False  # Disable Flask-Security registration, use custom
     app.config['SECURITY_SEND_REGISTER_EMAIL'] = False  # Disable email confirmation for now
     app.config['SECURITY_CONFIRMABLE'] = False  # Disable confirmation entirely
     app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT', 'super-secret-salt-change-in-production')
@@ -53,9 +53,9 @@ def create_app():
     
     # Register blueprints
     from app.routes import main
-    from app.simple_auth_working import simple_auth
+    from app.auth import auth
     app.register_blueprint(main)
-    app.register_blueprint(simple_auth)
+    app.register_blueprint(auth)
     
     # Create database tables and demo user/role
     with app.app_context():
