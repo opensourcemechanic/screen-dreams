@@ -1,6 +1,6 @@
 # Development Setup
 
-This guide explains how to set up the Awen Screenplay Editor using virtual environments for clean, reproducible development.
+This guide explains how to set up the Screen Dreams Screenwriter using virtual environments for clean, reproducible development.
 
 ## Prerequisites
 
@@ -17,8 +17,8 @@ Or follow the official uv installation guide: https://docs.astral.sh/uv/getting-
 ### Quick Setup with uv
 ```bash
 # Clone the repository
-git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
-cd awen-screenplay-editor
+git clone https://github.com/opensourcemechanic/screen-dreams.git
+cd screen-dreams
 
 # Create virtual environment and install dependencies
 uv venv
@@ -41,8 +41,8 @@ uv pip install -e .
 ### Quick Setup with Python venv
 ```bash
 # Clone the repository
-git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
-cd awen-screenplay-editor
+git clone https://github.com/opensourcemechanic/screen-dreams.git
+cd screen-dreams
 
 # Create virtual environment
 python3 -m venv .venv

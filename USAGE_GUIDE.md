@@ -1,4 +1,4 @@
-# Awen Screenplay Editor - Usage Guide
+# Screen Dreams Screenwriter - Usage Guide
 
 ## Getting Started
 
@@ -12,7 +12,7 @@ The application will be available at http://localhost:5000
 
 ### 2. Login
 
-The Awen Screenplay Editor requires authentication to protect your screenplays. You can:
+The Screen Dreams Screenwriter requires authentication to protect your screenplays. You can:
 
 - **Use the demo account**: Username `demo`, Password `demo123`
 - **Create a new account**: Click "Create Account" to register

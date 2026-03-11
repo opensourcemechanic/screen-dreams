@@ -18,7 +18,7 @@ def create_app():
     
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///screenwriter.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///screen_dreams.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SCREENPLAY_FOLDER'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'screenplays')
     app.config['AUTO_SAVE_INTERVAL'] = int(os.environ.get('AUTO_SAVE_INTERVAL', '15'))  # Default 15 seconds

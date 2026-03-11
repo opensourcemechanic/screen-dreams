@@ -1,4 +1,4 @@
-# Awen Screenplay Editor - Deployment Guide
+# Screen Dreams Screenwriter - Deployment Guide
 
 ## Local Development Deployment
 

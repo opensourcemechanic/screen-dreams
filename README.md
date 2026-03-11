@@ -1,6 +1,6 @@
-# Awen Screenplay Editor
+# Screen Dreams Screenwriter
 
-A simplified Python-based screenplay editor with Fountain format support and professional PDF output.
+A simplified Python-based screenplay editor with Fountain format support, professional PDF output, and enhanced backup management.
 
 ## Features
 
