@@ -81,18 +81,47 @@ ollama run llama2
 
 ## Quick Start
 
-1. Start the application:
+### Production Mode (Default - Debug Disabled)
 ```bash
+# Start the application (debug disabled for better performance)
+python3 run.py
+
+# Or use the quick start script
+./start.sh prod
+```
+
+### Development Mode (Debug Enabled)
+```bash
+# For active development with debugging
+python3 run_dev.py
+
+# Or use the quick start script
+./start.sh dev
+
+# Or enable debug via environment variable
+export FLASK_DEBUG=True
 python3 run.py
 ```
 
-2. Open your browser to `http://localhost:5000`
-
-3. Login with the demo account:
+### Access the Application
+1. Open your browser to `http://localhost:5000`
+2. Login with the demo account:
    - Email: `demo@example.com`
    - Password: `demo123`
+3. Create your first screenplay!
 
-4. Create your first screenplay!
+### Debug Mode Features
+When debug mode is enabled (`FLASK_DEBUG=True`):
+- **Auto-reload**: Server restarts when code changes
+- **Interactive debugger**: Detailed error pages with console
+- **Performance impact**: ~50% slower response times
+- **Use for**: Active development and debugging
+
+### Performance Mode
+When debug mode is disabled (default):
+- **Better performance**: ~2x faster response times
+- **Lower memory usage**
+- **Use for**: Testing, demos, and production-like scenarios
 
 ## Fountain Format Quick Reference
 

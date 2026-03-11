@@ -22,9 +22,10 @@
                 <p>{{ character.arc_notes or 'No arc notes' }}</p>
                 {% if character.ai_arc_suggestion %}
                 <div class="ai-suggestion">
-                    <strong>AI Suggestion:</strong>
+                    <strong>Latest AI Suggestion:</strong>
                     <p>{{ character.ai_arc_suggestion }}</p>
                     <small class="ai-timestamp">Generated: {{ character.ai_suggestion_updated.strftime('%Y-%m-%d %H:%M') if character.ai_suggestion_updated else 'Unknown' }}</small>
+                    <button type="button" onclick="showAISuggestionHistory({{ character.id }})" class="btn btn-sm btn-secondary">View All Suggestions</button>
                 </div>
                 {% endif %}
             </div>
@@ -62,8 +63,13 @@
                     <div class="ai-actions">
                         <button type="button" onclick="acceptAISuggestion()" class="btn btn-success btn-sm">Accept</button>
                         <button type="button" onclick="generateNewSuggestion()" class="btn btn-secondary btn-sm">Generate New</button>
+                        <button type="button" onclick="showAISuggestionHistory(window.currentCharacter?.id)" class="btn btn-info btn-sm">View History</button>
                     </div>
                 </div>
+            </div>
+            <div class="ai-suggestions-history" id="ai-suggestions-history" style="display: none;">
+                <h4>AI Suggestions History</h4>
+                <div class="suggestions-list"></div>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -145,8 +151,70 @@ async function generateNewSuggestion() {
     }, 1000);
 }
 
+function showAISuggestionHistory(characterId) {
+    if (!characterId) return;
+    
+    const historyContainer = document.getElementById('ai-suggestions-history');
+    const suggestionsList = historyContainer.querySelector('.suggestions-list');
+    
+    // Get suggestions from localStorage
+    const key = `ai_suggestions_${characterId}`;
+    const stored = localStorage.getItem(key);
+    const suggestions = stored ? JSON.parse(stored) : [];
+    
+    if (suggestions.length === 0) {
+        suggestionsList.innerHTML = '<p>No AI suggestions history found.</p>';
+    } else {
+        suggestionsList.innerHTML = suggestions.map((suggestion, index) => `
+            <div class="ai-suggestion-entry">
+                <div class="ai-suggestion-timestamp">
+                    ${new Date(suggestion.timestamp).toLocaleString()}
+                </div>
+                <div class="ai-suggestion-text">${suggestion.text}</div>
+                <div class="ai-actions">
+                    <button type="button" onclick="acceptSuggestionFromHistory('${suggestion.text}')" class="btn btn-success btn-sm">Accept</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Show history container
+    historyContainer.style.display = 'block';
+    
+    // Scroll to history
+    historyContainer.scrollIntoView({ behavior: 'smooth' });
+}
+
+function acceptSuggestionFromHistory(suggestionText) {
+    const arcTextarea = document.getElementById('character-arc');
+    if (arcTextarea) {
+        arcTextarea.value = suggestionText.trim();
+    }
+}
+
+function saveAISuggestionToHistory(characterId, suggestionText) {
+    const key = `ai_suggestions_${characterId}`;
+    const stored = localStorage.getItem(key);
+    const suggestions = stored ? JSON.parse(stored) : [];
+    
+    // Add new suggestion at the beginning
+    suggestions.unshift({
+        text: suggestionText,
+        timestamp: new Date().toISOString()
+    });
+    
+    // Keep only the most recent 10 suggestions
+    if (suggestions.length > 10) {
+        suggestions.splice(10);
+    }
+    
+    localStorage.setItem(key, JSON.stringify(suggestions));
+}
+
 function closeModal() {
     document.getElementById('characterModal').style.display = 'none';
+    // Hide history container when closing modal
+    document.getElementById('ai-suggestions-history').style.display = 'none';
 }
 
 document.getElementById('characterForm').addEventListener('submit', async (e) => {
@@ -243,8 +311,12 @@ async function getArcSuggestion(characterId) {
         
         if (response.ok) {
             const result = await response.json();
+            const suggestionText = result.suggestion || 'AI assistant not available';
             const suggestionDiv = arcDiv.querySelector('.ai-suggestion');
-            suggestionDiv.querySelector('p').textContent = result.suggestion || 'AI assistant not available';
+            suggestionDiv.querySelector('p').textContent = suggestionText;
+            
+            // Save to history
+            saveAISuggestionToHistory(characterId, suggestionText);
             
             // Add timestamp
             const timestamp = document.createElement('small');
