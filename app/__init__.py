@@ -1,13 +1,15 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_security import Security, SQLAlchemyUserDatastore
+from flask_login import LoginManager
+from flask_principal import Principal, identity_loaded, UserNeed, RoleNeed
 from flask_mail import Mail
 import os
 from datetime import datetime
 
 db = SQLAlchemy()
 mail = Mail()
-security = Security()
+login_manager = LoginManager()
+principal = Principal()
 
 def create_app():
     app = Flask(__name__, 
@@ -21,19 +23,24 @@ def create_app():
     app.config['SCREENPLAY_FOLDER'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'screenplays')
     app.config['AUTO_SAVE_INTERVAL'] = int(os.environ.get('AUTO_SAVE_INTERVAL', '15'))  # Default 15 seconds
     
-    # Flask-Security-Too configuration
-    app.config['SECURITY_REGISTERABLE'] = False  # Disable Flask-Security registration, use custom
-    app.config['SECURITY_SEND_REGISTER_EMAIL'] = False  # Disable email confirmation for now
-    app.config['SECURITY_CONFIRMABLE'] = False  # Disable confirmation entirely
-    app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT', 'super-secret-salt-change-in-production')
-    app.config['SECURITY_PASSWORD_HASH'] = 'argon2'
-    app.config['SECURITY_PASSWORD_LENGTH_MIN'] = 1  # Temporarily set to 1 for testing
+    # Flask-Login configuration
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'info'
     
-    # Disable all password complexity validation temporarily
-    app.config['SECURITY_PASSWORD_COMPLEXITY'] = None
+    # Flask-Principal configuration
+    principal.init_app(app)
     
-    # Use email as the primary identity field
-    app.config['SECURITY_EMAIL_REQUIRED'] = True
+    # Identity loading
+    @identity_loaded.connect_via(app)
+    def on_identity_loaded(sender, identity):
+        from flask_login import current_user
+        if current_user.is_authenticated:
+            identity.provides.add(UserNeed(current_user.id))
+            # Add role needs
+            for role in current_user.roles:
+                identity.provides.add(RoleNeed(role.name))
     
     # Email configuration (for future password reset functionality)
     app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'localhost')
@@ -46,10 +53,11 @@ def create_app():
     db.init_app(app)
     mail.init_app(app)
     
-    # Setup Flask-Security
-    from app.models import User, Role
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security.init_app(app, user_datastore)
+    # Setup Flask-Login user loader
+    @login_manager.user_loader
+    def load_user(user_id):
+        from app.models import User
+        return User.query.get(int(user_id))
     
     # Register blueprints
     from app.routes import main
@@ -78,24 +86,19 @@ def create_demo_user():
     # Check if demo user exists
     demo_user = User.query.filter_by(email='demo@example.com').first()
     if not demo_user:
-        # Get user_datastore from the current app
-        from flask import current_app
-        user_datastore = current_app.extensions['security'].datastore
-        
-        demo_user = user_datastore.create_user(
+        demo_user = User(
             email='demo@example.com',
             username='demo',
-            password='demo123',
             active=True,
             confirmed_at=datetime.utcnow()
         )
-        user_datastore.add_role_to_user(demo_user, user_role)
+        demo_user.set_password('demo123')
+        demo_user.roles.append(user_role)
+        db.session.add(demo_user)
         db.session.commit()
         print("Demo user created: email='demo@example.com', username='demo', password='demo123'")
     else:
         # Ensure demo user has user role
         if user_role not in demo_user.roles:
-            from flask import current_app
-            user_datastore = current_app.extensions['security'].datastore
-            user_datastore.add_role_to_user(demo_user, user_role)
+            demo_user.roles.append(user_role)
             db.session.commit()

@@ -63,18 +63,27 @@ class OllamaAssistant:
     
     def suggest_character_arc(self, character_name: str, character_description: str, screenplay_context: str) -> str:
         """Suggest character arc development"""
+        # Limit context to prevent token overflow
+        context = screenplay_context[:2000] if screenplay_context else ""
+        
         prompt = f"""You are a professional screenplay consultant. Analyze the following character and suggest a compelling character arc.
 
 Character: {character_name}
 Description: {character_description}
 
 Context from screenplay:
-{screenplay_context[:1000]}
+{context}
 
 Provide a brief character arc suggestion (3-5 sentences) focusing on:
 1. Character's starting point
 2. Key transformation
 3. Final state
+
+Make the suggestion specific to the character and the story context. Consider:
+- The character's personality traits
+- Their current situation in the story
+- Potential conflicts they might face
+- How they can grow or change
 
 Suggestion:"""
         

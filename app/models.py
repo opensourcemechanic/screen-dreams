@@ -1,8 +1,8 @@
 from app import db
 from datetime import datetime
-from flask_security import UserMixin, RoleMixin
+from flask_login import UserMixin
 
-class Role(db.Model, RoleMixin):
+class Role(db.Model):
     __tablename__ = 'roles'
     
     id = db.Column(db.Integer(), primary_key=True)
@@ -17,16 +17,12 @@ class User(db.Model, UserMixin):
     
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    username = db.Column(db.String(80), unique=True, nullable=True)  # Make optional for now
-    password = db.Column(db.String(255), nullable=False)
-    active = db.Column(db.Boolean())
-    fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    active = db.Column(db.Boolean(), default=True)
     confirmed_at = db.Column(db.DateTime())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime())
-    current_login_at = db.Column(db.DateTime())
-    last_login_ip = db.Column(db.String(100))
-    current_login_ip = db.Column(db.String(100))
-    login_count = db.Column(db.Integer)
     
     # Relationships
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
@@ -35,11 +31,15 @@ class User(db.Model, UserMixin):
     def __str__(self):
         return self.username or self.email.split('@')[0]
     
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
-        if self.email and not self.username:
-            # Auto-generate username from email
-            self.username = self.email.split('@')[0]
+    def set_password(self, password):
+        """Set password hash"""
+        from werkzeug.security import generate_password_hash
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Check password against hash"""
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self.password_hash, password)
 
 # Association table for user-role many-to-many relationship
 user_roles = db.Table('user_roles',
@@ -89,6 +89,8 @@ class Character(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     arc_notes = db.Column(db.Text)
+    ai_arc_suggestion = db.Column(db.Text)  # Store AI suggestion for character arc
+    ai_suggestion_updated = db.Column(db.DateTime)  # When AI suggestion was last updated
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

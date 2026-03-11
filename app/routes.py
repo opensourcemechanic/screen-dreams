@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, send_file, current_app, redirect, url_for, flash
-from flask_security import login_required, current_user
+from flask_login import login_required, current_user
 from app import db
 from app.models import Screenplay, Scene, Character, User, ScreenplayChange
 from app.screenplay import FountainParser
@@ -284,11 +284,25 @@ def api_ai_character_arc():
         return jsonify({'error': 'AI assistant not available'}), 503
     
     data = request.json
+    character_id = data.get('character_id')
+    character_name = data.get('character_name')
+    character_description = data.get('character_description', '')
+    screenplay_context = data.get('screenplay_context', '')
+    
+    # Generate suggestion
     suggestion = ai_assistant.suggest_character_arc(
-        data.get('character_name'),
-        data.get('character_description', ''),
-        data.get('screenplay_context', '')
+        character_name,
+        character_description,
+        screenplay_context
     )
+    
+    # Save suggestion to database if character_id provided
+    if character_id:
+        character = Character.query.get(character_id)
+        if character and character.screenplay.user_id == current_user.id:
+            character.ai_arc_suggestion = suggestion
+            character.ai_suggestion_updated = datetime.utcnow()
+            db.session.commit()
     
     return jsonify({'suggestion': suggestion})
 

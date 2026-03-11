@@ -20,9 +20,9 @@
                             <span class="demo-badge">Demo</span>
                         {% endif %}
                     </div>
-                    <a href="{{ url_for('security.logout') }}" class="btn btn-secondary btn-sm">Logout</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Logout</a>
                 {% else %}
-                    <a href="{{ url_for('security.login') }}" class="btn btn-primary btn-sm">Login</a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">Login</a>
                     <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-sm">Create Account</a>
                 {% endif %}
             </div>
