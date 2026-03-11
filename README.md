@@ -14,14 +14,70 @@ A simplified Python-based screenplay editor with Fountain format support and pro
 
 ## Installation
 
-1. Install Python dependencies:
+### Option 1: Using uv (Recommended - Fast & Modern)
+
+For modern, fast dependency management:
+
 ```bash
-pip install -r requirements.txt
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone and setup
+git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
+cd awen-screenplay-editor
+
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e .
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your settings (SECRET_KEY is required)
 ```
 
-2. (Optional) Install Ollama for AI features:
-- Download from https://ollama.ai
-- Run: `ollama pull llama2`
+### Option 2: Using Python venv (Standard)
+
+Traditional setup using Python's built-in virtual environment:
+
+```bash
+# Clone and setup
+git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
+cd awen-screenplay-editor
+
+# Create virtual environment
+python3 -m venv .venv
+
+# Activate environment
+# Linux/macOS:
+source .venv/bin/activate
+# Windows:
+.venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your settings (SECRET_KEY is required)
+```
+
+See [SETUP.md](SETUP.md) for detailed setup instructions and troubleshooting.
+
+## Optional: AI Features Setup
+
+For AI assistant features, install Ollama:
+
+```bash
+# Install Ollama (https://ollama.ai)
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull a model
+ollama pull llama2
+
+# Start Ollama
+ollama run llama2
+```
 
 ## Quick Start
 
@@ -33,7 +89,7 @@ python3 run.py
 2. Open your browser to `http://localhost:5000`
 
 3. Login with the demo account:
-   - Username: `demo`
+   - Email: `demo@example.com`
    - Password: `demo123`
 
 4. Create your first screenplay!
