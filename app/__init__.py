@@ -62,8 +62,13 @@ def create_app():
     # Register blueprints
     from app.routes import main
     from app.auth import auth
+    
+    # Register import/export routes first
+    from app.import_export import register_import_export_routes
+    main = register_import_export_routes(main)
+    
     app.register_blueprint(main)
-    app.register_blueprint(auth)
+    app.register_blueprint(auth, url_prefix='/auth')
     
     # Create database tables and demo user/role
     with app.app_context():

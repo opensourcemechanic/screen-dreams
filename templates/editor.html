@@ -10,6 +10,20 @@
             <input type="text" id="screenplay-author" value="{{ screenplay.author or '' }}" placeholder="Author" class="author-input">
         </div>
         <div class="editor-actions">
+            <div class="import-export-controls">
+                <div class="export-dropdown">
+                    <button class="btn btn-export">Export ▼</button>
+                    <div class="export-menu" id="export-menu">
+                        <button class="export-menu-item" data-export="fountain" data-screenplay-id="{{ screenplay.id }}">Fountain (.fountain)</button>
+                        <button class="export-menu-item" data-export="plain_text" data-screenplay-id="{{ screenplay.id }}">Plain Text (.txt)</button>
+                        <button class="export-menu-item" data-export="final_draft" data-screenplay-id="{{ screenplay.id }}">Final Draft (.fdx)</button>
+                        <button class="export-menu-item" data-export="backup" data-screenplay-id="{{ screenplay.id }}">Backup (.json)</button>
+                    </div>
+                </div>
+                <button class="btn btn-import" data-import>Import</button>
+                <button class="btn btn-backup" data-backup data-screenplay-id="{{ screenplay.id }}">Backup</button>
+                <button class="btn btn-secondary" data-restore>Restore</button>
+            </div>
             <button onclick="saveScreenplay()" class="btn btn-primary">Save</button>
             <button onclick="parseScreenplay()" class="btn btn-secondary">Parse</button>
             <button onclick="downloadPDF()" class="btn btn-secondary">Export PDF</button>
@@ -89,6 +103,8 @@ FADE OUT.">{{ screenplay.content }}</textarea>
 {% endblock %}
 
 {% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/import-export.css') }}">
+<script src="{{ url_for('static', filename='js/import-export.js') }}"></script>
 <script>
 const screenplayId = {{ screenplay.id }};
 let autoSaveTimer = null;
@@ -243,6 +259,29 @@ async function checkAIStatus() {
 updateStats();
 checkAIStatus();
 setInterval(checkAIStatus, 30000); // Check every 30 seconds
+
+// Initialize import/export functionality
+setCurrentScreenplayForBackup(screenplayId);
+
+// Export dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const exportButton = document.querySelector('.btn-export');
+    const exportMenu = document.getElementById('export-menu');
+    
+    if (exportButton && exportMenu) {
+        exportButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            exportMenu.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!exportButton.contains(e.target) && !exportMenu.contains(e.target)) {
+                exportMenu.classList.remove('show');
+            }
+        });
+    }
+});
 </script>
 
 <style>

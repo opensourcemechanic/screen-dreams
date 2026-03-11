@@ -6,7 +6,11 @@
 <div class="container">
     <div class="header">
         <h1>Your Screenplays</h1>
-        <button onclick="createNewScreenplay()" class="btn btn-primary">New Screenplay</button>
+        <div class="header-actions">
+            <button onclick="createNewScreenplay()" class="btn btn-primary">New Screenplay</button>
+            <button class="btn btn-import" data-import>Import Screenplay</button>
+            <button class="btn btn-secondary" data-restore>Restore from Backup</button>
+        </div>
     </div>
     
     <div class="screenplay-list">
@@ -115,4 +119,37 @@ async function deleteScreenplay(screenplayId) {
     }
 }
 </script>
+
+<!-- Include import/export functionality -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/import-export.css') }}">
+<script src="{{ url_for('static', filename='js/import-export.js') }}"></script>
+
+<style>
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+    }
+}
+</style>
 {% endblock %}
