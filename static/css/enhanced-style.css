@@ -71,6 +71,24 @@
     --btn-success-hover: #006600;
 }
 
+/* Enhanced header styling for themes */
+.header h1 {
+    color: var(--text-primary) !important;
+    border-bottom: 2px solid var(--accent-color) !important;
+    padding-bottom: 0.5rem;
+}
+
+/* Brighter colors for dark themes */
+[data-theme="dark"] .header h1 {
+    color: #ffffff !important;
+    border-bottom-color: #58a6ff !important;
+}
+
+[data-theme="high-contrast"] .header h1 {
+    color: #ffffff !important;
+    border-bottom-color: #0000ff !important;
+}
+
 /* Base styles with variables - force application */
 * {
     margin: 0;

@@ -38,6 +38,60 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Button state styles */
+.btn.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.btn.success {
+    background-color: var(--btn-success-bg) !important;
+    color: white !important;
+    transition: background-color 0.3s ease;
+}
+
+.btn.error {
+    background-color: var(--btn-danger-bg) !important;
+    color: white !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Enhanced backup display */
+.backup-timestamp {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0.25rem 0;
+}
+
+.backup-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0;
+}
+
+.backup-versions {
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    font-weight: 500;
+    margin: 0.25rem 0;
+}
+
 /* Import/Export Buttons */
 .import-export-controls {
     display: flex;
@@ -70,11 +124,11 @@
 }
 
 .btn-import {
-    background-color: var(--btn-info-bg);
+    background-color: var(--btn-secondary-bg);
 }
 
 .btn-import:hover {
-    background-color: #138496;
+    background-color: var(--btn-secondary-hover);
 }
 
 .btn-backup {

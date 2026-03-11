@@ -309,10 +309,23 @@ def register_import_export_routes(blueprint):
         try:
             backup_data = ImportExportManager.create_backup_package(screenplay)
             
-            # Save backup to localStorage via client (handled in frontend)
+            # Check if content has changed since last backup
+            # Simple hash-based change detection
+            import hashlib
+            content_hash = hashlib.sha256(screenplay.content.encode('utf-8')).hexdigest()
+            
+            # Check last backup hash from localStorage (client-side)
+            # For now, we'll let the client handle this logic
+            # but we provide the hash for comparison
+            
+            # Add hash to backup data
+            backup_data['content_hash'] = content_hash
+            
+            # Return backup data with hash for client-side comparison
             return jsonify({
                 'success': True,
-                'backup': backup_data
+                'backup': backup_data,
+                'content_hash': content_hash
             })
             
         except Exception as e:
