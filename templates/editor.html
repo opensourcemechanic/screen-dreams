@@ -81,6 +81,7 @@ FADE OUT.">{{ screenplay.content }}</textarea>
                 <span id="word-count">Words: 0</span>
                 <span id="page-count">Pages: ~0</span>
                 <span class="save-status" id="save-status">Saved</span>
+                <span id="ai-status" class="ai-status ai-offline">🤖 AI Offline</span>
             </div>
         </div>
     </div>
@@ -229,4 +230,36 @@ updateStats();
 checkAIStatus();
 setInterval(checkAIStatus, 30000); // Check every 30 seconds
 </script>
+
+<style>
+.ai-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-left: 1rem;
+}
+
+.ai-online {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.ai-offline {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.editor-stats {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.875rem;
+    color: #666;
+}
+</style>
 {% endblock %}
