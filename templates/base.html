@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Awen Screenplay Editor{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-style.css') }}">
 </head>
 <body>
     <!-- Skip to content link for accessibility -->
@@ -73,6 +73,7 @@
         {% block content %}{% endblock %}
     </main>
     
+    <script src="{{ url_for('static', filename='js/simple-theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/enhanced-ui.js') }}"></script>
     <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
     {% block scripts %}{% endblock %}

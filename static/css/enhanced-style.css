@@ -71,7 +71,7 @@
     --btn-success-hover: #006600;
 }
 
-/* Base styles with variables */
+/* Base styles with variables - force application */
 * {
     margin: 0;
     padding: 0;
@@ -80,9 +80,20 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Force theme application on main elements */
+.main-content {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.container {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
 }
 
 /* Navbar styles */

@@ -359,5 +359,5 @@ def api_config():
     return jsonify({
         'auto_save_interval': current_app.config['AUTO_SAVE_INTERVAL'],
         'username': current_user.username,
-        'is_demo': current_user.is_demo
+        'is_demo': current_user.email == 'demo@example.com'
     })
