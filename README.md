@@ -23,8 +23,8 @@ For modern, fast dependency management:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone and setup
-git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
-cd awen-screenplay-editor
+git clone https://github.com/opensourcemechanic/screen-dreams.git
+cd screen-dreams
 # Note: The app is branded as "Screen Dreams Screenwriter" inside
 
 # Create virtual environment and install dependencies
