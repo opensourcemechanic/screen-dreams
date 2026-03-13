@@ -358,21 +358,33 @@ body {
 
 .ai-panel {
     background-color: var(--content-bg);
-    padding: 1rem;
+    padding: 0.75rem;
     border-radius: 4px;
     border: 1px solid var(--content-border);
+    margin-top: 1rem;
 }
 
 .ai-panel h3 {
     color: var(--text-primary) !important;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
 }
 
 #ai-suggestions {
-    margin-bottom: 1rem;
-    min-height: 100px;
-    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    min-height: 60px;
+    font-size: 0.8rem;
     color: var(--content-text);
+}
+
+.ai-panel .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.ai-panel .btn:last-child {
+    margin-bottom: 0;
 }
 
 .editor-main {

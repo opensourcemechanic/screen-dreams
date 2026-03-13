@@ -453,9 +453,13 @@ class ImportExportManager {
     showBackupSettingsDialog() {
         const modal = document.createElement('div');
         modal.className = 'modal';
+        
+        // Load saved max prompt length
+        const savedMaxPromptLength = localStorage.getItem('maxPromptLength') || '2000';
+        
         modal.innerHTML = `
             <div class="modal-content">
-                <h2>Backup Settings</h2>
+                <h2>Settings</h2>
                 <div class="backup-settings">
                     <div class="setting-group">
                         <label>
@@ -481,6 +485,11 @@ class ImportExportManager {
                             <option value="100" ${this.backupRetentionLimit === 100 ? 'selected' : ''}>100 backups</option>
                         </select>
                     </div>
+                    <div class="setting-group">
+                        <label for="max-prompt-length">Maximum prompt length (characters):</label>
+                        <input type="number" id="max-prompt-length" min="100" max="10000" step="100" value="${savedMaxPromptLength}">
+                        <small>Maximum number of characters to include in AI prompt context</small>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" id="settings-save" class="btn btn-primary">Save Settings</button>
@@ -501,15 +510,19 @@ class ImportExportManager {
             const enabled = modal.querySelector('#auto-backup-enabled').checked;
             const frequency = parseInt(modal.querySelector('#backup-frequency').value);
             const retention = parseInt(modal.querySelector('#backup-retention').value);
+            const maxPromptLength = parseInt(modal.querySelector('#max-prompt-length').value);
             
             this.autoBackupEnabled = enabled;
             this.backupFrequency = frequency;
             this.backupRetentionLimit = retention;
             
+            // Save max prompt length to localStorage
+            localStorage.setItem('maxPromptLength', maxPromptLength.toString());
+            
             this.saveBackupSettings();
             this.setupAutoBackup(); // Restart auto backup with new settings
             
-            this.showNotification('Backup settings saved', 'success');
+            this.showNotification('Settings saved', 'success');
             document.body.removeChild(modal);
         });
     }
