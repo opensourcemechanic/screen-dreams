@@ -30,7 +30,10 @@
                     <button class="btn btn-secondary" onclick="loadDefaultPrompt('character_arc')">Load Default</button>
                     <button class="btn btn-secondary" onclick="savePrompt('character_arc')">Save Custom</button>
                 </div>
-                <textarea id="character-arc-prompt" name="character_arc_prompt" placeholder="Enter custom prompt for character arc suggestions...">{{ config.character_arc_prompt or '' }}</textarea>
+                <div class="character-counter">
+                    <span id="character-arc-char-count">0</span> / <span id="max-chars-display">{{ config.max_characters or 2000 }}</span> characters
+                </div>
+                <textarea id="character-arc-prompt" name="character_arc_prompt" placeholder="Enter custom prompt for character arc suggestions..." oninput="updateCharCount('character-arc')">{{ config.character_arc_prompt or '' }}</textarea>
                 <div class="prompt-help">
                     <h4>Available Variables:</h4>
                     <ul>
@@ -47,7 +50,10 @@
                     <button class="btn btn-secondary" onclick="loadDefaultPrompt('plot_development')">Load Default</button>
                     <button class="btn btn-secondary" onclick="savePrompt('plot_development')">Save Custom</button>
                 </div>
-                <textarea id="plot-development-prompt" name="plot_development_prompt" placeholder="Enter custom prompt for plot development suggestions...">{{ config.plot_development_prompt or '' }}</textarea>
+                <div class="character-counter">
+                    <span id="plot-development-char-count">0</span> / <span id="max-chars-display">{{ config.max_characters or 2000 }}</span> characters
+                </div>
+                <textarea id="plot-development-prompt" name="plot_development_prompt" placeholder="Enter custom prompt for plot development suggestions..." oninput="updateCharCount('plot-development')">{{ config.plot_development_prompt or '' }}</textarea>
                 <div class="prompt-help">
                     <h4>Available Variables:</h4>
                     <ul>
@@ -64,7 +70,10 @@
                     <button class="btn btn-secondary" onclick="loadDefaultPrompt('dialogue_enhancement')">Load Default</button>
                     <button class="btn btn-secondary" onclick="savePrompt('dialogue_enhancement')">Save Custom</button>
                 </div>
-                <textarea id="dialogue-enhancement-prompt" name="dialogue_enhancement_prompt" placeholder="Enter custom prompt for dialogue enhancement...">{{ config.dialogue_enhancement_prompt or '' }}</textarea>
+                <div class="character-counter">
+                    <span id="dialogue-enhancement-char-count">0</span> / <span id="max-chars-display">{{ config.max_characters or 2000 }}</span> characters
+                </div>
+                <textarea id="dialogue-enhancement-prompt" name="dialogue_enhancement_prompt" placeholder="Enter custom prompt for dialogue enhancement..." oninput="updateCharCount('dialogue-enhancement')">{{ config.dialogue_enhancement_prompt or '' }}</textarea>
                 <div class="prompt-help">
                     <h4>Available Variables:</h4>
                     <ul>
@@ -155,25 +164,15 @@ Provide an improved version of the dialogue that is:
 Improved dialogue:`
 };
 
-function updateCharCount() {
-    const maxChars = document.getElementById('max-characters').value;
-    document.getElementById('max-chars-display').textContent = maxChars;
+function updateCharCount(promptType) {
+    const textarea = document.getElementById(`${promptType}-prompt`);
+    const counter = document.getElementById(`${promptType}-char-count`);
+    const maxChars = 2000; // Default since we removed the settings pane
     
-    // Update character count for active textarea
-    const activeTextarea = document.querySelector('.prompt-template textarea:focus') || 
-                          document.querySelector('#character-arc-prompt');
-    if (activeTextarea) {
-        updateTextareaCharCount(activeTextarea);
-    }
-}
-
-function updateTextareaCharCount(textarea) {
     const count = textarea.value.length;
-    document.getElementById('char-count').textContent = count;
+    counter.textContent = count;
     
     // Update color based on limit
-    const maxChars = parseInt(document.getElementById('max-characters').value);
-    const counter = document.getElementById('char-count');
     if (count > maxChars) {
         counter.style.color = '#e74c3c';
     } else if (count > maxChars * 0.8) {
@@ -186,7 +185,7 @@ function updateTextareaCharCount(textarea) {
 function loadDefaultPrompt(type) {
     const textarea = document.getElementById(`${type.replace('_', '-')}-prompt`);
     textarea.value = defaultPrompts[type];
-    updateTextareaCharCount(textarea);
+    updateCharCount(type.replace('_', '-'));
 }
 
 function savePrompt(type) {
@@ -194,19 +193,8 @@ function savePrompt(type) {
     console.log(`Saving ${type} prompt`);
 }
 
-function generatePreview() {
-    const type = document.getElementById('preview-type').value;
-    const textarea = document.getElementById(`${type.replace('_', '-')}-prompt`);
-    const previewText = document.getElementById('preview-text');
-    
-    // Simple preview - in real implementation, this would format with actual data
-    previewText.value = textarea.value;
-    updateTextareaCharCount(previewText);
-}
-
 function saveAllPrompts() {
     const data = {
-        max_characters: document.getElementById('max-characters').value,
         character_arc_prompt: document.getElementById('character-arc-prompt').value,
         plot_development_prompt: document.getElementById('plot-development-prompt').value,
         dialogue_enhancement_prompt: document.getElementById('dialogue-enhancement-prompt').value
@@ -236,55 +224,58 @@ function resetToDefaults() {
         loadDefaultPrompt('character_arc');
         loadDefaultPrompt('plot_development');
         loadDefaultPrompt('dialogue_enhancement');
-        document.getElementById('max-characters').value = 2000;
-        updateCharCount();
     }
 }
 
-// Event listeners
-document.getElementById('max-characters').addEventListener('input', updateCharCount);
-
-document.querySelectorAll('.prompt-template textarea').forEach(textarea => {
-    textarea.addEventListener('input', () => updateTextareaCharCount(textarea));
-    textarea.addEventListener('focus', () => updateTextareaCharCount(textarea));
+// Initialize character counts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCharCount('character-arc');
+    updateCharCount('plot-development');
+    updateCharCount('dialogue-enhancement');
 });
-
-// Initialize
-updateCharCount();
 </script>
 
 <style>
 .prompt-editor-container {
     display: grid;
-    grid-template-columns: 300px 1fr 350px;
+    grid-template-columns: 1fr;
     gap: 2rem;
     margin-top: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.prompt-settings,
-.prompt-template,
-.prompt-preview {
+.prompt-templates h2 {
+    color: var(--text-primary) !important;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.prompt-template {
     background: var(--content-bg);
     border: 1px solid var(--content-border);
     border-radius: 8px;
     padding: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-.prompt-settings h2,
-.prompt-template h3,
-.prompt-preview h2 {
+.prompt-template h3 {
     color: var(--text-primary) !important;
     margin-bottom: 1rem;
-}
-
-.prompt-template {
-    margin-bottom: 2rem;
 }
 
 .template-controls {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
+}
+
+.character-counter {
+    text-align: right;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary) !important;
 }
 
 .prompt-template textarea {
@@ -328,46 +319,6 @@ updateCharCount();
     color: var(--text-primary) !important;
 }
 
-.preview-controls {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    align-items: center;
-}
-
-.preview-controls select {
-    padding: 0.5rem;
-    border: 1px solid var(--content-border);
-    border-radius: 4px;
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary) !important;
-}
-
-.preview-controls select option {
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary) !important;
-}
-
-.character-counter {
-    text-align: right;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-    color: var(--text-secondary) !important;
-}
-
-.preview-content textarea {
-    width: 100%;
-    height: 300px;
-    padding: 0.75rem;
-    border: 1px solid var(--content-border);
-    border-radius: 4px;
-    background: var(--bg-secondary) !important;
-    color: var(--text-primary) !important;
-    font-family: 'Courier New', monospace;
-    font-size: 0.875rem;
-    resize: vertical;
-}
-
 .form-actions {
     display: flex;
     gap: 1rem;
@@ -377,28 +328,14 @@ updateCharCount();
     border-top: 1px solid var(--content-border);
 }
 
-@media (max-width: 1200px) {
-    .prompt-editor-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .prompt-settings {
-        order: -1;
-    }
-}
-
 @media (max-width: 768px) {
     .prompt-editor-container {
         gap: 1rem;
+        margin: 1rem;
     }
     
     .template-controls {
         flex-direction: column;
-    }
-    
-    .preview-controls {
-        flex-direction: column;
-        align-items: stretch;
     }
     
     .form-actions {

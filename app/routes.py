@@ -379,8 +379,7 @@ def prompt_editor(screenplay_id):
     if request.method == 'POST':
         data = request.get_json()
         
-        # Update config
-        config.max_characters = data.get('max_characters', 2000)
+        # Update config (max_characters stays at default 2000)
         config.character_arc_prompt = data.get('character_arc_prompt')
         config.plot_development_prompt = data.get('plot_development_prompt')
         config.dialogue_enhancement_prompt = data.get('dialogue_enhancement_prompt')
