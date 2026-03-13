@@ -16,18 +16,35 @@ A simplified Python-based screenplay editor with Fountain format support, profes
 
 ## Mobile Compatibility
 
-**Recommended**: Use horizontal orientation on mobile devices for the best experience.
+**⚠️ IMPORTANT: Horizontal Orientation Required**
 
-The application is responsive and works on mobile devices, but some features are optimized for horizontal orientation:
-- **Editor**: Syntax guide moves below text area in vertical mode
-- **Screenplay Cards**: Buttons stack vertically on narrow screens
-- **Scene Content**: Scrollable with optimized height for mobile
+**For the best experience, please use your phone in horizontal (landscape) orientation.**
+
+The application is designed primarily for desktop and horizontal mobile use. While some features work in vertical orientation, the editor and screenplay management interfaces are optimized for horizontal viewing.
+
+### What Works Best in Horizontal Mode:
+- ✅ **Editor**: Full screenplay text with syntax guide visible
+- ✅ **Screenplay Cards**: Proper button layout and spacing
+- ✅ **Scene Content**: Optimal scrolling and readability
+- ✅ **AI Panel**: Full functionality with prompt editing
+
+### Vertical Mode Limitations:
+- ⚠️ **Editor**: Syntax guide moves below text area (reduced functionality)
+- ⚠️ **Screenplay Cards**: Buttons stack vertically (less convenient)
+- ⚠️ **Scene Content**: Reduced scrolling height
+- ⚠️ **General Layout**: More scrolling required
 
 ### Mobile Browser Support
-- Chrome Mobile (Android)
+- Chrome Mobile (Android) - Recommended
 - Safari Mobile (iOS)
 - Firefox Mobile
 - Edge Mobile
+
+### Recommended Mobile Workflow:
+1. **Rotate phone to horizontal orientation**
+2. **Use desktop view if available** in browser settings
+3. **Enable auto-rotation** for best experience
+4. **Consider using tablet** for extended writing sessions
 
 ## Installation
 
