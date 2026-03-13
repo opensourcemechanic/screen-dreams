@@ -498,11 +498,150 @@ body {
     background-color: white;
     padding: 1rem;
     border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ecf0f1;
 }
 
 .scene-content pre {
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.875rem;
     white-space: pre-wrap;
+    word-wrap: break-word;
     color: #555;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .screenplay-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 1rem;
+    }
+    
+    .screenplay-info {
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .screenplay-actions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+    
+    .screenplay-actions .btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    /* Editor Mobile Layout */
+    .editor-layout {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .editor-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        order: 2;
+    }
+    
+    .editor-main {
+        order: 1;
+        min-height: 400px;
+    }
+    
+    .screenplay-textarea {
+        min-height: 300px;
+        font-size: 11pt;
+        padding: 1rem;
+    }
+    
+    .editor-stats {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .editor-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .editor-title {
+        text-align: center;
+    }
+    
+    .editor-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .import-export-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .export-dropdown {
+        width: 100%;
+    }
+    
+    .export-menu {
+        width: 100%;
+        max-width: none;
+    }
+    
+    /* Scenes and Characters Mobile */
+    .scenes-list,
+    .characters-grid {
+        gap: 0.75rem;
+    }
+    
+    .scene-card,
+    .character-card {
+        padding: 1rem;
+    }
+    
+    .scene-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .scene-details {
+        flex-direction: column;
+        gap: 0.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .scene-content {
+        max-height: 200px;
+    }
+    
+    .scene-content pre {
+        font-size: 0.8rem;
+    }
 }

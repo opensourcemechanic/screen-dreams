@@ -97,6 +97,24 @@ class Character(db.Model):
     def __repr__(self):
         return f'<Character {self.name}>'
 
+class PromptConfig(db.Model):
+    __tablename__ = 'prompt_config'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    max_characters = db.Column(db.Integer, default=2000)
+    character_arc_prompt = db.Column(db.Text)
+    plot_development_prompt = db.Column(db.Text)
+    dialogue_enhancement_prompt = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('prompt_config', lazy=True, uselist=False))
+    
+    def __repr__(self):
+        return f'<PromptConfig for User {self.user_id}>'
+
 class ScreenplayChange(db.Model):
     """Track changes for undo/redo functionality"""
     __tablename__ = 'screenplay_changes'

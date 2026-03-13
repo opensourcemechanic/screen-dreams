@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, send_file, current_app, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app import db
-from app.models import Screenplay, Scene, Character, User, ScreenplayChange
+from app.models import Screenplay, Scene, Character, User, ScreenplayChange, PromptConfig
 from app.screenplay import FountainParser
 from app.pdf_generator import ScreenplayPDFGenerator
 from app.ai_assistant import OllamaAssistant
@@ -361,3 +361,33 @@ def api_config():
         'username': current_user.username,
         'is_demo': current_user.email == 'demo@example.com'
     })
+
+@main.route('/screenplay/<int:screenplay_id>/prompt-editor', methods=['GET', 'POST'])
+@login_required
+def prompt_editor(screenplay_id):
+    """AI prompt editor page"""
+    # Get screenplay
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
+    
+    # Get or create prompt config
+    config = PromptConfig.query.filter_by(user_id=current_user.id).first()
+    if not config:
+        config = PromptConfig(user_id=current_user.id, max_characters=2000)
+        db.session.add(config)
+        db.session.commit()
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        
+        # Update config
+        config.max_characters = data.get('max_characters', 2000)
+        config.character_arc_prompt = data.get('character_arc_prompt')
+        config.plot_development_prompt = data.get('plot_development_prompt')
+        config.dialogue_enhancement_prompt = data.get('dialogue_enhancement_prompt')
+        config.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    
+    return render_template('prompt_editor.html', screenplay=screenplay, config=config)

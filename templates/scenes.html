@@ -25,7 +25,7 @@
                     <span class="scene-time">🕐 {{ scene.time_of_day }}</span>
                 </div>
                 <div class="scene-content">
-                    <pre>{{ scene.content[:200] }}{% if scene.content|length > 200 %}...{% endif %}</pre>
+                    <pre>{{ scene.content }}</pre>
                 </div>
             </div>
             {% endfor %}

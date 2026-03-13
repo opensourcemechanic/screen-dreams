@@ -96,7 +96,7 @@ class EnhancedUI {
     }
     
     toggleTheme() {
-        const themes = ['light', 'dark', 'high-contrast'];
+        const themes = ['light', 'dark', 'high-contrast', 'evening', 'night'];
         const currentIndex = themes.indexOf(this.currentTheme);
         const nextIndex = (currentIndex + 1) % themes.length;
         this.switchTheme(themes[nextIndex]);

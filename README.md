@@ -11,6 +11,23 @@ A simplified Python-based screenplay editor with Fountain format support, profes
 - **AI Assistant**: Ollama integration for character arc and plot suggestions
 - **Auto-save**: Automatic saving every 15 seconds (configurable)
 - **Industry Standard**: Follows screenplay formatting conventions
+- **Enhanced Theming**: 5 themes including evening (dark blue) and night (dark grey)
+- **Mobile Responsive**: Optimized for mobile devices with touch-friendly controls
+
+## Mobile Compatibility
+
+**Recommended**: Use horizontal orientation on mobile devices for the best experience.
+
+The application is responsive and works on mobile devices, but some features are optimized for horizontal orientation:
+- **Editor**: Syntax guide moves below text area in vertical mode
+- **Screenplay Cards**: Buttons stack vertically on narrow screens
+- **Scene Content**: Scrollable with optimized height for mobile
+
+### Mobile Browser Support
+- Chrome Mobile (Android)
+- Safari Mobile (iOS)
+- Firefox Mobile
+- Edge Mobile
 
 ## Installation
 

@@ -2,6 +2,9 @@ import requests
 import json
 import os
 from typing import List, Dict, Optional
+from app import db
+from flask_login import current_user
+from app.models import PromptConfig
 
 class OllamaAssistant:
     """AI assistant using Ollama for screenplay suggestions"""
@@ -30,6 +33,21 @@ class OllamaAssistant:
             return False
         except:
             return False
+    
+    def get_user_prompt_config(self) -> PromptConfig:
+        """Get or create user prompt configuration"""
+        if not current_user or not current_user.is_authenticated:
+            # Return default config for non-authenticated users
+            default_config = PromptConfig()
+            default_config.max_characters = 2000
+            return default_config
+        
+        config = PromptConfig.query.filter_by(user_id=current_user.id).first()
+        if not config:
+            config = PromptConfig(user_id=current_user.id, max_characters=2000)
+            db.session.add(config)
+            db.session.commit()
+        return config
     
     def generate(self, prompt: str, context: str = "") -> str:
         """Generate text using Ollama"""
@@ -63,10 +81,23 @@ class OllamaAssistant:
     
     def suggest_character_arc(self, character_name: str, character_description: str, screenplay_context: str) -> str:
         """Suggest character arc development"""
-        # Limit context to prevent token overflow
-        context = screenplay_context[:2000] if screenplay_context else ""
+        config = self.get_user_prompt_config()
+        max_chars = config.max_characters
         
-        prompt = f"""You are a professional screenplay consultant. Analyze the following character and suggest a compelling character arc.
+        # Use custom prompt if available, otherwise default
+        if config.character_arc_prompt:
+            custom_prompt = config.character_arc_prompt
+            context = screenplay_context[:max_chars] if screenplay_context else ""
+            prompt = custom_prompt.format(
+                character_name=character_name,
+                character_description=character_description,
+                context=context
+            )
+        else:
+            # Default prompt with configurable context limit
+            context = screenplay_context[:max_chars] if screenplay_context else ""
+            
+            prompt = f"""You are a professional screenplay consultant. Analyze the following character and suggest a compelling character arc.
 
 Character: {character_name}
 Description: {character_description}

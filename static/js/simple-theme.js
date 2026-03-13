@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', function(e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 't') {
             e.preventDefault();
-            const themes = ['light', 'dark', 'high-contrast'];
+            const themes = ['light', 'dark', 'high-contrast', 'evening', 'night'];
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
             const currentIndex = themes.indexOf(currentTheme);
             const nextTheme = themes[(currentIndex + 1) % themes.length];

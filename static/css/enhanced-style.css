@@ -14,6 +14,12 @@
     --border-color: #ddd;
     --shadow-color: rgba(0, 0, 0, 0.1);
     
+    /* Content-specific colors */
+    --content-bg: #ffffff;
+    --content-border: #ecf0f1;
+    --content-text: #555555;
+    --content-secondary: #7f8c8d;
+    
     /* Button colors */
     --btn-primary-bg: #3498db;
     --btn-primary-hover: #2980b9;
@@ -38,6 +44,12 @@
     --border-color: #404040;
     --shadow-color: rgba(0, 0, 0, 0.3);
     
+    /* Content-specific colors */
+    --content-bg: #2d2d2d;
+    --content-border: #404040;
+    --content-text: #e6e6e6;
+    --content-secondary: #b0b0b0;
+    
     --btn-primary-bg: #58a6ff;
     --btn-primary-hover: #4492f7;
     --btn-secondary-bg: #6e7681;
@@ -61,6 +73,12 @@
     --border-color: #000000;
     --shadow-color: rgba(0, 0, 0, 0.5);
     
+    /* Content-specific colors */
+    --content-bg: #ffffff;
+    --content-border: #000000;
+    --content-text: #000000;
+    --content-secondary: #333333;
+    
     --btn-primary-bg: #0000ff;
     --btn-primary-hover: #000080;
     --btn-secondary-bg: #666666;
@@ -69,6 +87,64 @@
     --btn-danger-hover: #cc0000;
     --btn-success-bg: #008000;
     --btn-success-hover: #006600;
+}
+
+/* Evening Theme */
+[data-theme="evening"] {
+    --bg-primary: #1a2332;
+    --bg-secondary: #2c3e50;
+    --bg-navbar: #34495e;
+    --text-primary: #e8e8e8;
+    --text-secondary: #b8c5d6;
+    --text-navbar: #ffffff;
+    --accent-color: #5dade2;
+    --accent-hover: #3498db;
+    --border-color: #4a5f7a;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    
+    /* Content-specific colors */
+    --content-bg: #34495e;
+    --content-border: #4a5f7a;
+    --content-text: #e8e8e8;
+    --content-secondary: #b8c5d6;
+    
+    --btn-primary-bg: #5dade2;
+    --btn-primary-hover: #3498db;
+    --btn-secondary-bg: #7f8c8d;
+    --btn-secondary-hover: #6c7a84;
+    --btn-danger-bg: #ec7063;
+    --btn-danger-hover: #e74c3c;
+    --btn-success-bg: #58d68d;
+    --btn-success-hover: #27ae60;
+}
+
+/* Night Theme */
+[data-theme="night"] {
+    --bg-primary: #2d2d2d;
+    --bg-secondary: #404040;
+    --bg-navbar: #4a4a4a;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --text-navbar: #ffffff;
+    --accent-color: #66b3ff;
+    --accent-hover: #4da6ff;
+    --border-color: #5a5a5a;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    
+    /* Content-specific colors */
+    --content-bg: #4a4a4a;
+    --content-border: #5a5a5a;
+    --content-text: #e0e0e0;
+    --content-secondary: #a0a0a0;
+    
+    --btn-primary-bg: #66b3ff;
+    --btn-primary-hover: #4da6ff;
+    --btn-secondary-bg: #6e7681;
+    --btn-secondary-hover: #5a6370;
+    --btn-danger-bg: #ff6b6b;
+    --btn-danger-hover: #ff5252;
+    --btn-success-bg: #51cf66;
+    --btn-success-hover: #40c057;
 }
 
 /* Enhanced header styling for themes */
@@ -381,6 +457,51 @@ body {
     border-color: var(--accent-color);
     outline: none;
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Content Cards Theming */
+.scene-card {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+    box-shadow: 0 2px 8px var(--shadow-color) !important;
+}
+
+.scene-content {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+}
+
+.scene-content pre {
+    color: var(--content-text) !important;
+}
+
+.scene-heading {
+    color: var(--text-primary) !important;
+}
+
+.scene-details {
+    color: var(--content-secondary) !important;
+}
+
+.character-card {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+    box-shadow: 0 2px 8px var(--shadow-color) !important;
+}
+
+.screenplay-card {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+    box-shadow: 0 2px 8px var(--shadow-color) !important;
+}
+
+.screenplay-info h3 {
+    color: var(--text-primary) !important;
+}
+
+.screenplay-info .author,
+.screenplay-info .meta {
+    color: var(--content-secondary) !important;
 }
 
 /* Checkbox improvements */
