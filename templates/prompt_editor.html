@@ -31,7 +31,7 @@
                     <button class="btn btn-secondary" onclick="savePrompt('character_arc')">Save Custom</button>
                 </div>
                 <div class="character-counter">
-                    <span id="character-arc-char-count">0</span> / <span id="max-chars-display">{{ config.max_characters or 2000 }}</span> characters
+                    <span id="character-arc-char-count">0</span> / 2000 characters
                 </div>
                 <textarea id="character-arc-prompt" name="character_arc_prompt" placeholder="Enter custom prompt for character arc suggestions..." oninput="updateCharCount('character-arc')">{{ config.character_arc_prompt or '' }}</textarea>
                 <div class="prompt-help">
@@ -51,7 +51,7 @@
                     <button class="btn btn-secondary" onclick="savePrompt('plot_development')">Save Custom</button>
                 </div>
                 <div class="character-counter">
-                    <span id="plot-development-char-count">0</span> / <span id="max-chars-display">{{ config.max_characters or 2000 }}</span> characters
+                    <span id="plot-development-char-count">0</span> / 2000 characters
                 </div>
                 <textarea id="plot-development-prompt" name="plot_development_prompt" placeholder="Enter custom prompt for plot development suggestions..." oninput="updateCharCount('plot-development')">{{ config.plot_development_prompt or '' }}</textarea>
                 <div class="prompt-help">
@@ -71,7 +71,7 @@
                     <button class="btn btn-secondary" onclick="savePrompt('dialogue_enhancement')">Save Custom</button>
                 </div>
                 <div class="character-counter">
-                    <span id="dialogue-enhancement-char-count">0</span> / <span id="max-chars-display">{{ config.max_characters or 2000 }}</span> characters
+                    <span id="dialogue-enhancement-char-count">0</span> / 2000 characters
                 </div>
                 <textarea id="dialogue-enhancement-prompt" name="dialogue_enhancement_prompt" placeholder="Enter custom prompt for dialogue enhancement..." oninput="updateCharCount('dialogue-enhancement')">{{ config.dialogue_enhancement_prompt or '' }}</textarea>
                 <div class="prompt-help">
@@ -82,24 +82,6 @@
                         <li><code>{context}</code> - Scene context (limited by max characters)</li>
                     </ul>
                 </div>
-            </div>
-        </div>
-        
-        <div class="prompt-preview">
-            <h2>Preview & Test</h2>
-            <div class="preview-controls">
-                <select id="preview-type">
-                    <option value="character_arc">Character Arc</option>
-                    <option value="plot_development">Plot Development</option>
-                    <option value="dialogue_enhancement">Dialogue Enhancement</option>
-                </select>
-                <button class="btn btn-primary" onclick="generatePreview()">Generate Preview</button>
-            </div>
-            <div class="character-counter">
-                <span id="char-count">0</span> / <span id="max-chars-display">{{ config.max_characters or 2000 }}</span> characters
-            </div>
-            <div class="preview-content">
-                <textarea id="preview-text" readonly placeholder="Preview will appear here..."></textarea>
             </div>
         </div>
     </div>
