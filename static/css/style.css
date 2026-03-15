@@ -164,34 +164,33 @@ body {
 }
 
 .screenplay-card {
-    border: 1px solid #ecf0f1;
+    border: 1px solid var(--content-border, #ecf0f1);
     border-radius: 8px;
     padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background-color: var(--content-bg, #ffffff);
+    box-shadow: 0 2px 4px var(--shadow-color, rgba(0,0,0,0.1));
     transition: box-shadow 0.2s;
 }
 
 .screenplay-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px var(--shadow-color, rgba(0,0,0,0.1));
 }
 
 .screenplay-info h3 {
     font-size: 1.25rem;
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    color: var(--text-primary, #2c3e50);
 }
 
 .screenplay-info .author {
-    color: #7f8c8d;
-    font-style: italic;
+    color: var(--content-secondary, #7f8c8d);
+    font-size: 0.875rem;
     margin-bottom: 0.25rem;
 }
 
 .screenplay-info .meta {
-    color: #95a5a6;
-    font-size: 0.875rem;
+    color: var(--content-secondary, #95a5a6);
+    font-size: 0.75rem;
 }
 
 .screenplay-actions {
@@ -432,25 +431,25 @@ body {
 }
 
 .character-card {
-    border: 1px solid #ecf0f1;
+    border: 1px solid var(--content-border, #ecf0f1);
     border-radius: 8px;
     padding: 1.5rem;
-    background-color: #f8f9fa;
+    background-color: var(--content-bg, #f8f9fa);
 }
 
 .character-card h3 {
-    color: #2c3e50;
+    color: var(--text-primary, #2c3e50);
     margin-bottom: 0.75rem;
 }
 
 .character-description {
-    color: #555;
+    color: var(--content-text, #555);
     margin-bottom: 1rem;
     font-size: 0.875rem;
 }
 
 .character-arc {
-    background-color: white;
+    background-color: var(--content-bg, white);
     padding: 1rem;
     border-radius: 4px;
     margin-bottom: 1rem;
@@ -459,12 +458,12 @@ body {
 .character-arc strong {
     display: block;
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    color: var(--text-primary, #2c3e50);
 }
 
 .character-arc p {
     font-size: 0.875rem;
-    color: #555;
+    color: var(--content-text, #555);
 }
 
 .character-actions {
@@ -479,10 +478,10 @@ body {
 }
 
 .scene-card {
-    border: 1px solid #ecf0f1;
+    border: 1px solid var(--content-border, #ecf0f1);
     border-radius: 8px;
     padding: 1.5rem;
-    background-color: #f8f9fa;
+    background-color: var(--content-bg, #f8f9fa);
 }
 
 .scene-header {
@@ -492,8 +491,8 @@ body {
 }
 
 .scene-number {
-    background-color: #3498db;
-    color: white;
+    background-color: var(--accent-color, #3498db);
+    color: var(--text-navbar, white);
     padding: 0.25rem 0.75rem;
     border-radius: 4px;
     font-weight: bold;
@@ -502,7 +501,7 @@ body {
 
 .scene-heading {
     font-weight: bold;
-    color: #2c3e50;
+    color: var(--text-primary, #2c3e50);
     font-family: 'Courier New', Courier, monospace;
 }
 
@@ -511,16 +510,16 @@ body {
     gap: 1.5rem;
     margin-bottom: 1rem;
     font-size: 0.875rem;
-    color: #7f8c8d;
+    color: var(--content-secondary, #7f8c8d);
 }
 
 .scene-content {
-    background-color: white;
+    background-color: var(--content-bg, white);
     padding: 1rem;
     border-radius: 4px;
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #ecf0f1;
+    border: 1px solid var(--content-border, #ecf0f1);
 }
 
 .scene-content pre {
@@ -528,7 +527,7 @@ body {
     font-size: 0.875rem;
     white-space: pre-wrap;
     word-wrap: break-word;
-    color: #555;
+    color: var(--content-text, #555);
     margin: 0;
     line-height: 1.4;
 }
@@ -658,7 +657,7 @@ body {
     }
     
     .scene-content {
-        max-height: 200px;
+        max-height: 250px;
     }
     
     .scene-content pre {
