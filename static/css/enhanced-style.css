@@ -36,8 +36,8 @@
     --bg-primary: #1a1a1a;
     --bg-secondary: #2d2d2d;
     --bg-navbar: #0d1117;
-    --text-primary: #e6e6e6;
-    --text-secondary: #b0b0b0;
+    --text-primary: #f0f0f0;
+    --text-secondary: #b8b8b8;
     --text-navbar: #ffffff;
     --accent-color: #58a6ff;
     --accent-hover: #4492f7;
@@ -47,8 +47,8 @@
     /* Content-specific colors */
     --content-bg: #2d2d2d;
     --content-border: #404040;
-    --content-text: #e6e6e6;
-    --content-secondary: #b0b0b0;
+    --content-text: #f0f0f0;
+    --content-secondary: #b8b8b8;
     
     --btn-primary-bg: #58a6ff;
     --btn-primary-hover: #4492f7;
@@ -123,8 +123,8 @@
     --bg-primary: #2d2d2d;
     --bg-secondary: #404040;
     --bg-navbar: #4a4a4a;
-    --text-primary: #e0e0e0;
-    --text-secondary: #a0a0a0;
+    --text-primary: #f0f0f0;
+    --text-secondary: #b8b8b8;
     --text-navbar: #ffffff;
     --accent-color: #66b3ff;
     --accent-hover: #4da6ff;
@@ -134,8 +134,8 @@
     /* Content-specific colors */
     --content-bg: #4a4a4a;
     --content-border: #5a5a5a;
-    --content-text: #e0e0e0;
-    --content-secondary: #a0a0a0;
+    --content-text: #f0f0f0;
+    --content-secondary: #b8b8b8;
     
     --btn-primary-bg: #66b3ff;
     --btn-primary-hover: #4da6ff;
@@ -531,7 +531,7 @@ body {
     overflow-y: auto;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: var(--bg-secondary);
+    background-color: var(--content-bg);
 }
 
 .ai-suggestion-entry {
@@ -545,13 +545,14 @@ body {
 
 .ai-suggestion-timestamp {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: var(--content-secondary);
     margin-bottom: 0.5rem;
 }
 
 .ai-suggestion-text {
     white-space: pre-wrap;
     line-height: 1.4;
+    color: var(--content-text);
 }
 
 /* Responsive design */
