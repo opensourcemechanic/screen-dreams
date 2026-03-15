@@ -10,3 +10,4 @@ python-dotenv==1.0.0
 Werkzeug==3.0.1
 argon2-cffi==23.1.0
 setuptools>=65.0.0
+gunicorn>=21.0.0

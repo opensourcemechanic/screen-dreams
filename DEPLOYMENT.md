@@ -104,17 +104,17 @@ timeout = 30
 keepalive = 2
 
 # Logging
-accesslog = "/var/log/screenplay-editor/access.log"
-errorlog = "/var/log/screenplay-editor/error.log"
+accesslog = "/var/log/screen-dreams/access.log"
+errorlog = "/var/log/screen-dreams/error.log"
 loglevel = "info"
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" %(D)s'
 
 # Process naming
-proc_name = "screenplay-editor"
+proc_name = "screen-dreams"
 
 # Server mechanics
 daemon = False
-pidfile = "/var/run/screenplay-editor/gunicorn.pid"
+pidfile = "/var/run/screen-dreams/gunicorn.pid"
 user = "www-data"
 group = "www-data"
 tmp_upload_dir = None
@@ -134,11 +134,11 @@ limit_request_field_size = 8190
 
 #### Linux (systemd)
 
-Create `/etc/systemd/system/screenplay-editor.service`:
+Create `/etc/systemd/system/screen-dreams.service`:
 
 ```ini
 [Unit]
-Description=Screenplay Editor Web Application
+Description=Screen Dreams Screenwriter Web Application
 After=network.target
 Wants=network.target
 
@@ -146,22 +146,19 @@ Wants=network.target
 Type=notify
 User=www-data
 Group=www-data
-WorkingDirectory=/opt/screenplay-editor
-Environment=PATH=/opt/screenplay-editor/venv/bin
-EnvironmentFile=/opt/screenplay-editor/.env
-ExecStart=/opt/screenplay-editor/venv/bin/gunicorn --config gunicorn.conf.py run:app
+WorkingDirectory=/opt/screen-dreams
+Environment=PATH=/opt/screen-dreams/venv/bin
+EnvironmentFile=/opt/screen-dreams/.env
+ExecStart=/opt/screen-dreams/venv/bin/gunicorn --config gunicorn.conf.py run:app
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=always
 RestartSec=5
-StartLimitInterval=60
-StartLimitBurst=3
 
 # Security
-NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/screenplay-editor /var/log/screenplay-editor /var/run/screenplay-editor
+ReadWritePaths=/opt/screen-dreams /var/log/screen-dreams /var/run/screen-dreams
 
 [Install]
 WantedBy=multi-user.target
@@ -169,18 +166,18 @@ WantedBy=multi-user.target
 
 ```bash
 # Create necessary directories and permissions
-sudo mkdir -p /opt/screenplay-editor
-sudo mkdir -p /var/log/screenplay-editor
-sudo mkdir -p /var/run/screenplay-editor
-sudo chown www-data:www-data /opt/screenplay-editor
-sudo chown www-data:www-data /var/log/screenplay-editor
-sudo chown www-data:www-data /var/run/screenplay-editor
+sudo mkdir -p /opt/screen-dreams
+sudo mkdir -p /var/log/screen-dreams
+sudo mkdir -p /var/run/screen-dreams
+sudo chown www-data:www-data /opt/screen-dreams
+sudo chown www-data:www-data /var/log/screen-dreams
+sudo chown www-data:www-data /var/run/screen-dreams
 
 # Enable and start service
 sudo systemctl daemon-reload
-sudo systemctl enable screenplay-editor
-sudo systemctl start screenplay-editor
-sudo systemctl status screenplay-editor
+sudo systemctl enable screen-dreams
+sudo systemctl start screen-dreams
+sudo systemctl status screen-dreams
 ```
 
 #### Windows (NSSM - Non-Sucking Service Manager)
@@ -191,21 +188,21 @@ sudo systemctl status screenplay-editor
 # Extract and add to PATH
 
 # Create service
-nssm install ScreenplayEditor "C:\opt\screenplay-editor\venv\Scripts\gunicorn.exe"
-nssm set ScreenplayEditor Arguments "--config gunicorn.conf.py run:app"
-nssm set ScreenplayEditor Directory "C:\opt\screenplay-editor"
-nssm set ScreenplayEditor DisplayName "Screenplay Editor"
-nssm set ScreenplayEditor Description "Screenplay Editor Web Application"
-nssm set ScreenplayEditor Start SERVICE_AUTO_START
-nssm set ScreenplayEditor AppEnvironmentExtra "PYTHONPATH=C:\opt\screenplay-editor"
+nssm install ScreenDreams "C:\opt\screen-dreams\venv\Scripts\gunicorn.exe"
+nssm set ScreenDreams Arguments "--config gunicorn.conf.py run:app"
+nssm set ScreenDreams Directory "C:\opt\screen-dreams"
+nssm set ScreenDreams DisplayName "Screen Dreams Screenwriter"
+nssm set ScreenDreams Description "Screen Dreams Screenwriter Web Application"
+nssm set ScreenDreams Start SERVICE_AUTO_START
+nssm set ScreenDreams AppEnvironmentExtra "PYTHONPATH=C:\opt\screen-dreams"
 
 # Start service
-nssm start ScreenplayEditor
+nssm start ScreenDreams
 ```
 
 #### macOS (launchd)
 
-Create `/Library/LaunchDaemons/com.screenplay.editor.plist`:
+Create `/Library/LaunchDaemons/com.screen.dreams.plist`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -213,24 +210,24 @@ Create `/Library/LaunchDaemons/com.screenplay.editor.plist`:
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.screenplay.editor</string>
+    <string>com.screen.dreams</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/opt/screenplay-editor/venv/bin/gunicorn</string>
+        <string>/opt/screen-dreams/venv/bin/gunicorn</string>
         <string>--config</string>
         <string>gunicorn.conf.py</string>
         <string>run:app</string>
     </array>
     <key>WorkingDirectory</key>
-    <string>/opt/screenplay-editor</string>
+    <string>/opt/screen-dreams</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/var/log/screenplay-editor/access.log</string>
+    <string>/var/log/screen-dreams/access.log</string>
     <key>StandardErrorPath</key>
-    <string>/var/log/screenplay-editor/error.log</string>
+    <string>/var/log/screen-dreams/error.log</string>
     <key>UserName</key>
     <string>www</string>
     <key>GroupName</key>
@@ -241,8 +238,8 @@ Create `/Library/LaunchDaemons/com.screenplay.editor.plist`:
 
 ```bash
 # Load and start service
-sudo launchctl load /Library/LaunchDaemons/com.screenplay.editor.plist
-sudo launchctl start com.screenplay.editor
+sudo launchctl load /Library/LaunchDaemons/com.screen.dreams.plist
+sudo launchctl start com.screen.dreams
 ```
 
 ### 4. Nginx Reverse Proxy
@@ -310,6 +307,38 @@ server {
     location /static {
         alias /opt/screenplay-editor/static;
         expires 1y;
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        
+        # Buffer settings
+        proxy_buffering on;
+        proxy_buffer_size 4k;
+        proxy_buffers 8 4k;
+    }
+    
+    # API rate limiting
+    location /api/ {
+        limit_req zone=api burst=20 nodelay;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # Static Files (served directly by Nginx)
+    location /static {
+        alias /opt/screen-dreams/static;
+        expires 1y;
         add_header Cache-Control "public, immutable";
         add_header X-Content-Type-Options nosniff;
         
@@ -323,34 +352,6 @@ server {
             expires 1y;
             add_header Cache-Control "public, immutable";
         }
-    }
-    
-    # Main Application (Proxy to Gunicorn)
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-Host $host;
-        proxy_set_header X-Forwarded-Port $server_port;
-        
-        # Timeouts
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-        
-        # Buffer sizes
-        proxy_buffering on;
-        proxy_buffer_size 4k;
-        proxy_buffers 8 4k;
-        proxy_busy_buffers_size 8k;
-        
-        # Headers
-        proxy_redirect off;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
     }
     
     # Health Check
@@ -372,7 +373,7 @@ server {
 
 Enable site:
 ```bash
-sudo ln -s /etc/nginx/sites-available/screenplay-editor /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/screen-dreams /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -393,29 +394,29 @@ sudo crontab -e
 
 ### 6. Production Environment Variables
 
-Create `/opt/screenplay-editor/.env`:
+Create `/opt/screen-dreams/.env`:
 
 ```bash
 # Flask Configuration
 FLASK_ENV=production
-FLASK_DEBUG=False
-SECRET_KEY=your-very-secure-secret-key-here-change-this-in-production
+SECRET_KEY=your-very-secure-secret-key-here
 
-# Database
-DATABASE_URL=sqlite:///screenwriter.db
+# Database Configuration
+# For SQLite: sqlite:///screenwriter.db
 # For PostgreSQL: postgresql://user:password@localhost/screenwriter
 
 # Application Settings
-SCREENPLAY_FOLDER=/opt/screenplay-editor/screenplays
+SCREENPLAY_FOLDER=/opt/screen-dreams/screenplays
 MAX_CONTENT_LENGTH=16777216  # 16MB max upload
 
 # AI Assistant (Ollama)
-OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama2
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_TIMEOUT=300
 
 # Logging
 LOG_LEVEL=INFO
-LOG_FILE=/var/log/screenplay-editor/app.log
+LOG_FILE=/var/log/screen-dreams/app.log
 
 # Security
 RATELIMIT_STORAGE_URL=redis://localhost:6379/1
@@ -469,17 +470,17 @@ def create_app(config_name=None):
     
     # Setup logging for production
     if app.config.get('ENV') == 'production':
-        if not os.path.exists('/var/log/screenplay-editor'):
-            os.makedirs('/var/log/screenplay-editor', exist_ok=True)
+        if not os.path.exists('/var/log/screen-dreams'):
+            os.makedirs('/var/log/screen-dreams', exist_ok=True)
         
-        file_handler = RotatingFileHandler('/var/log/screenplay-editor/app.log', maxBytes=10240000, backupCount=10)
+        file_handler = RotatingFileHandler('/var/log/screen-dreams/app.log', maxBytes=10240000, backupCount=10)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
         ))
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
         app.logger.setLevel(logging.INFO)
-        app.logger.info('Screenplay Editor startup')
+        app.logger.info('Screen Dreams Screenwriter startup')
     
     # Register blueprints
     from app.routes import main
@@ -517,15 +518,15 @@ def health_check():
 
 ### 9. Backup Strategy
 
-Create backup script `/opt/screenplay-editor/backup.sh`:
+Create backup script `/opt/screen-dreams/backup.sh`:
 
 ```bash
 #!/bin/bash
 
-BACKUP_DIR="/opt/backups/screenplay-editor"
+BACKUP_DIR="/opt/backups/screen-dreams"
 DATE=$(date +%Y%m%d_%H%M%S)
-DB_FILE="/opt/screenplay-editor/screenwriter.db"
-SCREENPLAYS_DIR="/opt/screenplay-editor/screenplays"
+DB_FILE="/opt/screen-dreams/screenwriter.db"
+SCREENPLAYS_DIR="/opt/screen-dreams/screenplays"
 
 # Create backup directory
 mkdir -p "$BACKUP_DIR"
@@ -549,7 +550,7 @@ Add to crontab:
 ```bash
 sudo crontab -e
 # Add line for daily backup at 2 AM
-0 2 * * * /opt/screenplay-editor/backup.sh >> /var/log/screenplay-editor/backup.log 2>&1
+0 2 * * * /opt/screen-dreams/backup.sh >> /var/log/screen-dreams/backup.log 2>&1
 ```
 
 ### 10. Scaling Considerations
@@ -565,7 +566,7 @@ For high-traffic deployments:
 
 Example Nginx upstream configuration:
 ```nginx
-upstream screenplay_backend {
+upstream screen_dreams_backend {
     server 127.0.0.1:8000;
     server 127.0.0.1:8001;
     server 127.0.0.1:8002;
