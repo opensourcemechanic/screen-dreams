@@ -6,32 +6,23 @@ from app import db
 from flask_login import current_user
 from app.models import PromptConfig
 
-class AIProvider:
-    """Base class for AI providers"""
+class OllamaAssistant:
+    """AI assistant using Ollama for screenplay suggestions"""
     
-    def __init__(self):
-        self.timeout = int(os.environ.get('AI_TIMEOUT', '300'))
-    
-    def is_available(self) -> bool:
-        raise NotImplementedError
-    
-    def generate_text(self, prompt: str) -> str:
-        raise NotImplementedError
-
-class OllamaProvider(AIProvider):
-    """Ollama AI provider with support for local and remote servers"""
-    
-    def __init__(self):
-        super().__init__()
+    def __init__(self, base_url: str = "http://localhost:11434"):
         # Support both HTTP and HTTPS
-        base_url = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
         if not base_url.startswith(('http://', 'https://')):
-            base_url = f"https://{base_url}"
-        self.base_url = base_url
+            if os.environ.get('FORCE_HTTPS', 'False').lower() == 'true':
+                base_url = f"https://{base_url}"
+            else:
+                base_url = f"http://{base_url}"
+        
+        self.base_url = os.environ.get('OLLAMA_BASE_URL', base_url)
         self.model = os.environ.get('OLLAMA_MODEL', 'llama2')
-        self.api_key = os.environ.get('OLLAMA_API_KEY', None)  # For authenticated servers
-        self.verify_ssl = os.environ.get('OLLAMA_VERIFY_SSL', 'true').lower() == 'true'
+        self.timeout = int(os.environ.get('OLLAMA_TIMEOUT', '300'))
         self.check_timeout = int(os.environ.get('OLLAMA_CHECK_TIMEOUT', '5'))
+        self.api_key = os.environ.get('OLLAMA_API_KEY', None)
+        self.verify_ssl = os.environ.get('OLLAMA_VERIFY_SSL', 'true').lower() == 'true'
     
     def _get_headers(self) -> Dict[str, str]:
         """Get headers for requests"""
@@ -71,14 +62,16 @@ class OllamaProvider(AIProvider):
             print(f"Ollama model check failed: {e}")
             return False
     
-    def generate_text(self, prompt: str) -> str:
+    def generate(self, prompt: str, context: str = "") -> str:
         """Generate text using Ollama"""
         try:
+            full_prompt = f"{context}\n\n{prompt}" if context else prompt
+            
             response = requests.post(
                 f"{self.base_url}/api/generate",
                 json={
                     "model": self.model,
-                    "prompt": prompt,
+                    "prompt": full_prompt,
                     "stream": False
                 },
                 timeout=self.timeout,
@@ -97,125 +90,6 @@ class OllamaProvider(AIProvider):
                 return "Cannot connect to Ollama. Please check the server configuration."
             else:
                 return f"AI assistant error: {str(e)}"
-
-class OpenAIProvider(AIProvider):
-    """OpenAI API provider"""
-    
-    def __init__(self):
-        super().__init__()
-        self.api_key = os.environ.get('OPENAI_API_KEY')
-        self.model = os.environ.get('OPENAI_MODEL', 'gpt-3.5-turbo')
-        self.base_url = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
-    
-    def is_available(self) -> bool:
-        """Check if OpenAI API is available"""
-        return bool(self.api_key)
-    
-    def generate_text(self, prompt: str) -> str:
-        """Generate text using OpenAI"""
-        if not self.api_key:
-            return "OpenAI API key not configured"
-        
-        try:
-            response = requests.post(
-                f"{self.base_url}/chat/completions",
-                json={
-                    "model": self.model,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "max_tokens": 1000
-                },
-                headers={
-                    'Authorization': f'Bearer {self.api_key}',
-                    'Content-Type': 'application/json'
-                },
-                timeout=self.timeout
-            )
-            
-            if response.status_code == 200:
-                return response.json()['choices'][0]['message']['content']
-            return f"OpenAI API Error: HTTP {response.status_code}"
-        except Exception as e:
-            return f"OpenAI API error: {str(e)}"
-
-class AnthropicProvider(AIProvider):
-    """Anthropic Claude API provider"""
-    
-    def __init__(self):
-        super().__init__()
-        self.api_key = os.environ.get('ANTHROPIC_API_KEY')
-        self.model = os.environ.get('ANTHROPIC_MODEL', 'claude-3-sonnet-20240229')
-        self.base_url = os.environ.get('ANTHROPIC_BASE_URL', 'https://api.anthropic.com/v1')
-    
-    def is_available(self) -> bool:
-        """Check if Anthropic API is available"""
-        return bool(self.api_key)
-    
-    def generate_text(self, prompt: str) -> str:
-        """Generate text using Anthropic Claude"""
-        if not self.api_key:
-            return "Anthropic API key not configured"
-        
-        try:
-            response = requests.post(
-                f"{self.base_url}/messages",
-                json={
-                    "model": self.model,
-                    "max_tokens": 1000,
-                    "messages": [{"role": "user", "content": prompt}]
-                },
-                headers={
-                    'x-api-key': self.api_key,
-                    'Content-Type': 'application/json',
-                    'anthropic-version': '2023-06-01'
-                },
-                timeout=self.timeout
-            )
-            
-            if response.status_code == 200:
-                return response.json()['content'][0]['text']
-            return f"Anthropic API Error: HTTP {response.status_code}"
-        except Exception as e:
-            return f"Anthropic API error: {str(e)}"
-
-class AIAssistant:
-    """Multi-provider AI assistant for screenplay suggestions"""
-    
-    def __init__(self):
-        self.providers = {
-            'ollama': OllamaProvider(),
-            'openai': OpenAIProvider(),
-            'anthropic': AnthropicProvider()
-        }
-        self.default_provider = os.environ.get('AI_PROVIDER', 'ollama')
-    
-    def get_provider(self) -> AIProvider:
-        """Get the configured AI provider"""
-        provider_name = self.default_provider.lower()
-        if provider_name in self.providers:
-            return self.providers[provider_name]
-        return self.providers['ollama']  # Fallback
-    
-    def is_available(self) -> bool:
-        """Check if the configured AI provider is available"""
-        return self.get_provider().is_available()
-    
-    def check_model(self) -> bool:
-        """Check if the model is available (Ollama-specific)"""
-        provider = self.get_provider()
-        if hasattr(provider, 'check_model'):
-            return provider.check_model()
-        return self.is_available()
-
-# Legacy compatibility
-class OllamaAssistant(AIAssistant):
-    """Legacy compatibility class"""
-    pass
-            if response.status_code == 200:
-                models = response.json().get('models', [])
-                return any(model.get('name', '').startswith(self.model) for model in models)
-            return False
-        except:
-            return False
     
     def get_user_prompt_config(self) -> PromptConfig:
         """Get or create user prompt configuration"""
@@ -231,36 +105,6 @@ class OllamaAssistant(AIAssistant):
             db.session.add(config)
             db.session.commit()
         return config
-    
-    def generate(self, prompt: str, context: str = "") -> str:
-        """Generate text using Ollama"""
-        try:
-            full_prompt = f"{context}\n\n{prompt}" if context else prompt
-            
-            response = requests.post(
-                f"{self.base_url}/api/generate",
-                json={
-                    "model": self.model,
-                    "prompt": full_prompt,
-                    "stream": False
-                },
-                timeout=self.timeout
-            )
-            
-            if response.status_code == 200:
-                return response.json().get('response', '')
-            return ""
-        except Exception as e:
-            print(f"Error generating with Ollama: {e}")
-            if "timed out" in str(e).lower():
-                return "AI assistant timed out. Please ensure Ollama is running and try again."
-            elif "connection refused" in str(e).lower():
-                return "Cannot connect to Ollama. Please start Ollama with 'ollama run'."
-            elif "context canceled" in str(e).lower():
-                return "AI request was canceled. Please try again."
-            else:
-                return f"AI assistant error: {str(e)}"
-            return ""
     
     def suggest_character_arc(self, character_name: str, character_description: str, screenplay_context: str) -> str:
         """Suggest character arc development"""
@@ -350,33 +194,34 @@ Improved dialogue:"""
 
 Text: {text}
 
-Errors (if any):"""
+Format your response as a JSON array of objects with 'line', 'error', and 'suggestion' fields.
+If no errors are found, return an empty array.
+
+Response:"""
         
-        result = self.generate(prompt)
-        
-        # Parse result into structured format
-        # For now, return as simple list
-        return [{"text": result}] if result else []
+        try:
+            response = self.generate(prompt)
+            # Try to parse as JSON, fallback to empty list
+            try:
+                return json.loads(response)
+            except:
+                return []
+        except:
+            return []
     
-    def autocomplete_character(self, partial_name: str, known_characters: List[str]) -> List[str]:
-        """Autocomplete character names"""
-        # Simple matching - could be enhanced with Ollama for fuzzy matching
-        matches = [char for char in known_characters if char.upper().startswith(partial_name.upper())]
-        return sorted(matches)
-    
-    def suggest_scene_heading(self, partial_text: str) -> List[str]:
-        """Suggest scene heading completions"""
+    def get_common_locations(self, partial_text: str = "") -> List[str]:
+        """Get common screenplay locations"""
         common_locations = [
             "INT. COFFEE SHOP - DAY",
+            "INT. APARTMENT - NIGHT", 
+            "EXT. CITY STREET - DAY",
             "INT. OFFICE - DAY",
-            "INT. APARTMENT - NIGHT",
-            "EXT. STREET - DAY",
             "EXT. PARK - DAY",
-            "INT. CAR - DAY",
             "INT. RESTAURANT - NIGHT",
-            "EXT. BUILDING - DAY",
-            "INT. BEDROOM - NIGHT",
-            "INT. KITCHEN - MORNING"
+            "EXT. BEACH - SUNSET",
+            "INT. CAR - DAY",
+            "INT. HOSPITAL ROOM - DAY",
+            "EXT. FOREST - DAY"
         ]
         
         if not partial_text:
