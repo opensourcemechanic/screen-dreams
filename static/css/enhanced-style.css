@@ -525,6 +525,44 @@ body {
     font-size: 0.95rem;
 }
 
+/* AI Suggestion Box */
+#ai-suggestion-group {
+    background-color: var(--content-bg);
+    border: 1px solid var(--content-border);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+#ai-suggestion-group label {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.ai-suggestion-box {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--content-border);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.ai-suggestion-box p {
+    margin: 0 0 1rem 0;
+    color: var(--content-text);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.ai-suggestion-box .ai-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
 /* AI Suggestions History */
 .ai-suggestions-history {
     max-height: 300px;
