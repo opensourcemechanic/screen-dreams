@@ -132,7 +132,160 @@ limit_request_field_size = 8190
 
 ### 3. Auto-Restart Services
 
-#### Linux (systemd)
+#### HTTPS Configuration
+
+### SSL Certificate Setup
+
+For production deployment, HTTPS is strongly recommended for security.
+
+#### Option 1: Let's Encrypt (Recommended)
+
+```bash
+# Run the SSL setup script
+sudo chmod +x /opt/screen-dreams/setup-ssl.sh
+sudo /opt/screen-dreams/setup-ssl.sh your-domain.com admin@your-domain.com
+```
+
+#### Option 2: Manual Let's Encrypt Setup
+
+```bash
+# Install Certbot
+sudo apt-get update
+sudo apt-get install certbot python3-certbot-nginx
+
+# Obtain certificate
+sudo certbot certonly --standalone -d your-domain.com -d www.your-domain.com
+
+# Copy and configure Nginx HTTPS config
+sudo cp /opt/screen-dreams/nginx-https.conf /etc/nginx/sites-available/screen-dreams-https
+sudo sed -i 's/your-domain.com/your-actual-domain.com/g' /etc/nginx/sites-available/screen-dreams-https
+
+# Enable HTTPS site
+sudo ln -sf /etc/nginx/sites-available/screen-dreams-https /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/screen-dreams
+
+# Test and reload
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+#### Option 3: Custom SSL Certificates
+
+If using custom SSL certificates, place them in `/etc/ssl/certs/` and update the nginx configuration:
+
+```nginx
+ssl_certificate /etc/ssl/certs/your-domain.crt;
+ssl_certificate_key /etc/ssl/private/your-domain.key;
+```
+
+### Environment Configuration for HTTPS
+
+Update your `.env` file:
+
+```bash
+# Copy example configuration
+cp /opt/screen-dreams/.env.example /opt/screen-dreams/.env
+
+# Edit configuration
+sudo nano /opt/screen-dreams/.env
+```
+
+Key HTTPS settings:
+```bash
+FORCE_HTTPS=True
+PREFERRED_URL_SCHEME=https
+SESSION_COOKIE_SECURE=True
+REMEMBER_COOKIE_SECURE=True
+```
+
+## AI Provider Configuration
+
+### Remote Ollama Server (HTTPS)
+
+For secure remote Ollama deployment:
+
+```bash
+# In .env file
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=https://your-ollama-server.com:11434
+OLLAMA_API_KEY=your-api-key-if-required
+OLLAMA_VERIFY_SSL=true
+OLLAMA_MODEL=llama2
+```
+
+### OpenAI Configuration
+
+```bash
+# In .env file
+AI_PROVIDER=openai
+OPENAI_API_KEY=your-openai-api-key
+OPENAI_MODEL=gpt-3.5-turbo
+```
+
+### Anthropic Claude Configuration
+
+```bash
+# In .env file
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=your-anthropic-api-key
+ANTHROPIC_MODEL=claude-3-sonnet-20240229
+```
+
+### Multiple AI Provider Setup
+
+You can configure multiple providers and switch between them:
+
+```bash
+# Primary provider
+AI_PROVIDER=ollama
+
+# Ollama configuration
+OLLAMA_BASE_URL=https://ollama.example.com:11434
+OLLAMA_API_KEY=ollama-key
+
+# OpenAI backup
+OPENAI_API_KEY=openai-key
+
+# Anthropic backup
+ANTHROPIC_API_KEY=anthropic-key
+```
+
+## Security Best Practices
+
+### Firewall Configuration
+
+```bash
+# Allow only necessary ports
+sudo ufw enable
+sudo ufw allow 22/tcp    # SSH
+sudo ufw allow 80/tcp    # HTTP (redirects to HTTPS)
+sudo ufw allow 443/tcp   # HTTPS
+```
+
+### SSL Security Headers
+
+The nginx configuration includes security headers:
+- `Strict-Transport-Security` - Force HTTPS
+- `X-Frame-Options` - Prevent clickjacking
+- `X-Content-Type-Options` - Prevent MIME sniffing
+- `Content-Security-Policy` - XSS protection
+
+### Rate Limiting
+
+Built-in rate limiting for:
+- Login attempts: 5 per minute
+- API calls: 10 per second
+- General requests: Configurable
+
+### File Permissions
+
+```bash
+# Secure file permissions
+sudo chown -R www-data:www-data /opt/screen-dreams
+sudo chmod -R 755 /opt/screen-dreams
+sudo chmod 600 /opt/screen-dreams/.env
+sudo chmod 600 /etc/ssl/private/*
+```
 
 Create `/etc/systemd/system/screen-dreams.service`:
 

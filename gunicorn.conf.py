@@ -38,3 +38,21 @@ preload_app = True
 limit_request_line = 4094
 limit_request_fields = 100
 limit_request_field_size = 8190
+
+# HTTPS Support (when behind reverse proxy)
+forwarded_allow_ips = "*"
+secure_scheme_headers = {
+    'X-FORWARDED-PROTOCOL': 'ssl',
+    'X-FORWARDED-PROTO': 'https',
+    'X-FORWARDED-SSL': 'on'
+}
+
+# Trust proxy headers for HTTPS
+proxy_protocol = False
+proxy_allow_ips = "127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+
+# Environment variables for Flask
+raw_env = [
+    'FORCE_HTTPS=True',
+    'PREFERRED_URL_SCHEME=https'
+]
