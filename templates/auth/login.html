@@ -57,15 +57,15 @@
     max-width: 500px;
     margin: 2rem auto;
     padding: 2rem;
-    background: white;
+    background: var(--content-bg, white);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px var(--shadow-color, rgba(0,0,0,0.1));
 }
 
 .auth-form h2 {
     text-align: center;
     margin-bottom: 1.5rem;
-    color: #2c3e50;
+    color: var(--text-primary, #2c3e50);
 }
 
 .form-group {
@@ -76,21 +76,23 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary, #333);
 }
 
 .form-control {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--content-border, #ddd);
     border-radius: 4px;
     font-size: 1rem;
+    background-color: var(--content-bg, white);
+    color: var(--content-text, #333);
 }
 
 .form-control:focus {
-    border-color: #3498db;
+    border-color: var(--accent-color, #3498db);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    box-shadow: 0 0 0 2px var(--accent-color, rgba(52, 152, 219, 0.2));
 }
 
 .form-actions {
@@ -126,23 +128,30 @@
 .demo-info {
     margin-top: 2rem;
     padding: 1rem;
-    background-color: #f8f9fa;
+    background-color: var(--content-bg, #f8f9fa);
     border-radius: 4px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--accent-color, #3498db);
 }
 
 .demo-info h3 {
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    color: var(--text-primary, #2c3e50);
     font-size: 1rem;
+}
+
+.demo-info p {
+    color: var(--content-text, #555);
+    margin-bottom: 0.5rem;
 }
 
 .demo-credentials {
     font-family: 'Courier New', monospace;
-    background-color: white;
+    background-color: var(--content-bg, white);
+    color: var(--content-text, #333);
     padding: 0.5rem;
     border-radius: 4px;
     margin-top: 0.5rem;
+    border: 1px solid var(--content-border, #ddd);
 }
 </style>
 {% endblock %}
