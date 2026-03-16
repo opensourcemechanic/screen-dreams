@@ -560,12 +560,66 @@ body {
     background-color: #081b2d;
 }
 
-/* High-contrast theme character card background adjustment */
+/* ========================================
+   COMPREHENSIVE CHARACTER PAGE THEMING
+   Ensures adequate contrast across all 5 themes
+   ======================================== */
+
+/* LIGHT THEME (Theme 1) - Default styling */
+[data-theme="light"] .character-card h3,
+:root .character-card h3 {
+    color: #2c3e50 !important;
+}
+
+[data-theme="light"] .character-card p,
+:root .character-card p {
+    color: #555555 !important;
+}
+
+[data-theme="light"] .character-arc strong,
+:root .character-arc strong {
+    color: #2c3e50 !important;
+}
+
+[data-theme="light"] .character-arc p,
+:root .character-arc p {
+    color: #555555 !important;
+}
+
+[data-theme="light"] .ai-suggestion-box p,
+[data-theme="light"] .ai-suggestion-text,
+:root .ai-suggestion-box p,
+:root .ai-suggestion-text {
+    color: #333333 !important;
+}
+
+/* DARK THEME (Theme 2) */
+[data-theme="dark"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .character-card p {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .character-arc strong {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .character-arc p {
+    color: #f0f0f0 !important;
+}
+
+[data-theme="dark"] .ai-suggestion-box p,
+[data-theme="dark"] .ai-suggestion-text {
+    color: #ffffff !important;
+}
+
+/* HIGH-CONTRAST THEME (Theme 3) */
 [data-theme="high-contrast"] .character-card {
     background-color: #2a2a2a !important;
 }
 
-/* High-contrast theme text enhancement for better visibility */
 [data-theme="high-contrast"] .character-card h3 {
     color: #ffffff !important;
 }
@@ -582,11 +636,56 @@ body {
     color: #444444 !important;
 }
 
-/* Night theme AI output text - make it much darker */
+[data-theme="high-contrast"] .ai-suggestion-box p,
+[data-theme="high-contrast"] .ai-suggestion-text {
+    color: #ffffff !important;
+}
+
+/* NIGHT THEME (Theme 4) */
+[data-theme="night"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="night"] .character-card p {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="night"] .character-arc strong {
+    color: #ffffff !important;
+}
+
+[data-theme="night"] .character-arc p {
+    color: #f0f0f0 !important;
+}
+
 [data-theme="night"] .ai-suggestion-box p,
 [data-theme="night"] .ai-suggestion-text {
     color: #0a0a0a !important;
 }
+
+/* EVENING THEME (Theme 5) */
+[data-theme="evening"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="evening"] .character-card p {
+    color: #e8e8e8 !important;
+}
+
+[data-theme="evening"] .character-arc strong {
+    color: #ffffff !important;
+}
+
+[data-theme="evening"] .character-arc p {
+    color: #e8e8e8 !important;
+}
+
+[data-theme="evening"] .ai-suggestion-box p,
+[data-theme="evening"] .ai-suggestion-text {
+    color: #ffffff !important;
+}
+
+/* ======================================== */
 
 .ai-suggestion-box {
     background-color: var(--bg-secondary);
