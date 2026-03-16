@@ -637,16 +637,16 @@ body {
 }
 
 [data-theme="high-contrast"] .ai-suggestion {
-    background-color: #0a0a0a !important;
+    background-color: #050a0f !important;
 }
 
 [data-theme="high-contrast"] .ai-suggestion-box {
-    background-color: #0a0a0a !important;
+    background-color: #050a0f !important;
 }
 
 [data-theme="high-contrast"] .ai-suggestion-box p,
 [data-theme="high-contrast"] .ai-suggestion-text {
-    color: #33ff33 !important;
+    color: #00ff00 !important;
 }
 
 /* NIGHT THEME (Theme 4) */
