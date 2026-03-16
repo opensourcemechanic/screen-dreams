@@ -619,6 +619,19 @@ body {
     color: #ffffff;
 }
 
+/* Character arc text styling for dark themes */
+[data-theme="dark"] .character-arc strong,
+[data-theme="night"] .character-arc strong,
+[data-theme="high-contrast"] .character-arc strong {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .character-arc p,
+[data-theme="night"] .character-arc p,
+[data-theme="high-contrast"] .character-arc p {
+    color: #f0f0f0;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .theme-switcher {
