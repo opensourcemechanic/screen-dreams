@@ -542,7 +542,7 @@ body {
 }
 
 .ai-suggestion-box {
-    background-color: var(--bg-primary);
+    background-color: var(--bg-secondary);
     border: 1px solid var(--content-border);
     border-radius: 4px;
     padding: 1rem;
@@ -582,7 +582,8 @@ body {
     overflow-y: auto;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background-color: var(--content-bg);
+    margin-bottom: 1rem;
+    background-color: var(--bg-secondary);
 }
 
 .ai-suggestion-entry {
