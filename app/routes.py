@@ -148,53 +148,64 @@ def api_screenplay(screenplay_id):
 @login_required
 def api_parse_screenplay(screenplay_id):
     """Parse screenplay and extract scenes/characters (user must own screenplay)"""
-    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
-    
-    # Format screenplay content with uppercase character names
-    formatted_content = parser.format_screenplay_content(screenplay.content)
-    
-    # Update screenplay content with formatted version
-    screenplay.content = formatted_content
-    
-    # Extract scenes
-    scenes_data = parser.extract_scenes(screenplay.content)
-    
-    # Clear existing scenes
-    Scene.query.filter_by(screenplay_id=screenplay_id).delete()
-    
-    # Add new scenes
-    for scene_data in scenes_data:
-        scene = Scene(
-            screenplay_id=screenplay_id,
-            scene_number=scene_data['scene_number'],
-            heading=scene_data['heading'],
-            location=scene_data['location'],
-            time_of_day=scene_data['time_of_day'],
-            content=scene_data['content'],
-            order=scene_data['scene_number']
-        )
-        db.session.add(scene)
-    
-    # Extract characters
-    character_names = parser.extract_characters(screenplay.content)
-    existing_characters = {c.name for c in screenplay.characters}
-    
-    # Add new characters
-    for name in character_names:
-        if name not in existing_characters:
-            character = Character(
+    try:
+        screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
+        
+        # Format screenplay content with uppercase character names
+        formatted_content = parser.format_screenplay_content(screenplay.content)
+        
+        # Update screenplay content with formatted version
+        screenplay.content = formatted_content
+        
+        # Extract scenes
+        scenes_data = parser.extract_scenes(screenplay.content)
+        
+        # Clear existing scenes
+        Scene.query.filter_by(screenplay_id=screenplay_id).delete()
+        
+        # Add new scenes
+        for scene_data in scenes_data:
+            scene = Scene(
                 screenplay_id=screenplay_id,
-                name=name
+                scene_number=scene_data['scene_number'],
+                heading=scene_data['heading'],
+                location=scene_data['location'],
+                time_of_day=scene_data['time_of_day'],
+                content=scene_data['content'],
+                order=scene_data['scene_number']
             )
-            db.session.add(character)
-    
-    db.session.commit()
-    
-    return jsonify({
-        'scenes': len(scenes_data),
-        'characters': len(character_names),
-        'content_updated': True
-    })
+            db.session.add(scene)
+        
+        # Extract characters
+        character_names = parser.extract_characters(screenplay.content)
+        existing_characters = {c.name for c in screenplay.characters}
+        
+        # Add new characters
+        for name in character_names:
+            if name not in existing_characters:
+                character = Character(
+                    screenplay_id=screenplay_id,
+                    name=name
+                )
+                db.session.add(character)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'scenes': len(scenes_data),
+            'characters': len(character_names),
+            'content_updated': True,
+            'success': True
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Error parsing screenplay {screenplay_id}: {str(e)}")
+        return jsonify({
+            'error': f'Failed to parse screenplay: {str(e)}',
+            'success': False,
+            'details': str(e)
+        }), 500
 
 @main.route('/api/screenplay/<int:screenplay_id>/pdf', methods=['GET'])
 @login_required
