@@ -551,15 +551,22 @@ body {
 
 .ai-suggestion-box p {
     margin: 0 0 1rem 0;
-    color: #f0f0f0;
+    color: #ffffff;
     font-size: 0.95rem;
     line-height: 1.5;
     white-space: pre-wrap;
 }
 
-/* Dark theme specific AI suggestion styling */
-[data-theme="dark"] .ai-suggestion-box p,
+/* Theme-specific AI suggestion text colors for maximum contrast */
+[data-theme="dark"] .ai-suggestion-box p {
+    color: #ffffff;
+}
+
 [data-theme="night"] .ai-suggestion-box p {
+    color: #ffffff;
+}
+
+[data-theme="high-contrast"] .ai-suggestion-box p {
     color: #ffffff;
 }
 
@@ -596,12 +603,19 @@ body {
 .ai-suggestion-text {
     white-space: pre-wrap;
     line-height: 1.4;
-    color: #f0f0f0;
+    color: #ffffff;
 }
 
-/* Dark theme specific AI suggestion history styling */
-[data-theme="dark"] .ai-suggestion-text,
+/* Theme-specific AI suggestion history text for maximum contrast */
+[data-theme="dark"] .ai-suggestion-text {
+    color: #ffffff;
+}
+
 [data-theme="night"] .ai-suggestion-text {
+    color: #ffffff;
+}
+
+[data-theme="high-contrast"] .ai-suggestion-text {
     color: #ffffff;
 }
 
