@@ -548,10 +548,21 @@ body {
 }
 
 /* Theme-specific AI suggestion background colors */
-[data-theme="dark"] .ai-suggestion,
-[data-theme="night"] .ai-suggestion,
+[data-theme="dark"] .ai-suggestion {
+    background-color: #081b2d;
+}
+
+[data-theme="night"] .ai-suggestion {
+    background-color: #041018;
+}
+
 [data-theme="high-contrast"] .ai-suggestion {
     background-color: #081b2d;
+}
+
+/* High-contrast theme character card background adjustment */
+[data-theme="high-contrast"] .character-card {
+    background-color: #2a2a2a !important;
 }
 
 .ai-suggestion-box {
