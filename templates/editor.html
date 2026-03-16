@@ -162,13 +162,39 @@ async function saveScreenplay(isAutoSave = false) {
         if (response.ok) {
             lastSavedContent = content;
             document.getElementById('save-status').textContent = isAutoSave ? 'Auto-saved' : 'Saved';
-            setTimeout(() => {
-                document.getElementById('save-status').textContent = 'Saved';
-            }, 2000);
+        } else {
+            document.getElementById('save-status').textContent = 'Error saving';
         }
     } catch (error) {
-        console.error('Error saving screenplay:', error);
         document.getElementById('save-status').textContent = 'Error saving';
+    }
+}
+
+async function loadScreenplay() {
+    try {
+        const response = await fetch(`/api/screenplay/${screenplayId}`);
+        
+        if (response.ok) {
+            const screenplay = await response.json();
+            
+            // Update form fields
+            document.getElementById('screenplay-title').value = screenplay.title;
+            document.getElementById('screenplay-author').value = screenplay.author || '';
+            document.getElementById('screenplay-content').value = screenplay.content;
+            
+            // Update last saved content
+            lastSavedContent = screenplay.content;
+            
+            // Update save status
+            document.getElementById('save-status').textContent = 'Loaded';
+            
+            // Update stats
+            updateStats();
+        } else {
+            document.getElementById('save-status').textContent = 'Error loading';
+        }
+    } catch (error) {
+        document.getElementById('save-status').textContent = 'Error loading';
     }
 }
 
