@@ -628,12 +628,16 @@ body {
     color: #e0e0e0 !important;
 }
 
+[data-theme="high-contrast"] .character-arc {
+    background-color: #1a1a1a !important;
+}
+
 [data-theme="high-contrast"] .character-arc strong {
-    color: #333333 !important;
+    color: #c4e138 !important;
 }
 
 [data-theme="high-contrast"] .character-arc p {
-    color: #444444 !important;
+    color: #c4e138 !important;
 }
 
 [data-theme="high-contrast"] .ai-suggestion {
@@ -646,9 +650,8 @@ body {
 
 [data-theme="high-contrast"] .ai-suggestion-box p,
 [data-theme="high-contrast"] .ai-suggestion-text {
-    color: #39ff14 !important;
+    color: #c4e138 !important;
     font-weight: 500 !important;
-    text-shadow: 0 0 8px #39ff14, 0 0 15px #39ff14, 0 0 20px #39ff14;
 }
 
 /* NIGHT THEME (Theme 4) */
