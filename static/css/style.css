@@ -462,12 +462,12 @@ body {
 .character-arc strong {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--text-primary, #2c3e50);
+    color: #610c0c;
 }
 
 .character-arc p {
     font-size: 0.875rem;
-    color: var(--content-text, #555);
+    color: #610c0c;
 }
 
 .character-actions {
