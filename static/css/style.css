@@ -218,7 +218,7 @@ body {
 }
 
 .modal-content {
-    background-color: white;
+    background-color: var(--content-bg, white);
     padding: 2rem;
     border-radius: 8px;
     max-width: 500px;
@@ -227,7 +227,7 @@ body {
 
 .modal-content h2 {
     margin-bottom: 1.5rem;
-    color: #2c3e50;
+    color: var(--text-primary, #2c3e50);
 }
 
 .form-group {

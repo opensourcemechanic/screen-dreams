@@ -442,13 +442,6 @@ body {
     color: var(--text-primary);
 }
 
-/* Dark theme specific form label styling for maximum contrast */
-[data-theme="dark"] .form-group label,
-[data-theme="night"] .form-group label,
-[data-theme="high-contrast"] .form-group label {
-    color: #ffffff;
-}
-
 .form-control {
     width: 100%;
     padding: 0.75rem;
