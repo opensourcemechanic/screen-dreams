@@ -636,9 +636,17 @@ body {
     color: #444444 !important;
 }
 
+[data-theme="high-contrast"] .ai-suggestion {
+    background-color: #0a0a0a !important;
+}
+
+[data-theme="high-contrast"] .ai-suggestion-box {
+    background-color: #0a0a0a !important;
+}
+
 [data-theme="high-contrast"] .ai-suggestion-box p,
 [data-theme="high-contrast"] .ai-suggestion-text {
-    color: #ffffff !important;
+    color: #33ff33 !important;
 }
 
 /* NIGHT THEME (Theme 4) */
@@ -660,7 +668,7 @@ body {
 
 [data-theme="night"] .ai-suggestion-box p,
 [data-theme="night"] .ai-suggestion-text {
-    color: #0a0a0a !important;
+    color: #1a4d1a !important;
 }
 
 /* EVENING THEME (Theme 5) */
