@@ -453,7 +453,7 @@ body {
 }
 
 .character-arc {
-    background-color: var(--content-bg, white);
+    background-color: var(--bg-primary, white);
     padding: 1rem;
     border-radius: 4px;
     margin-bottom: 1rem;
