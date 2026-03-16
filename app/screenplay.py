@@ -145,20 +145,36 @@ class FountainParser:
         return sorted(list(characters))
     
     def format_screenplay_content(self, text: str) -> str:
-        """Format screenplay content with uppercase character names for consistency"""
-        elements = self.parse(text)
+        """Format screenplay content with uppercase character names while preserving original formatting"""
+        lines = text.split('\n')
         formatted_lines = []
         
-        for element in elements:
-            elem_type = element['type']
-            content = element['content']
+        for i, line in enumerate(lines):
+            stripped_line = line.strip()
             
-            if elem_type == 'character':
-                # Ensure character names are uppercase
-                formatted_lines.append(content.upper())
+            # Check if this line is a character name using the same logic as the parser
+            # Character names must be followed by dialogue or parenthetical
+            is_character = False
+            if (self.character_pattern.match(stripped_line) and 
+                not self.scene_heading_pattern.match(stripped_line) and
+                not self.transition_pattern.match(stripped_line) and
+                not self.parenthetical_pattern.match(stripped_line)):
+                
+                # Check if next line exists and could be dialogue or parenthetical
+                if i + 1 < len(lines):
+                    next_line = lines[i + 1].strip()
+                    if (next_line.startswith('(') or 
+                        (next_line and not self.scene_heading_pattern.match(next_line) and
+                         not self.character_pattern.match(next_line))):
+                        is_character = True
+            
+            if is_character:
+                # This is a character name - convert to uppercase while preserving original whitespace
+                leading_whitespace = line[:len(line) - len(line.lstrip())]
+                formatted_lines.append(leading_whitespace + stripped_line.upper())
             else:
-                # Keep other elements as-is
-                formatted_lines.append(content)
+                # Keep all other lines exactly as-is (preserving spacing, indentation, etc.)
+                formatted_lines.append(line)
         
         return '\n'.join(formatted_lines)
     
