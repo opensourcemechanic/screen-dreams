@@ -574,15 +574,18 @@ body {
     color: #e0e0e0 !important;
 }
 
-[data-theme="high-contrast"] .character-arc strong,
+[data-theme="high-contrast"] .character-arc strong {
+    color: #333333 !important;
+}
+
 [data-theme="high-contrast"] .character-arc p {
-    color: #ffffff !important;
+    color: #444444 !important;
 }
 
 /* Night theme AI output text - make it much darker */
 [data-theme="night"] .ai-suggestion-box p,
 [data-theme="night"] .ai-suggestion-text {
-    color: #1a1a1a !important;
+    color: #0a0a0a !important;
 }
 
 .ai-suggestion-box {
