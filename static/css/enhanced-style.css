@@ -541,6 +541,19 @@ body {
     display: block;
 }
 
+.ai-suggestion {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--content-bg, white);
+}
+
+/* Theme-specific AI suggestion background colors */
+[data-theme="dark"] .ai-suggestion,
+[data-theme="night"] .ai-suggestion,
+[data-theme="high-contrast"] .ai-suggestion {
+    background-color: #081b2d;
+}
+
 .ai-suggestion-box {
     background-color: var(--bg-secondary);
     border: 1px solid var(--content-border);
