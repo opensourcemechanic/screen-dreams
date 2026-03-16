@@ -542,7 +542,7 @@ body {
 }
 
 .ai-suggestion-box {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-primary);
     border: 1px solid var(--content-border);
     border-radius: 4px;
     padding: 1rem;
@@ -551,10 +551,16 @@ body {
 
 .ai-suggestion-box p {
     margin: 0 0 1rem 0;
-    color: var(--content-text);
+    color: #f0f0f0;
     font-size: 0.95rem;
     line-height: 1.5;
     white-space: pre-wrap;
+}
+
+/* Dark theme specific AI suggestion styling */
+[data-theme="dark"] .ai-suggestion-box p,
+[data-theme="night"] .ai-suggestion-box p {
+    color: #ffffff;
 }
 
 .ai-suggestion-box .ai-actions {
@@ -590,7 +596,13 @@ body {
 .ai-suggestion-text {
     white-space: pre-wrap;
     line-height: 1.4;
-    color: var(--content-text);
+    color: #f0f0f0;
+}
+
+/* Dark theme specific AI suggestion history styling */
+[data-theme="dark"] .ai-suggestion-text,
+[data-theme="night"] .ai-suggestion-text {
+    color: #ffffff;
 }
 
 /* Responsive design */
