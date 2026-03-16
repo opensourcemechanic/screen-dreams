@@ -565,6 +565,26 @@ body {
     background-color: #2a2a2a !important;
 }
 
+/* High-contrast theme text enhancement for better visibility */
+[data-theme="high-contrast"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="high-contrast"] .character-card p {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="high-contrast"] .character-arc strong,
+[data-theme="high-contrast"] .character-arc p {
+    color: #ffffff !important;
+}
+
+/* Night theme AI output text - make it much darker */
+[data-theme="night"] .ai-suggestion-box p,
+[data-theme="night"] .ai-suggestion-text {
+    color: #1a1a1a !important;
+}
+
 .ai-suggestion-box {
     background-color: var(--bg-secondary);
     border: 1px solid var(--content-border);
