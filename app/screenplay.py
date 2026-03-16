@@ -6,7 +6,7 @@ class FountainParser:
     
     def __init__(self):
         self.scene_heading_pattern = re.compile(r'^(INT|EXT|EST|INT\./EXT|INT/EXT|I/E)[\.\s]', re.IGNORECASE)
-        self.character_pattern = re.compile(r'^[A-Z][A-Z\s]+$')
+        self.character_pattern = re.compile(r'^[A-Za-z][A-Za-z\s]+$')
         self.transition_pattern = re.compile(r'^(FADE IN:|FADE OUT\.|CUT TO:|DISSOLVE TO:)', re.IGNORECASE)
         self.parenthetical_pattern = re.compile(r'^\([^)]+\)$')
         
@@ -44,15 +44,18 @@ class FountainParser:
                 i += 1
                 continue
             
-            # Character name (all caps, followed by dialogue or parenthetical)
+            # Character name (case-insensitive detection, converted to uppercase for consistency)
             if (self.character_pattern.match(line) and 
                 i + 1 < len(lines) and 
                 (lines[i + 1].strip().startswith('(') or 
                  (lines[i + 1].strip() and not self.scene_heading_pattern.match(lines[i + 1])))):
                 
+                # Convert to uppercase for screenplay/fountain standard consistency
+                character_name = line.upper()
+                
                 elements.append({
                     'type': 'character',
-                    'content': line,
+                    'content': character_name,
                     'line': i
                 })
                 i += 1
@@ -127,7 +130,7 @@ class FountainParser:
         return scenes
     
     def extract_characters(self, text: str) -> List[str]:
-        """Extract unique character names from screenplay"""
+        """Extract unique character names from screenplay and convert to uppercase for consistency"""
         elements = self.parse(text)
         characters = set()
         
@@ -135,7 +138,9 @@ class FountainParser:
             if element['type'] == 'character':
                 # Remove (V.O.), (O.S.), etc.
                 name = re.sub(r'\s*\([^)]+\)\s*$', '', element['content'])
-                characters.add(name.strip())
+                # Convert to uppercase for screenplay/fountain standard consistency
+                name = name.strip().upper()
+                characters.add(name)
         
         return sorted(list(characters))
     
