@@ -150,6 +150,12 @@ def api_parse_screenplay(screenplay_id):
     """Parse screenplay and extract scenes/characters (user must own screenplay)"""
     screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
     
+    # Format screenplay content with uppercase character names
+    formatted_content = parser.format_screenplay_content(screenplay.content)
+    
+    # Update screenplay content with formatted version
+    screenplay.content = formatted_content
+    
     # Extract scenes
     scenes_data = parser.extract_scenes(screenplay.content)
     
@@ -186,7 +192,8 @@ def api_parse_screenplay(screenplay_id):
     
     return jsonify({
         'scenes': len(scenes_data),
-        'characters': len(character_names)
+        'characters': len(character_names),
+        'content_updated': True
     })
 
 @main.route('/api/screenplay/<int:screenplay_id>/pdf', methods=['GET'])

@@ -144,6 +144,24 @@ class FountainParser:
         
         return sorted(list(characters))
     
+    def format_screenplay_content(self, text: str) -> str:
+        """Format screenplay content with uppercase character names for consistency"""
+        elements = self.parse(text)
+        formatted_lines = []
+        
+        for element in elements:
+            elem_type = element['type']
+            content = element['content']
+            
+            if elem_type == 'character':
+                # Ensure character names are uppercase
+                formatted_lines.append(content.upper())
+            else:
+                # Keep other elements as-is
+                formatted_lines.append(content)
+        
+        return '\n'.join(formatted_lines)
+    
     def format_for_display(self, text: str) -> str:
         """Format Fountain text for HTML display"""
         elements = self.parse(text)
