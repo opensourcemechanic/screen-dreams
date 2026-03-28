@@ -26,9 +26,9 @@ class ScreenplayPDFGenerator:
     PARENTHETICAL_INDENT = 1.5
     TRANSITION_INDENT = 4.0
     
-    # Element widths
-    DIALOGUE_WIDTH = 3.5
-    PARENTHETICAL_WIDTH = 2.0
+    # Element widths (industry standard)
+    DIALOGUE_WIDTH = 4.0  # ~35-40 characters with Courier 12pt
+    PARENTHETICAL_WIDTH = 3.0
     
     def __init__(self):
         self.page_width, self.page_height = letter
@@ -183,7 +183,8 @@ class ScreenplayPDFGenerator:
             fontName='Courier',
             fontSize=12,
             alignment=TA_LEFT,
-            leftIndent=self.PARENTHETICAL_INDENT * inch
+            leftIndent=self.PARENTHETICAL_INDENT * inch,
+            rightIndent=(6.5 - self.PARENTHETICAL_INDENT - self.PARENTHETICAL_WIDTH) * inch
         )
         return Paragraph(text, style)
     
@@ -195,7 +196,7 @@ class ScreenplayPDFGenerator:
             fontSize=12,
             alignment=TA_LEFT,
             leftIndent=self.DIALOGUE_INDENT * inch,
-            rightIndent=(self.page_width / inch - self.RIGHT_MARGIN - self.DIALOGUE_INDENT - self.DIALOGUE_WIDTH) * inch
+            rightIndent=(6.5 - self.DIALOGUE_INDENT - self.DIALOGUE_WIDTH) * inch
         )
         return Paragraph(text, style)
     
