@@ -1,9 +1,9 @@
 #!/bin/bash
-# Docker deployment script for Screen Dreams
+# Simple Docker deployment script for Screen Dreams (WSL-compatible)
 
 set -e
 
-echo "=== Screen Dreams Docker Deployment ==="
+echo "=== Screen Dreams Docker Deployment (WSL Version) ==="
 echo
 
 # Colors for output
@@ -25,46 +25,27 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if Docker is installed
-print_status "Checking for Docker installation..."
-if ! which docker &> /dev/null; then
-    print_error "Docker is not installed. Please install Docker first."
-    print_error "Docker not found at: $(which docker 2>/dev/null || echo 'not found')"
-    print_error "Current PATH: $PATH"
+# Simple Docker detection - just try to use it
+print_status "Testing Docker availability..."
+if ! docker --version >/dev/null 2>&1; then
+    print_error "Docker is not available. Please ensure Docker is installed and running."
     exit 1
 fi
 
-print_status "Docker found at: $(which docker)"
+print_status "Docker is available: $(docker --version | head -1)"
 
-# Check if Docker is running
-print_status "Checking if Docker daemon is running..."
-if ! docker info &> /dev/null; then
-    print_error "Docker is not running. Please start Docker daemon."
-    print_error "Try running: sudo systemctl start docker"
-    print_error "Or start Docker Desktop if using Docker Desktop"
-    exit 1
-fi
-
-print_status "Docker daemon is running"
-
-# Check if Docker Compose is installed
-print_status "Checking for Docker Compose..."
+# Test Docker Compose (try both versions)
 DOCKER_COMPOSE_CMD=""
-
-if which docker-compose &> /dev/null; then
+if docker-compose --version >/dev/null 2>&1; then
     DOCKER_COMPOSE_CMD="docker-compose"
-    print_status "Found docker-compose at: $(which docker-compose)"
-elif docker compose version &> /dev/null; then
+    print_status "Using docker-compose: $(docker-compose --version | head -1)"
+elif docker compose version >/dev/null 2>&1; then
     DOCKER_COMPOSE_CMD="docker compose"
-    print_status "Found docker compose plugin"
+    print_status "Using docker compose plugin"
 else
-    print_error "Docker Compose is not installed. Please install Docker Compose first."
-    print_error "Try installing with: sudo apt-get install docker-compose"
-    print_error "Or check if docker compose plugin is available"
+    print_error "Neither docker-compose nor docker compose is available."
     exit 1
 fi
-
-print_status "Using Docker Compose command: $DOCKER_COMPOSE_CMD"
 
 # Create necessary directories
 print_status "Creating necessary directories..."
@@ -97,14 +78,14 @@ print_status "Checking service health..."
 if $DOCKER_COMPOSE_CMD exec -T postgres pg_isready -U screenwriter -d screenwriter_db > /dev/null 2>&1; then
     print_status "PostgreSQL is ready"
 else
-    print_error "PostgreSQL is not ready"
+    print_warning "PostgreSQL might still be starting..."
 fi
 
 # Check Redis
 if $DOCKER_COMPOSE_CMD exec -T redis redis-cli ping > /dev/null 2>&1; then
     print_status "Redis is ready"
 else
-    print_error "Redis is not ready"
+    print_warning "Redis might still be starting..."
 fi
 
 # Check main application
@@ -120,7 +101,7 @@ $DOCKER_COMPOSE_CMD ps
 
 # Show logs
 print_status "Recent application logs:"
-$DOCKER_COMPOSE_CMD logs --tail=50 screen-dreams
+$DOCKER_COMPOSE_CMD logs --tail=20 screen-dreams
 
 echo
 print_status "Deployment completed!"
