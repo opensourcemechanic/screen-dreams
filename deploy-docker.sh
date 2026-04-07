@@ -26,16 +26,31 @@ print_error() {
 }
 
 # Check if Docker is installed
-if ! command -v docker &> /dev/null; then
+if ! which docker &> /dev/null; then
     print_error "Docker is not installed. Please install Docker first."
     exit 1
 fi
 
+# Check if Docker is running
+if ! docker info &> /dev/null; then
+    print_error "Docker is not running. Please start Docker daemon."
+    exit 1
+fi
+
 # Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
+if ! which docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
     print_error "Docker Compose is not installed. Please install Docker Compose first."
     exit 1
 fi
+
+# Determine Docker Compose command
+if which docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+else
+    DOCKER_COMPOSE_CMD="docker compose"
+fi
+
+print_status "Using Docker Compose command: $DOCKER_COMPOSE_CMD"
 
 # Create necessary directories
 print_status "Creating necessary directories..."
@@ -52,10 +67,10 @@ fi
 
 # Build and start services
 print_status "Building Docker images..."
-docker-compose build
+$DOCKER_COMPOSE_CMD build
 
 print_status "Starting services..."
-docker-compose up -d
+$DOCKER_COMPOSE_CMD up -d
 
 # Wait for services to be ready
 print_status "Waiting for services to be ready..."
@@ -65,14 +80,14 @@ sleep 30
 print_status "Checking service health..."
 
 # Check PostgreSQL
-if docker-compose exec -T postgres pg_isready -U screenwriter -d screenwriter_db > /dev/null 2>&1; then
+if $DOCKER_COMPOSE_CMD exec -T postgres pg_isready -U screenwriter -d screenwriter_db > /dev/null 2>&1; then
     print_status "PostgreSQL is ready"
 else
     print_error "PostgreSQL is not ready"
 fi
 
 # Check Redis
-if docker-compose exec -T redis redis-cli ping > /dev/null 2>&1; then
+if $DOCKER_COMPOSE_CMD exec -T redis redis-cli ping > /dev/null 2>&1; then
     print_status "Redis is ready"
 else
     print_error "Redis is not ready"
@@ -87,11 +102,11 @@ fi
 
 # Show running services
 print_status "Running services:"
-docker-compose ps
+$DOCKER_COMPOSE_CMD ps
 
 # Show logs
 print_status "Recent application logs:"
-docker-compose logs --tail=50 screen-dreams
+$DOCKER_COMPOSE_CMD logs --tail=50 screen-dreams
 
 echo
 print_status "Deployment completed!"
@@ -101,14 +116,14 @@ echo "Application: http://localhost:5000"
 echo "Nginx (if enabled): http://localhost"
 echo
 echo "=== Useful Commands ==="
-echo "View logs: docker-compose logs -f [service-name]"
-echo "Stop services: docker-compose down"
-echo "Restart services: docker-compose restart [service-name]"
-echo "Access database: docker-compose exec postgres psql -U screenwriter -d screenwriter_db"
-echo "Access Redis: docker-compose exec redis redis-cli"
+echo "View logs: $DOCKER_COMPOSE_CMD logs -f [service-name]"
+echo "Stop services: $DOCKER_COMPOSE_CMD down"
+echo "Restart services: $DOCKER_COMPOSE_CMD restart [service-name]"
+echo "Access database: $DOCKER_COMPOSE_CMD exec postgres psql -U screenwriter -d screenwriter_db"
+echo "Access Redis: $DOCKER_COMPOSE_CMD exec redis redis-cli"
 echo
 echo "=== AI Services ==="
-echo "To start with Ollama: docker-compose --profile ai up -d"
-echo "Then pull a model: docker-compose exec ollama ollama pull llama2"
+echo "To start with Ollama: $DOCKER_COMPOSE_CMD --profile ai up -d"
+echo "Then pull a model: $DOCKER_COMPOSE_CMD exec ollama ollama pull llama2"
 echo
 print_status "For production deployment, see DEPLOYMENT.md for HTTPS setup."
