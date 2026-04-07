@@ -1,0 +1,165 @@
+# Screen Dreams Application Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: screen-dreams
+  namespace: screen-dreams
+  labels:
+    app: screen-dreams
+    component: webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: screen-dreams
+      component: webapp
+  template:
+    metadata:
+      labels:
+        app: screen-dreams
+        component: webapp
+    spec:
+      containers:
+      - name: screen-dreams
+        image: screen-dreams:latest
+        ports:
+        - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: screen-dreams-config
+        env:
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: screen-dreams-secrets
+              key: SECRET_KEY
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: screen-dreams-secrets
+              key: OPENAI_API_KEY
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: screen-dreams-secrets
+              key: ANTHROPIC_API_KEY
+        - name: IONOS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: screen-dreams-secrets
+              key: IONOS_API_KEY
+        - name: SCALEWAY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: screen-dreams-secrets
+              key: SCALEWAY_API_KEY
+        - name: MAIL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: screen-dreams-secrets
+              key: MAIL_USERNAME
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: screen-dreams-secrets
+              key: MAIL_PASSWORD
+        volumeMounts:
+        - name: uploads-storage
+          mountPath: /app/uploads
+        - name: logs-storage
+          mountPath: /var/log/screen-dreams
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+      volumes:
+      - name: uploads-storage
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+      - name: logs-storage
+        emptyDir: {}
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:15-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until pg_isready -h postgres -p 5432 -U screenwriter; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+      - name: wait-for-redis
+        image: redis:7-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until redis-cli -h redis -p 6379 ping; do
+            echo "Waiting for redis..."
+            sleep 2
+          done
+
+---
+# Screen Dreams Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: screen-dreams
+  namespace: screen-dreams
+  labels:
+    app: screen-dreams
+    component: webapp
+spec:
+  selector:
+    app: screen-dreams
+    component: webapp
+  ports:
+  - port: 5000
+    targetPort: 5000
+  type: ClusterIP
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: screen-dreams-hpa
+  namespace: screen-dreams
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: screen-dreams
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

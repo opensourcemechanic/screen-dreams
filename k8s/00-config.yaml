@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: screen-dreams
+  labels:
+    name: screen-dreams
+    app: screen-dreams
+
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: screen-dreams-config
+  namespace: screen-dreams
+data:
+  FLASK_ENV: "production"
+  FLASK_DEBUG: "false"
+  DATABASE_URL: "postgresql://screenwriter:screenwriter123@postgres:5432/screenwriter_db"
+  REDIS_URL: "redis://redis:6379/0"
+  RATELIMIT_STORAGE_URL: "redis://redis:6379/0"
+  LOG_LEVEL: "info"
+  LOG_FILE: "/var/log/screen-dreams/app.log"
+  UPLOAD_FOLDER: "/app/uploads"
+  MAX_CONTENT_LENGTH: "104857600"
+  SESSION_COOKIE_SECURE: "true"
+  SESSION_COOKIE_HTTPONLY: "true"
+  SESSION_COOKIE_SAMESITE: "Lax"
+  CSP_DEFAULT_SRC: "'self'"
+  CSP_SCRIPT_SRC: "'self' 'unsafe-inline'"
+  CSP_STYLE_SRC: "'self' 'unsafe-inline'"
+  CSP_IMG_SRC: "'self' data:"
+  CSP_FONT_SRC: "'self'"
+  SECURITY_EMAIL_SENDER: "noreply@screendreams.com"
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: screen-dreams-secrets
+  namespace: screen-dreams
+type: Opaque
+data:
+  # Base64 encoded values - replace with your actual encoded values
+  SECRET_KEY: eW91ci0yNTYtY2hhcmFjdGVyLXNlY3JldC1rZXktaGVyZS1jaGFuZ2UtdGhpcy1pbi1wcm9kdWN0aW9u  # your-256-character-secret-key-here-change-this-in-production
+  DB_PASSWORD: c2NyZWVud3JpdGVyMTIz  # screenwriter123
+  OPENAI_API_KEY: eW91ci1vcGVuYWktYXBpLWtleQ==  # your-openai-api-key
+  ANTHROPIC_API_KEY: eW91ci1hbnRocm9waWMtYXBpLWtleQ==  # your-anthropic-api-key
+  IONOS_API_KEY: eW91ci1pb25vcy1hcGkta2V5  # your-ionos-api-key
+  SCALEWAY_API_KEY: eW91ci1zY2FsZXdheS1hcGkta2V5  # your-scaleway-api-key
+  MAIL_USERNAME: eW91ci1lbWFpbEBnbWFpbC5jb20=  # your-email@gmail.com
+  MAIL_PASSWORD: eW91ci1hcHAtcGFzc3dvcmQ=  # your-app-password
+
+---
+# Persistent Volume Claims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: screen-dreams
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: screen-dreams
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: standard
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: screen-dreams
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-pvc
+  namespace: screen-dreams
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: standard

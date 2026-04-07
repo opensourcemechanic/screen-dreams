@@ -1,0 +1,145 @@
+# Ollama AI Service (Optional - for local AI)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: screen-dreams
+  labels:
+    app: ollama
+    component: ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+      component: ai
+  template:
+    metadata:
+      labels:
+        app: ollama
+        component: ai
+    spec:
+      containers:
+      - name: ollama
+        image: ollama/ollama:latest
+        ports:
+        - containerPort: 11434
+        env:
+        - name: OLLAMA_HOST
+          value: "0.0.0.0"
+        volumeMounts:
+        - name: ollama-storage
+          mountPath: /root/.ollama
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /api/tags
+            port: 11434
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/tags
+            port: 11434
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: ollama-storage
+        persistentVolumeClaim:
+          claimName: ollama-pvc
+
+---
+# Ollama Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: screen-dreams
+  labels:
+    app: ollama
+    component: ai
+spec:
+  selector:
+    app: ollama
+    component: ai
+  ports:
+  - port: 11434
+    targetPort: 11434
+  type: ClusterIP
+
+---
+# Nginx Ingress Controller
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: screen-dreams-ingress
+  namespace: screen-dreams
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+  - hosts:
+    - screendreams.com
+    - www.screendreams.com
+    secretName: screen-dreams-tls
+  rules:
+  - host: screendreams.com
+    http:
+      paths:
+      - path: /static(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: screen-dreams
+            port:
+              number: 5000
+      - path: /api(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: screen-dreams
+            port:
+              number: 5000
+      - path: /(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: screen-dreams
+            port:
+              number: 5000
+  - host: www.screendreams.com
+    http:
+      paths:
+      - path: /static(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: screen-dreams
+            port:
+              number: 5000
+      - path: /api(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: screen-dreams
+            port:
+              number: 5000
+      - path: /(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: screen-dreams
+            port:
+              number: 5000
