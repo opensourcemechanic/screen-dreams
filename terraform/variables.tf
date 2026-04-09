@@ -107,6 +107,26 @@ variable "scaleway_api_key" {
   default     = ""
 }
 
+# Ollama Configuration
+variable "ollama_base_url" {
+  description = "Ollama base URL"
+  type        = string
+  default     = "http://localhost:11434"
+}
+
+variable "ollama_model" {
+  description = "Ollama model to use"
+  type        = string
+  default     = "qwen:0.5b"
+}
+
+variable "ollama_api_key" {
+  description = "Ollama API key (if required)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # Application variables
 variable "secret_key" {
   description = "Flask application secret key"

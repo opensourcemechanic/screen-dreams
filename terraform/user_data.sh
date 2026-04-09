@@ -66,14 +66,50 @@ cat > /home/ec2-user/start-screen-dreams.sh << 'EOF'
 #!/bin/bash
 
 # Stop and remove existing containers if they exist
-docker stop screen-dreams nginx 2>/dev/null || true
-docker rm screen-dreams nginx 2>/dev/null || true
+docker stop screen-dreams nginx ollama 2>/dev/null || true
+docker rm screen-dreams nginx ollama 2>/dev/null || true
+
+# Start Ollama container if AI provider is ollama
+if [ "${ai_provider}" = "ollama" ]; then
+  echo "Starting Ollama container..."
+  docker run -d \
+    --name ollama \
+    --restart unless-stopped \
+    -p 11434:11434 \
+    -v ollama:/root/.ollama \
+    ollama/ollama:latest
+  
+  # Wait for Ollama to start
+  echo "Waiting for Ollama to start..."
+  sleep 10
+  
+  # Pull the specified model
+  echo "Pulling Ollama model: ${ollama_model}"
+  docker exec ollama ollama pull ${ollama_model}
+  
+  # Verify Ollama is running
+  if docker ps | grep ollama; then
+    echo "Ollama container started successfully!"
+  else
+    echo "ERROR: Failed to start Ollama container"
+  fi
+fi
 
 # Run the screen-dreams container directly
+# Use host networking when using Ollama for reliable communication
+if [ "${ai_provider}" = "ollama" ]; then
+  NETWORK_MODE="--network host"
+  PORT_MAPPING=""
+else
+  NETWORK_MODE=""
+  PORT_MAPPING="-p 5000:5000"
+fi
+
 docker run -d \
   --name screen-dreams \
   --restart unless-stopped \
-  -p 5000:5000 \
+  $PORT_MAPPING \
+  $NETWORK_MODE \
   -e DATABASE_TYPE=sqlite \
   -e DATABASE_URL=sqlite:///opt/screen-dreams/screen_dreams.db \
   -e SECRET_KEY=${secret_key} \
@@ -82,6 +118,9 @@ docker run -d \
   -e ANTHROPIC_API_KEY=${anthropic_api_key} \
   -e IONOS_API_KEY=${ionos_api_key} \
   -e SCALEWAY_API_KEY=${scaleway_api_key} \
+  -e OLLAMA_BASE_URL=${ollama_base_url} \
+  -e OLLAMA_MODEL=${ollama_model} \
+  -e OLLAMA_API_KEY=${ollama_api_key} \
   -e FLASK_ENV=production \
   -e FLASK_DEBUG=False \
   -e UPLOAD_FOLDER=/opt/screen-dreams/uploads \
@@ -105,13 +144,49 @@ docker run -d \
   screen-dreams:latest
 
 # Start nginx reverse proxy for port 80 access
-docker run -d \
-  --name nginx \
-  --restart unless-stopped \
-  -p 80:80 \
-  -v /opt/screen-dreams/nginx.conf:/etc/nginx/nginx.conf:ro \
-  --link screen-dreams:screen-dreams \
-  nginx:alpine
+# Update nginx config for host networking if using Ollama
+if [ "${ai_provider}" = "ollama" ]; then
+  # Update nginx config to use localhost for host networking
+  cat > nginx.conf << NGINXEOF
+events {
+    worker_connections 1024;
+}
+
+http {
+    upstream screen_dreams {
+        server localhost:5000;
+    }
+
+    server {
+        listen 80;
+        location / {
+            proxy_pass http://localhost:5000;
+            proxy_set_header Host \$host;
+            proxy_set_header X-Real-IP \$remote_addr;
+            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto \$scheme;
+        }
+    }
+}
+NGINXEOF
+  
+  # Start nginx without linking (using host network)
+  docker run -d \
+    --name nginx \
+    --restart unless-stopped \
+    -p 80:80 \
+    -v /opt/screen-dreams/nginx.conf:/etc/nginx/nginx.conf:ro \
+    nginx:alpine
+else
+  # Start nginx with container linking for other AI providers
+  docker run -d \
+    --name nginx \
+    --restart unless-stopped \
+    -p 80:80 \
+    -v /opt/screen-dreams/nginx.conf:/etc/nginx/nginx.conf:ro \
+    --link screen-dreams:screen-dreams \
+    nginx:alpine
+fi
 
 echo "Screen Dreams and nginx containers started successfully!"
 docker ps | grep -E "(screen-dreams|nginx)"
@@ -190,6 +265,11 @@ ANTHROPIC_API_KEY=${anthropic_api_key}
 IONOS_API_KEY=${ionos_api_key}
 SCALEWAY_API_KEY=${scaleway_api_key}
 
+# Ollama Configuration
+OLLAMA_BASE_URL=${ollama_base_url}
+OLLAMA_MODEL=${ollama_model}
+OLLAMA_API_KEY=${ollama_api_key}
+
 # Flask Configuration
 SECRET_KEY=${secret_key}
 FLASK_ENV=production
@@ -261,13 +341,16 @@ echo "Application Status (Port 80):"
 curl -s http://localhost:80/health || echo "Application not responding on port 80"
 echo ""
 echo "Docker Containers:"
-docker ps | grep -E "(screen-dreams|nginx)" || echo "Containers not running"
+docker ps | grep -E "(screen-dreams|nginx|ollama)" || echo "Containers not running"
 echo ""
 echo "Screen Dreams Logs:"
 docker logs --tail 5 screen-dreams 2>/dev/null || echo "No logs available"
 echo ""
 echo "Nginx Logs:"
 docker logs --tail 5 nginx 2>/dev/null || echo "No nginx logs available"
+echo ""
+echo "Ollama Status:"
+curl -s http://localhost:11434/api/tags 2>/dev/null | jq -r '.models[].name' || echo "Ollama not responding on port 11434"
 echo ""
 echo "System Resources:"
 free -h

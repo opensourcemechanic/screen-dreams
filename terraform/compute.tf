@@ -35,6 +35,9 @@ resource "aws_instance" "screen_dreams" {
     anthropic_api_key = var.anthropic_api_key
     ionos_api_key    = var.ionos_api_key
     scaleway_api_key = var.scaleway_api_key
+    ollama_base_url  = var.ollama_base_url
+    ollama_model     = var.ollama_model
+    ollama_api_key   = var.ollama_api_key
     secret_key       = var.secret_key
     region           = var.region
     app_name         = var.app_name
