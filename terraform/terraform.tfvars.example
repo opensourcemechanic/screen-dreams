@@ -15,11 +15,16 @@ allowed_ssh_cidr = "0.0.0.0/0"  # Restrict to your IP for better security
 # db_password = "your-secure-password-here"
 
 # AI Provider Configuration
-ai_provider = "openai"  # Options: openai, anthropic, ionos, scaleway
-openai_api_key = "sk-your-openai-api-key-here"
-anthropic_api_key = "sk-ant-your-anthropic-api-key-here"
-ionos_api_key = "your-ionos-api-key-here"
-scaleway_api_key = "your-scaleway-api-key-here"
+ai_provider = "ollama"  # Options: ollama, openai, anthropic, ionos, scaleway
+# openai_api_key = "sk-your-openai-api-key-here"
+# anthropic_api_key = "sk-ant-your-anthropic-api-key-here"
+# ionos_api_key = "your-ionos-api-key-here"
+# scaleway_api_key = "your-scaleway-api-key-here"
+
+# Ollama Configuration (optional)
+# ollama_base_url = "http://localhost:11434"
+# ollama_model = "llama2"
+# ollama_api_key = "your-ollama-api-key-if-required"
 
 # Flask Secret Key (will be auto-generated if not specified)
 # secret_key = "your-256-character-secret-key-here"
