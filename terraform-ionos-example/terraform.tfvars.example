@@ -1,0 +1,19 @@
+# IONOS Cloud Configuration
+ionos_region = "de/fra"  # Frankfurt, Germany
+ionos_username = "your-ionos-username"
+ionos_password = "your-ionos-password"
+
+# Server Configuration
+server_password = "your-secure-server-password"
+
+# Database Configuration (will be auto-generated if not specified)
+# db_password = "your-secure-database-password"
+
+# AI Provider Configuration
+ai_provider = "ionos"  # Options: ionos, openai, anthropic
+ionos_api_key = "your-ionos-ai-api-key"
+openai_api_key = "sk-your-openai-api-key-here"
+anthropic_api_key = "sk-ant-your-anthropic-api-key-here"
+
+# Flask Secret Key (will be auto-generated if not specified)
+# secret_key = "your-256-character-secret-key-here"

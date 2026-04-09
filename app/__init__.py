@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_principal import Principal, identity_loaded, UserNeed, RoleNeed
@@ -48,6 +48,11 @@ def create_app():
     app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'false').lower() == 'true'
     app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', '')
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', '')
+    
+    # Register health check route
+    @app.route('/health')
+    def health_check():
+        return jsonify({"status": "healthy"})
     
     # Initialize extensions
     db.init_app(app)

@@ -1,0 +1,34 @@
+# Terraform state files
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Terraform variables with secrets
+terraform.tfvars
+*.auto.tfvars
+
+# Terraform plan files
+*.plan
+screendreams_plan
+
+# Generated deployment files
+app-deployment.zip
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Log files
+*.log

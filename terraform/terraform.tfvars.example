@@ -1,0 +1,25 @@
+# AWS Configuration
+region = "us-east-1"
+environment = "dev"
+
+# AWS Credentials (optional - can use environment variables or aws configure)
+# aws_access_key = "AKIA..."
+# aws_secret_key = "your-secret-key"
+
+# SSH Configuration
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... your-public-key-here"
+ssh_key_name = "screen-dreams-key"
+allowed_ssh_cidr = "0.0.0.0/0"  # Restrict to your IP for better security
+
+# Database Configuration (will be auto-generated if not specified)
+# db_password = "your-secure-password-here"
+
+# AI Provider Configuration
+ai_provider = "openai"  # Options: openai, anthropic, ionos, scaleway
+openai_api_key = "sk-your-openai-api-key-here"
+anthropic_api_key = "sk-ant-your-anthropic-api-key-here"
+ionos_api_key = "your-ionos-api-key-here"
+scaleway_api_key = "your-scaleway-api-key-here"
+
+# Flask Secret Key (will be auto-generated if not specified)
+# secret_key = "your-256-character-secret-key-here"
