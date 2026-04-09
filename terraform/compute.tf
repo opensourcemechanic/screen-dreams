@@ -14,7 +14,7 @@ resource "aws_instance" "screen_dreams" {
   # Root volume
   root_block_device {
     volume_type           = "gp2"
-    volume_size           = 8
+    volume_size           = 20
     delete_on_termination = true
     encrypted             = true
   }
