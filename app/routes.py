@@ -4,14 +4,14 @@ from app import db
 from app.models import Screenplay, Scene, Character, User, ScreenplayChange, PromptConfig
 from app.screenplay import FountainParser
 from app.pdf_generator import ScreenplayPDFGenerator
-from app.ai_assistant import OllamaAssistant
+from app.ai_assistant import AIAssistant
 import os
 from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
 parser = FountainParser()
 pdf_generator = ScreenplayPDFGenerator()
-ai_assistant = OllamaAssistant()
+ai_assistant = AIAssistant()
 
 # Debug route to check users
 @main.route('/debug/users')
@@ -362,13 +362,21 @@ def api_ai_status():
     available = ai_assistant.is_available()
     model_available = ai_assistant.check_model() if available else False
     
-    return jsonify({
+    # Get provider-specific info
+    response = {
         'available': available,
         'model_available': model_available,
-        'model': ai_assistant.model,
-        'base_url': ai_assistant.base_url,
-        'timeout': ai_assistant.timeout
-    })
+        'provider': ai_assistant.provider,
+        'timeout': ai_assistant.assistant.timeout if hasattr(ai_assistant.assistant, 'timeout') else 300
+    }
+    
+    # Add provider-specific details
+    if hasattr(ai_assistant.assistant, 'model'):
+        response['model'] = ai_assistant.assistant.model
+    if hasattr(ai_assistant.assistant, 'base_url'):
+        response['base_url'] = ai_assistant.assistant.base_url
+    
+    return jsonify(response)
 
 @main.route('/api/config', methods=['GET'])
 @login_required
