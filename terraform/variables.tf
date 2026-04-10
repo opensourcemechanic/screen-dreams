@@ -32,7 +32,7 @@ variable "database_type" {
 variable "instance_type" {
   description = "EC2 instance type (Free Tier: t3.micro)"
   type        = string
-  default     = "t3.micro"
+  default     = "t3.small"
 }
 
 variable "ssh_public_key" {
@@ -117,7 +117,7 @@ variable "ollama_base_url" {
 variable "ollama_model" {
   description = "Ollama model to use"
   type        = string
-  default     = "qwen:0.5b"
+  default     = "tinyllama:latest"
 }
 
 variable "ollama_api_key" {
