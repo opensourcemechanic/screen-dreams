@@ -47,29 +47,37 @@ cd screen-dreams
 chmod +x deploy-docker-simple.sh
 ./deploy-docker-simple.sh
 
-# For Podman environments:
-chmod +x podman-deploy.sh
-./podman-deploy.sh
+# For Podman environments (recommended for local):
+chmod +x podman-deploy-8080.sh
+./podman-deploy-8080.sh
 
 # 3. Access application
-http://localhost        # Via nginx (port 80)
+http://localhost:8080   # Via nginx (port 8080) - RECOMMENDED for local
 http://localhost:5000   # Direct access (port 5000)
+# Note: Port 8080 is default for local deployments to avoid privileged port issues
 ```
 
 ## Access Methods
 
-### Primary Access (Recommended)
-- **URL**: `http://localhost`
-- **Port**: 80
-- **Features**: Nginx reverse proxy, static file optimization, security headers
+### Primary Access (Local/Development)
+- **URL**: `http://localhost:8080`
+- **Port**: 8080
+- **Features**: Nginx reverse proxy, avoids privileged port issues
+- **Note**: Default for local Podman/Docker deployments
 
 ### Direct Access
 - **URL**: `http://localhost:5000`
 - **Port**: 5000
-- **Features**: Direct Flask app access, useful for debugging
+- **Features**: Direct Flask app access, debugging enabled
+
+### Production Access (Port 80)
+- **URL**: `http://localhost` (or `http://your-domain.com`)
+- **Port**: 80
+- **Features**: Standard HTTP access, requires sudo or systemd service
+- **Note**: Use for production deployments with proper firewall setup for debugging
 
 ### Health Checks
-- **Nginx**: `http://localhost/health`
+- **Nginx**: `http://localhost:8080/health`
 - **Direct**: `http://localhost:5000/health`
 
 ## Service Architecture
