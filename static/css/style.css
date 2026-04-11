@@ -15,6 +15,42 @@ body {
     color: white;
     padding: 1rem 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* Theme-based header background images */
+    background-image: url('../images/themes/light/navbar-bg.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.main-content {
+    /* Theme-based main content background images */
+    background-image: url('../images/themes/light/body-bg.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: calc(100vh - 80px); /* Full height minus navbar */
+}
+
+.container {
+    position: relative;
+    z-index: 1; /* Ensure content stays above background */
+    background-color: rgba(255, 255, 255, 0.3); /* Lighter overlay to show more background */
+    border-radius: 8px;
+    padding: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(2px); /* Reduced blur */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .container {
+    background-color: transparent; /* No overlay in navbar */
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    backdrop-filter: none;
+    box-shadow: none;
 }
 
 .nav-container {

@@ -21,6 +21,15 @@ usermod -a -G docker ec2-user
 curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
+# Add 2GB swap space for Ollama (t3.micro has limited RAM)
+echo "Creating swap file for Ollama..."
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+swapon --show
+
 # Install unzip for extracting app files
 echo "Installing unzip..."
 yum install -y unzip
@@ -59,7 +68,7 @@ rm /tmp/app-deployment.zip
 
 # Create necessary directories
 echo "Creating additional directories..."
-mkdir -p uploads screenplays logs
+mkdir -p uploads screenplays logs data
 
 # Create Docker startup script for direct container deployment
 cat > /home/ec2-user/start-screen-dreams.sh << 'EOF'
@@ -95,30 +104,20 @@ if [ "${ai_provider}" = "ollama" ]; then
   fi
 fi
 
-# Run the screen-dreams container directly
-# Use host networking when using Ollama for reliable communication
-if [ "${ai_provider}" = "ollama" ]; then
-  NETWORK_MODE="--network host"
-  PORT_MAPPING=""
-else
-  NETWORK_MODE=""
-  PORT_MAPPING="-p 5000:5000"
-fi
-
+# Run the screen-dreams container with standard networking
 docker run -d \
   --name screen-dreams \
   --restart unless-stopped \
-  $PORT_MAPPING \
-  $NETWORK_MODE \
+  -p 5000:5000 \
   -e DATABASE_TYPE=sqlite \
-  -e DATABASE_URL=sqlite:///opt/screen-dreams/screen_dreams.db \
+  -e DATABASE_URL=sqlite:///opt/screen-dreams/data/screen_dreams.db \
   -e SECRET_KEY=${secret_key} \
   -e AI_PROVIDER=${ai_provider} \
   -e OPENAI_API_KEY=${openai_api_key} \
   -e ANTHROPIC_API_KEY=${anthropic_api_key} \
   -e IONOS_API_KEY=${ionos_api_key} \
   -e SCALEWAY_API_KEY=${scaleway_api_key} \
-  -e OLLAMA_BASE_URL=${ollama_base_url} \
+  -e OLLAMA_BASE_URL=http://ollama:11434 \
   -e OLLAMA_MODEL=${ollama_model} \
   -e OLLAMA_API_KEY=${ollama_api_key} \
   -e FLASK_ENV=production \
@@ -141,52 +140,18 @@ docker run -d \
   -v /opt/screen-dreams/uploads:/opt/screen-dreams/uploads \
   -v /opt/screen-dreams/screenplays:/opt/screen-dreams/screenplays \
   -v /opt/screen-dreams/logs:/opt/screen-dreams/logs \
+  -v /opt/screen-dreams/data:/opt/screen-dreams/data \
+  --link ollama:ollama \
   screen-dreams:latest
 
 # Start nginx reverse proxy for port 80 access
-# Update nginx config for host networking if using Ollama
-if [ "${ai_provider}" = "ollama" ]; then
-  # Update nginx config to use localhost for host networking
-  cat > nginx.conf << NGINXEOF
-events {
-    worker_connections 1024;
-}
-
-http {
-    upstream screen_dreams {
-        server localhost:5000;
-    }
-
-    server {
-        listen 80;
-        location / {
-            proxy_pass http://localhost:5000;
-            proxy_set_header Host \$host;
-            proxy_set_header X-Real-IP \$remote_addr;
-            proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto \$scheme;
-        }
-    }
-}
-NGINXEOF
-  
-  # Start nginx without linking (using host network)
-  docker run -d \
-    --name nginx \
-    --restart unless-stopped \
-    -p 80:80 \
-    -v /opt/screen-dreams/nginx.conf:/etc/nginx/nginx.conf:ro \
-    nginx:alpine
-else
-  # Start nginx with container linking for other AI providers
-  docker run -d \
-    --name nginx \
-    --restart unless-stopped \
-    -p 80:80 \
-    -v /opt/screen-dreams/nginx.conf:/etc/nginx/nginx.conf:ro \
-    --link screen-dreams:screen-dreams \
-    nginx:alpine
-fi
+docker run -d \
+  --name nginx \
+  --restart unless-stopped \
+  -p 80:80 \
+  -v /opt/screen-dreams/nginx.conf:/etc/nginx/nginx.conf:ro \
+  --link screen-dreams:screen-dreams \
+  nginx:alpine
 
 echo "Screen Dreams and nginx containers started successfully!"
 docker ps | grep -E "(screen-dreams|nginx)"

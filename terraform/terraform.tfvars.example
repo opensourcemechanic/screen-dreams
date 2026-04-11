@@ -22,8 +22,8 @@ ai_provider = "ollama"  # Options: ollama, openai, anthropic, ionos, scaleway
 # scaleway_api_key = "your-scaleway-api-key-here"
 
 # Ollama Configuration (optional)
-ollama_base_url = "http://localhost:11434"
-ollama_model = "qwen:0.5b"
+# ollama_base_url = "http://localhost:11434"
+# ollama_model = "llama2"
 # ollama_api_key = "your-ollama-api-key-if-required"
 
 # Flask Secret Key (will be auto-generated if not specified)

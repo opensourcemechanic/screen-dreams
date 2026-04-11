@@ -48,74 +48,126 @@
     --content-bg: #2d2d2d;
     --content-border: #404040;
     --content-text: #f0f0f0;
-    --content-secondary: #b8b8b8;
-    
-    --btn-primary-bg: #58a6ff;
-    --btn-primary-hover: #4492f7;
-    --btn-secondary-bg: #6e7681;
-    --btn-secondary-hover: #5a6370;
-    --btn-danger-bg: #f85149;
-    --btn-danger-hover: #da3633;
-    --btn-success-bg: #3fb950;
-    --btn-success-hover: #2ea043;
+}
+
+/* Dark Theme Main Content */
+[data-theme="dark"] .main-content {
+    background-image: url('../images/themes/dark/body-bg.webp');
+}
+
+/* Dark Theme Container */
+[data-theme="dark"] .container {
+    background-color: rgba(45, 45, 45, 0.4);
+}
+
+/* Dark Theme Navbar */
+[data-theme="dark"] .navbar {
+    background-image: url('../images/themes/dark/navbar-bg.webp');
 }
 
 /* High Contrast Theme */
 [data-theme="high-contrast"] {
     --bg-primary: #000000;
-    --bg-secondary: #ffffff;
+    --bg-secondary: #1a1a1a;
     --bg-navbar: #000000;
-    --text-primary: #000000;
-    --text-secondary: #333333;
+    --text-primary: #ffffff;
+    --text-secondary: #ffff00;
     --text-navbar: #ffffff;
-    --accent-color: #0000ff;
-    --accent-hover: #000080;
-    --border-color: #000000;
-    --shadow-color: rgba(0, 0, 0, 0.5);
+    --accent-color: #00ff00;
+    --accent-hover: #00cc00;
+    --border-color: #ffffff;
+    --shadow-color: rgba(255, 255, 255, 0.2);
     
     /* Content-specific colors */
-    --content-bg: #ffffff;
-    --content-border: #000000;
-    --content-text: #000000;
-    --content-secondary: #333333;
-    
-    --btn-primary-bg: #0000ff;
-    --btn-primary-hover: #000080;
-    --btn-secondary-bg: #666666;
-    --btn-secondary-hover: #333333;
-    --btn-danger-bg: #ff0000;
-    --btn-danger-hover: #cc0000;
-    --btn-success-bg: #008000;
-    --btn-success-hover: #006600;
+    --content-bg: #1a1a1a;
+    --content-border: #ffffff;
+    --content-text: #ffffff;
+    --content-secondary: #ffff00;
+}
+
+/* High Contrast Theme Main Content */
+[data-theme="high-contrast"] .main-content {
+    background-image: url('../images/themes/high-contrast/body-bg.webp');
+}
+
+/* High Contrast Theme Container */
+[data-theme="high-contrast"] .container {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* High Contrast Theme Navbar */
+[data-theme="high-contrast"] .navbar {
+    background-image: url('../images/themes/high-contrast/navbar-bg.webp');
 }
 
 /* Evening Theme */
 [data-theme="evening"] {
-    --bg-primary: #1a2332;
-    --bg-secondary: #2c3e50;
-    --bg-navbar: #34495e;
-    --text-primary: #e8e8e8;
-    --text-secondary: #b8c5d6;
-    --text-navbar: #ffffff;
-    --accent-color: #5dade2;
-    --accent-hover: #3498db;
-    --border-color: #4a5f7a;
+    --bg-primary: #2c1810;
+    --bg-secondary: #3d241a;
+    --bg-navbar: #1a0e08;
+    --text-primary: #f4e4d4;
+    --text-secondary: #d4a574;
+    --text-navbar: #f4e4d4;
+    --accent-color: #d4a574;
+    --accent-hover: #b8935f;
+    --border-color: #8b6914;
     --shadow-color: rgba(0, 0, 0, 0.4);
     
     /* Content-specific colors */
-    --content-bg: #34495e;
-    --content-border: #4a5f7a;
-    --content-text: #e8e8e8;
-    --content-secondary: #b8c5d6;
+    --content-bg: #3d241a;
+    --content-border: #8b6914;
+    --content-text: #f4e4d4;
+    --content-secondary: #d4a574;
+}
+
+/* Evening Theme Main Content */
+[data-theme="evening"] .main-content {
+    background-image: url('../images/themes/evening/body-bg.webp');
+}
+
+/* Evening Theme Container */
+[data-theme="evening"] .container {
+    background-color: rgba(61, 36, 26, 0.4);
+}
+
+/* Evening Theme Navbar */
+[data-theme="evening"] .navbar {
+    background-image: url('../images/themes/evening/navbar-bg.webp');
+}
+
+/* Night Theme */
+[data-theme="night"] {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a2e;
+    --bg-navbar: #0f0f23;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --text-navbar: #ffffff;
+    --accent-color: #4a9eff;
+    --accent-hover: #3d8bfe;
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.5);
     
-    --btn-primary-bg: #5dade2;
-    --btn-primary-hover: #3498db;
-    --btn-secondary-bg: #7f8c8d;
-    --btn-secondary-hover: #6c7a84;
-    --btn-danger-bg: #ec7063;
-    --btn-danger-hover: #e74c3c;
-    --btn-success-bg: #58d68d;
-    --btn-success-hover: #27ae60;
+    /* Content-specific colors */
+    --content-bg: #1a1a2e;
+    --content-border: #333333;
+    --content-text: #e0e0e0;
+    --content-secondary: #a0a0a0;
+}
+
+/* Night Theme Main Content */
+[data-theme="night"] .main-content {
+    background-image: url('../images/themes/night/body-bg.webp');
+}
+
+/* Night Theme Container */
+[data-theme="night"] .container {
+    background-color: rgba(26, 26, 46, 0.4);
+}
+
+/* Night Theme Navbar */
+[data-theme="night"] .navbar {
+    background-image: url('../images/themes/night/navbar-bg.webp');
 }
 
 /* Night Theme */

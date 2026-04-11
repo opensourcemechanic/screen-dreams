@@ -74,25 +74,25 @@ sleep 30
 # Check service health
 print_status "Checking service health..."
 
-# Check PostgreSQL
-if $DOCKER_COMPOSE_CMD exec -T postgres pg_isready -U screenwriter -d screenwriter_db > /dev/null 2>&1; then
-    print_status "PostgreSQL is ready"
-else
-    print_warning "PostgreSQL might still be starting..."
-fi
-
 # Check Redis
-if $DOCKER_COMPOSE_CMD exec -T redis redis-cli ping > /dev/null 2>&1; then
+if $DOCKER_COMPOSE_CMD exec -T redis-dev redis-cli ping > /dev/null 2>&1; then
     print_status "Redis is ready"
 else
     print_warning "Redis might still be starting..."
 fi
 
-# Check main application
+# Check main application (direct port 5000)
 if curl -f http://localhost:5000/health > /dev/null 2>&1; then
-    print_status "Screen Dreams application is ready"
+    print_status "Screen Dreams application is ready (port 5000)"
 else
     print_warning "Screen Dreams application might still be starting..."
+fi
+
+# Check nginx reverse proxy (port 80)
+if curl -f http://localhost/health > /dev/null 2>&1; then
+    print_status "Nginx reverse proxy is ready (port 80)"
+else
+    print_warning "Nginx might still be starting..."
 fi
 
 # Show running services
@@ -101,24 +101,27 @@ $DOCKER_COMPOSE_CMD ps
 
 # Show logs
 print_status "Recent application logs:"
-$DOCKER_COMPOSE_CMD logs --tail=20 screen-dreams
+$DOCKER_COMPOSE_CMD logs --tail=20 screen-dreams-dev
 
 echo
 print_status "Deployment completed!"
 echo
 echo "=== Access Information ==="
-echo "Application: http://localhost:5000"
-echo "Nginx (if enabled): http://localhost"
+echo "Application (via nginx): http://localhost"
+echo "Application (direct): http://localhost:5000"
+echo "Health check (nginx): http://localhost/health"
+echo "Health check (direct): http://localhost:5000/health"
 echo
 echo "=== Useful Commands ==="
 echo "View logs: $DOCKER_COMPOSE_CMD logs -f [service-name]"
 echo "Stop services: $DOCKER_COMPOSE_CMD down"
 echo "Restart services: $DOCKER_COMPOSE_CMD restart [service-name]"
-echo "Access database: $DOCKER_COMPOSE_CMD exec postgres psql -U screenwriter -d screenwriter_db"
-echo "Access Redis: $DOCKER_COMPOSE_CMD exec redis redis-cli"
+echo "Access Redis: $DOCKER_COMPOSE_CMD exec redis-dev redis-cli"
+echo "View nginx logs: $DOCKER_COMPOSE_CMD logs -f nginx-dev"
+echo "Restart nginx: $DOCKER_COMPOSE_CMD restart nginx-dev"
 echo
 echo "=== AI Services ==="
 echo "To start with Ollama: $DOCKER_COMPOSE_CMD --profile ai up -d"
-echo "Then pull a model: $DOCKER_COMPOSE_CMD exec ollama ollama pull llama2"
+echo "Then pull a model: $DOCKER_COMPOSE_CMD exec ollama-dev ollama pull llama2"
 echo
 print_status "For production deployment, see DEPLOYMENT.md for HTTPS setup."

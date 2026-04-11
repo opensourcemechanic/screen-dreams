@@ -32,7 +32,7 @@ tmp_upload_dir = None
 # Graceful shutdown and restarts
 max_requests = 1000
 max_requests_jitter = 100
-preload_app = True
+preload_app = False
 
 # Security
 limit_request_line = 4094

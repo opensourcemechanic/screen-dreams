@@ -1,10 +1,13 @@
 import requests
 import json
 import os
+import logging
 from typing import List, Dict, Optional
 from app import db
 from flask_login import current_user
 from app.models import PromptConfig
+
+logger = logging.getLogger(__name__)
 
 class OpenAIAssistant:
     """AI assistant using OpenAI API for screenplay suggestions"""
@@ -170,6 +173,10 @@ class OllamaAssistant:
         try:
             full_prompt = f"{context}\n\n{prompt}" if context else prompt
             
+            logger.info(f"Ollama request: {self.base_url}/api/generate")
+            logger.info(f"Model: {self.model}")
+            logger.info(f"Prompt length: {len(full_prompt)}")
+            
             response = requests.post(
                 f"{self.base_url}/api/generate",
                 json={
@@ -182,11 +189,14 @@ class OllamaAssistant:
                 verify=self.verify_ssl
             )
             
+            logger.info(f"Ollama response status: {response.status_code}")
+            logger.info(f"Ollama response: {response.text}")
+            
             if response.status_code == 200:
                 return response.json().get('response', '')
-            return f"Error: HTTP {response.status_code}"
+            return f"Error: HTTP {response.status_code} - {response.text}"
         except Exception as e:
-            print(f"Ollama generation failed: {e}")
+            logger.error(f"Ollama generation failed: {e}")
             if "timed out" in str(e).lower():
                 return "AI assistant timed out. Please ensure Ollama is running and try again."
             elif "connection" in str(e).lower():

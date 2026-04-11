@@ -276,6 +276,11 @@ async function getArcSuggestion(characterId) {
     const name = card.querySelector('h3').textContent;
     const description = card.querySelector('.character-description').textContent;
     
+    // Debug logging
+    console.log('AI Request for character ID:', characterId);
+    console.log('Character name:', name);
+    console.log('Character description:', description);
+    
     const arcDiv = card.querySelector('.character-arc');
     
     // Show loading state
@@ -293,14 +298,24 @@ async function getArcSuggestion(characterId) {
     }
     
     try {
-        // Get screenplay context for better AI suggestions
-        const screenplayResponse = await fetch(`/api/screenplay/${screenplayId}`);
-        const screenplayData = await screenplayResponse.json();
-        const screenplayContext = screenplayData.content || '';
+        // Get screenplay context for better AI suggestions (best-effort)
+        let screenplayContext = '';
+        try {
+            const screenplayResponse = await fetch(`/api/screenplay/${screenplayId}`, {
+                credentials: 'same-origin'
+            });
+            if (screenplayResponse.ok) {
+                const screenplayData = await screenplayResponse.json();
+                screenplayContext = screenplayData.content || '';
+            }
+        } catch (ctxError) {
+            // Context fetch failed, proceed without it
+        }
         
         const response = await fetch('/api/ai/character-arc', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
+            credentials: 'same-origin',
             body: JSON.stringify({
                 character_id: characterId,
                 character_name: name,

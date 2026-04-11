@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -29,9 +30,9 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/uploads /app/screenplays /var/log/screen-dreams
 
-# Create non-root user for security
-RUN groupadd -r screenwriter && useradd -r -g screenwriter screenwriter
-RUN chown -R screenwriter:screenwriter /app /var/log/screen-dreams
+# Create non-root user for security with proper home directory
+RUN groupadd -r screenwriter && useradd -r -g screenwriter -m -d /home/screenwriter screenwriter
+RUN chown -R screenwriter:screenwriter /app /var/log/screen-dreams /home/screenwriter
 USER screenwriter
 
 # Expose port
