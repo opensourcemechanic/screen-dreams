@@ -1,13 +1,35 @@
-# Docker Quick Start Guide
+# Docker & Podman Quick Start Guide
 
 ## Quick Deployment with Nginx Port 80
 
 Deploy Screen Dreams with nginx reverse proxy for production-ready port 80 access.
 
+## Choose Your Container Engine
+
+### Docker Environments
+If you have Docker installed:
+```bash
+./deploy-docker-simple.sh
+# or
+./local-docker-deploy.sh
+```
+
+### Podman Environments  
+If you have Podman installed (Docker alternative):
+```bash
+./podman-deploy.sh
+```
+
+### Not Sure Which You Have?
+```bash
+docker --version    # If this works, use Docker scripts
+podman --version    # If this works, use Podman script
+```
+
 ### Prerequisites
 
-- Docker installed
-- Docker Compose installed
+- Docker OR Podman installed
+- Docker Compose OR Podman Compose (for Docker environments)
 - Git available
 - 2GB+ RAM
 - 10GB+ storage
@@ -19,9 +41,15 @@ Deploy Screen Dreams with nginx reverse proxy for production-ready port 80 acces
 git clone https://github.com/opensourcemechanic/screen-dreams.git
 cd screen-dreams
 
-# 2. Deploy with nginx
+# 2. Choose your deployment method:
+
+# For Docker environments:
 chmod +x deploy-docker-simple.sh
 ./deploy-docker-simple.sh
+
+# For Podman environments:
+chmod +x podman-deploy.sh
+./podman-deploy.sh
 
 # 3. Access application
 http://localhost        # Via nginx (port 80)
