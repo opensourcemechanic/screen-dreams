@@ -59,6 +59,415 @@ rm screenwriter.db
 python3 run.py  # Will recreate automatically
 ```
 
+## Podman Container Deployment
+
+### Overview
+
+Podman is a daemonless container engine that provides Docker-compatible CLI but with better security and no central daemon. It's ideal for rootless deployments and development environments.
+
+### Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/opensourcemechanic/screen-dreams.git
+cd screen-dreams
+
+# Deploy with unified script (recommended)
+chmod +x podman-deploy-unified.sh
+./podman-deploy-unified.sh
+
+# Access application
+http://localhost:8080    # Nginx proxy (default)
+http://localhost:5000    # Direct Flask access
+```
+
+### Deployment Options
+
+#### Option 1: Unified Script (Recommended)
+```bash
+# Default deployment (port 8080, lightweight, auto-registry)
+./podman-deploy-unified.sh
+
+# Port 80 deployment (requires sudo/privileged)
+./podman-deploy-unified.sh --port-80
+
+# Full image names (bypasses registry issues)
+./podman-deploy-unified.sh --full-image-names
+
+# Lightweight build (Alpine Linux)
+./podman-deploy-unified.sh --lightweight
+
+# Standard build (Debian)
+./podman-deploy-unified.sh --standard-build
+```
+
+#### Option 2: Specialized Scripts
+```bash
+# Port 8080 specific deployment
+./podman-deploy-8080.sh
+
+# Quick fix with full image names
+./podman-deploy-quick-fix.sh
+
+# Standard deployment
+./podman-deploy-fixed.sh
+```
+
+### Directory Structure
+
+```
+screen-dreams/              # Project directory (current directory)
+  uploads/                  # User uploaded files
+  screenplays/             # Generated screenplays
+  logs/                    # Application logs
+  docker/                  # Docker/Podman configurations
+    nginx/
+      default.conf         # Nginx reverse proxy config
+  .env                     # Environment variables
+  Dockerfile.dev           # Development container build
+  Dockerfile.dev.podman    # Lightweight Alpine build
+  docker-compose.dev.yml  # Docker Compose configuration
+```
+
+**Note**: For Podman deployment, all files are used from the current project directory. No separate `/opt/screen-dreams` installation is required.
+
+### Container Architecture
+
+```
+Pod: screen-dreams-pod
+  |
+  +-- Container: screen-dreams-dev (Flask App)
+  |      Port: 5000 (internal)
+  |      Image: screen-dreams:lightweight
+  |      Volumes: ./uploads, ./screenplays, ./logs
+  |
+  +-- Container: screen-dreams-nginx-dev (Nginx Proxy)
+  |      Port: 8080 (host) -> 80 (container)
+  |      Image: nginx:alpine
+  |      Config: ./docker/nginx/default.conf
+  |
+  +-- Container: screen-dreams-redis-dev (Redis Cache)
+         Port: 6379 (internal)
+         Image: redis:7-alpine
+```
+
+### Service Configuration
+
+#### Environment Variables (.env)
+```bash
+# Flask Configuration
+FLASK_ENV=development
+SECRET_KEY=dev-secret-key-change-in-production
+
+# Database Configuration
+DATABASE_URL=sqlite:///screenwriter_dev.db
+
+# Redis Configuration
+REDIS_URL=redis://redis-dev:6379/0
+RATELIMIT_STORAGE_URL=redis://redis-dev:6379/0
+
+# AI Assistant Configuration
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://ollama-dev:11434
+OLLAMA_MODEL=llama2
+OLLAMA_TIMEOUT=300
+```
+
+#### Nginx Configuration (docker/nginx/default.conf)
+```nginx
+upstream screen-dreams-backend {
+    server screen-dreams-dev:5000;
+}
+
+server {
+    listen 80;
+    server_name localhost;
+
+    # Security headers
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+    # Static files
+    location /static {
+        alias /var/www/static;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Main application
+    location / {
+        proxy_pass http://screen-dreams-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Health check
+    location /health {
+        proxy_pass http://screen-dreams-backend;
+        access_log off;
+    }
+}
+```
+
+### Container Build Options
+
+#### Option 1: Lightweight Alpine (Default)
+```dockerfile
+FROM python:3.11-alpine
+
+# Install minimal dependencies
+RUN apk add --no-cache gcc musl-dev libpq-dev curl vim git
+
+# Install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY . .
+
+# Run application
+CMD ["python3", "run_dev.py"]
+```
+
+#### Option 2: Standard Debian
+```dockerfile
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y gcc g++ libpq-dev curl vim git
+
+# Install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY . .
+
+# Run application
+CMD ["python3", "run_dev.py"]
+```
+
+### Registry Configuration
+
+Podman may require registry configuration for short image names:
+
+#### Automatic Configuration
+```bash
+# The unified script handles this automatically
+./podman-deploy-unified.sh
+```
+
+#### Manual Configuration
+```bash
+# Create system registry config
+sudo mkdir -p /etc/containers
+echo '[registries.search]
+registries = ["docker.io"]' | sudo tee /etc/containers/registries.conf
+
+# Create user registry config
+mkdir -p ~/.config/containers
+echo '[registries.search]
+registries = ["docker.io"]' > ~/.config/containers/registries.conf
+```
+
+#### Full Image Names (Bypass Registry)
+```bash
+# Use full image names to avoid registry issues
+./podman-deploy-unified.sh --full-image-names
+
+# This uses images like:
+# docker.io/library/redis:7-alpine
+# docker.io/library/nginx:alpine
+```
+
+### Port Configuration
+
+#### Port 8080 (Default - Recommended)
+- **Advantages**: No privileged port issues, works everywhere
+- **Use Case**: Local development, testing, most environments
+- **Access**: http://localhost:8080
+
+#### Port 80 (Production)
+- **Advantages**: Standard HTTP port, user-friendly URLs
+- **Requirements**: Proper permissions, firewall configuration
+- **Use Case**: Production deployments with proper setup
+- **Access**: http://localhost
+
+#### Port Forwarding
+```bash
+# Forward port 80 to 8080 (if needed)
+sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080
+
+# Make persistent
+sudo apt install -y iptables-persistent
+sudo netfilter-persistent save
+```
+
+### Management Commands
+
+#### Container Operations
+```bash
+# View running containers
+podman ps
+
+# View container logs
+podman logs -f screen-dreams-dev
+podman logs -f screen-dreams-nginx-dev
+podman logs -f screen-dreams-redis-dev
+
+# Restart containers
+podman restart screen-dreams-dev
+podman restart screen-dreams-nginx-dev
+
+# Stop all containers
+podman stop -a
+
+# Remove all containers
+podman rm -a
+
+# Remove pod
+podman pod rm screen-dreams-pod
+```
+
+#### Image Management
+```bash
+# List images
+podman images
+
+# Build new image
+podman build -t screen-dreams:custom -f Dockerfile.dev .
+
+# Remove unused images
+podman image prune -f
+
+# Remove all images
+podman rmi -a
+```
+
+#### System Cleanup
+```bash
+# Clean up everything
+podman system prune -a
+
+# Clean up volumes
+podman volume prune
+
+# Check disk usage
+podman system df
+```
+
+### Production Considerations
+
+#### Security
+- **Rootless Containers**: Podman runs containers without root by default
+- **Pod Isolation**: Containers share network but are isolated otherwise
+- **File Permissions**: Ensure proper permissions for volumes
+- **Environment Variables**: Keep sensitive data in .env file
+
+#### Performance
+- **Lightweight Images**: Use Alpine for smaller footprint
+- **Resource Limits**: Set memory and CPU limits in production
+- **Health Checks**: Monitor container health and restart policies
+- **Logging**: Configure proper log rotation
+
+#### Persistence
+- **Data Volumes**: Use bind mounts for uploads and screenplays
+- **Database**: SQLite file persists in project directory
+- **Backups**: Regular backups of uploads and screenplays directories
+- **State Management**: Redis data is ephemeral (cache only)
+
+#### Monitoring
+```bash
+# Check container resource usage
+podman stats
+
+# Check container health
+podman exec screen-dreams-dev curl localhost:5000/health
+
+# Monitor logs
+podman logs -f --tail=100 screen-dreams-dev
+```
+
+### Troubleshooting
+
+#### Common Issues
+
+**Port Binding Errors**
+```bash
+# Use port 8080 instead of 80
+./podman-deploy-unified.sh --port-8080
+
+# Or fix privileged port permissions
+sudo sysctl -w net.ipv4.ip_unprivileged_port_start=80
+```
+
+**Registry Resolution Errors**
+```bash
+# Use full image names
+./podman-deploy-unified.sh --full-image-names
+
+# Or configure registry
+./podman-deploy-unified.sh --registry-config
+```
+
+**Container Communication Issues**
+```bash
+# Test pod networking
+podman exec -it screen-dreams-dev ping redis-dev
+
+# Check service discovery
+podman exec -it screen-dreams-dev curl redis-dev:6379
+```
+
+**Permission Issues**
+```bash
+# Check file permissions
+ls -la uploads/ screenplays/ logs/
+
+# Fix permissions
+chmod 755 uploads screenplays logs
+```
+
+#### Debug Commands
+```bash
+# Enter container for debugging
+podman exec -it screen-dreams-dev /bin/sh
+
+# Check container processes
+podman exec -it screen-dreams-dev ps aux
+
+# Test application inside container
+podman exec -it screen-dreams-dev curl localhost:5000/health
+
+# Check network configuration
+podman exec -it screen-dreams-dev netstat -tlnp
+```
+
+### Migration from Docker
+
+If migrating from Docker to Podman:
+
+```bash
+# Export Docker images (if needed)
+docker save screen-dreams:latest | podman load
+
+# Use Docker Compose equivalent
+# Podman doesn't support docker-compose directly
+# Use the provided Podman scripts instead
+
+# Update deployment scripts
+# Replace docker commands with podman commands
+# Use podman pods instead of docker networks
+```
+
 ---
 
 ## Production Deployment Guide
