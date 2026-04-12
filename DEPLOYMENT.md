@@ -101,16 +101,10 @@ http://localhost:5000    # Direct Flask access
 ./podman-deploy-unified.sh --standard-build
 ```
 
-#### Option 2: Specialized Scripts
+#### Option 2: Direct Deployment (Advanced)
 ```bash
-# Port 8080 specific deployment
-./podman-deploy-8080.sh
-
-# Quick fix with full image names
-./podman-deploy-quick-fix.sh
-
-# Standard deployment
-./podman-deploy-fixed.sh
+# Manual container deployment for custom setups
+# See "Direct Container Deployment" section below
 ```
 
 ### Directory Structure
@@ -449,6 +443,388 @@ podman exec -it screen-dreams-dev curl localhost:5000/health
 
 # Check network configuration
 podman exec -it screen-dreams-dev netstat -tlnp
+```
+
+### Systemd Service Management
+
+#### Production Service Definition
+
+For production deployments, create a systemd service to manage Podman containers:
+
+```bash
+# Create systemd service for Podman containers
+sudo tee /etc/systemd/system/screen-dreams-podman.service > /dev/null << 'EOF'
+[Unit]
+Description=Screen Dreams Podman Containers
+After=podman.service network.target
+Wants=podman.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/user/screen-dreams  # Update path as needed
+ExecStart=/usr/bin/podman start -a
+ExecStop=/usr/bin/podman stop -a
+ExecReload=/usr/bin/podman restart -a
+TimeoutStartSec=60
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start the service
+sudo systemctl enable screen-dreams-podman.service
+sudo systemctl start screen-dreams-podman.service
+```
+
+#### Service Management Commands
+
+```bash
+# Check service status
+sudo systemctl status screen-dreams-podman.service
+
+# Start all containers
+sudo systemctl start screen-dreams-podman.service
+
+# Stop all containers
+sudo systemctl stop screen-dreams-podman.service
+
+# Restart all containers
+sudo systemctl restart screen-dreams-podman.service
+
+# View service logs
+sudo journalctl -u screen-dreams-podman.service -f
+
+# Check if service starts on boot
+sudo systemctl is-enabled screen-dreams-podman.service
+```
+
+#### Advanced Service Options
+
+##### Option 1: Per-Container Services
+```bash
+# Main application service
+sudo tee /etc/systemd/system/screen-dreams-app.service > /dev/null << 'EOF'
+[Unit]
+Description=Screen Dreams Application
+After=screen-dreams-pod.service
+Requires=screen-dreams-pod.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/podman start screen-dreams-dev
+ExecStop=/usr/bin/podman stop screen-dreams-dev
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Nginx service
+sudo tee /etc/systemd/system/screen-dreams-nginx.service > /dev/null << 'EOF'
+[Unit]
+Description=Screen Dreams Nginx Proxy
+After=screen-dreams-pod.service
+Requires=screen-dreams-pod.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/podman start screen-dreams-nginx-dev
+ExecStop=/usr/bin/podman stop screen-dreams-nginx-dev
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable services
+sudo systemctl enable screen-dreams-app.service screen-dreams-nginx.service
+```
+
+##### Option 2: Deployment Service
+```bash
+# Service that runs deployment script
+sudo tee /etc/systemd/system/screen-dreams-deploy.service > /dev/null << 'EOF'
+[Unit]
+Description=Screen Dreams Deployment Service
+After=podman.service network.target
+Wants=podman.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/user/screen-dreams  # Update path
+ExecStart=/home/user/screen-dreams/podman-deploy-unified.sh --port-8080
+ExecStop=/usr/bin/podman stop -a
+ExecStopPost=/usr/bin/podman rm -a
+TimeoutStartSec=300
+TimeoutStopSec=60
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+#### Service Configuration
+
+##### Environment Variables
+```bash
+# Create service environment file
+sudo tee /etc/systemd/system/screen-dreams-podman.service.d/env.conf > /dev/null << 'EOF'
+[Service]
+Environment="PODMAN_TIMEOUT=60"
+Environment="PODMAN_LOG_LEVEL=info"
+EOF
+```
+
+##### Resource Limits
+```bash
+# Add resource limits to service
+sudo tee /etc/systemd/system/screen-dreams-podman.service.d/limits.conf > /dev/null << 'EOF'
+[Service]
+MemoryLimit=2G
+CPUQuota=200%
+TasksMax=100
+EOF
+```
+
+### Direct Container Deployment
+
+For advanced users who want manual control over container deployment:
+
+#### Manual Deployment Steps
+
+```bash
+# 1. Clean up existing containers
+podman stop -a 2>/dev/null || true
+podman rm -a 2>/dev/null || true
+podman pod rm -a 2>/dev/null || true
+
+# 2. Create pod with custom networking
+podman pod create --name screen-dreams-pod \
+    -p 5000:5000 \
+    -p 8080:80 \
+    --share default
+
+# 3. Build application image
+podman build -t screen-dreams:custom -f Dockerfile.dev.podman .
+
+# 4. Start Redis
+podman run -d --name screen-dreams-redis-dev \
+    --pod screen-dreams-pod \
+    --restart unless-stopped \
+    --memory=256m \
+    docker.io/library/redis:7-alpine
+
+# 5. Start Flask application
+podman run -d --name screen-dreams-dev \
+    --pod screen-dreams-pod \
+    --restart unless-stopped \
+    --memory=1g \
+    -e DATABASE_URL=sqlite:///screenwriter_dev.db \
+    -e REDIS_URL=redis://redis-dev:6379/0 \
+    -e RATELIMIT_STORAGE_URL=redis://redis-dev:6379/0 \
+    -e SECRET_KEY=your-secret-key-here \
+    -e AI_PROVIDER=ollama \
+    -e OLLAMA_BASE_URL=http://ollama-dev:11434 \
+    -e OLLAMA_MODEL=llama2 \
+    -e UPLOAD_FOLDER=/app/uploads \
+    -e SCREENPLAY_FOLDER=/app/screenplays \
+    -v $(pwd):/app \
+    -v $(pwd)/uploads:/app/uploads \
+    -v $(pwd)/screenplays:/app/screenplays \
+    -v $(pwd)/logs:/var/log/screen-dreams \
+    screen-dreams:custom python3 run_dev.py
+
+# 6. Start nginx
+podman run -d --name screen-dreams-nginx-dev \
+    --pod screen-dreams-pod \
+    --restart unless-stopped \
+    --memory=256m \
+    -v $(pwd)/docker/nginx/default-dev.conf:/etc/nginx/conf.d/default.conf:ro \
+    -v $(pwd)/static:/var/www/static:ro \
+    docker.io/library/nginx:alpine
+
+# 7. Start Ollama (optional, for AI features)
+podman run -d --name ollama-dev \
+    --pod screen-dreams-pod \
+    --restart unless-stopped \
+    --memory=2g \
+    docker.io/ollama/ollama
+
+# 8. Pull AI model (if using Ollama)
+podman exec ollama-dev ollama pull tinyllama
+```
+
+#### Custom Configuration
+
+##### Environment File
+```bash
+# Create custom environment file
+cat > .env.custom << 'EOF'
+# Flask Configuration
+FLASK_ENV=production
+SECRET_KEY=your-very-secure-secret-key-here
+
+# Database Configuration
+DATABASE_URL=sqlite:///screenwriter_prod.db
+
+# Redis Configuration
+REDIS_URL=redis://redis-dev:6379/0
+RATELIMIT_STORAGE_URL=redis://redis-dev:6379/0
+
+# AI Configuration
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://ollama-dev:11434
+OLLAMA_MODEL=tinyllama
+OLLAMA_TIMEOUT=300
+
+# Application Paths
+UPLOAD_FOLDER=/app/uploads
+SCREENPLAY_FOLDER=/app/screenplays
+EOF
+```
+
+##### Custom Nginx Config
+```bash
+# Create production nginx config
+cat > docker/nginx/custom.conf << 'EOF'
+upstream screen-dreams-backend {
+    server screen-dreams-dev:5000;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    # Security headers
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+
+    # Static files
+    location /static {
+        alias /var/www/static;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Main application
+    location / {
+        proxy_pass http://screen-dreams-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # API endpoints with rate limiting
+    location /api/ {
+        limit_req zone=api burst=20 nodelay;
+        proxy_pass http://screen-dreams-backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Health check
+    location /health {
+        proxy_pass http://screen-dreams-backend;
+        access_log off;
+    }
+}
+EOF
+```
+
+#### Deployment Automation
+
+##### Deployment Script
+```bash
+#!/bin/bash
+# deploy-custom.sh - Custom deployment script
+
+set -e
+
+echo "=== Custom Screen Dreams Deployment ==="
+
+# Configuration
+IMAGE_TAG="screen-dreams:custom"
+POD_NAME="screen-dreams-pod"
+MEMORY_LIMIT="2g"
+
+# Stop existing containers
+echo "Stopping existing containers..."
+podman stop -a 2>/dev/null || true
+podman rm -a 2>/dev/null || true
+podman pod rm -a 2>/dev/null || true
+
+# Create pod
+echo "Creating pod..."
+podman pod create --name $POD_NAME \
+    -p 5000:5000 \
+    -p 8080:80
+
+# Build image
+echo "Building application image..."
+podman build -t $IMAGE_TAG -f Dockerfile.dev.podman .
+
+# Start containers
+echo "Starting containers..."
+podman run -d --name screen-dreams-redis-dev \
+    --pod $POD_NAME \
+    --restart unless-stopped \
+    --memory=256m \
+    docker.io/library/redis:7-alpine
+
+podman run -d --name screen-dreams-dev \
+    --pod $POD_NAME \
+    --restart unless-stopped \
+    --memory=$MEMORY_LIMIT \
+    --env-file .env.custom \
+    -v $(pwd):/app \
+    -v $(pwd)/uploads:/app/uploads \
+    -v $(pwd)/screenplays:/app/screenplays \
+    -v $(pwd)/logs:/var/log/screen-dreams \
+    $IMAGE_TAG python3 run_dev.py
+
+podman run -d --name screen-dreams-nginx-dev \
+    --pod $POD_NAME \
+    --restart unless-stopped \
+    --memory=256m \
+    -v $(pwd)/docker/nginx/custom.conf:/etc/nginx/conf.d/default.conf:ro \
+    -v $(pwd)/static:/var/www/static:ro \
+    docker.io/library/nginx:alpine
+
+# Health check
+echo "Performing health check..."
+sleep 20
+
+if curl -f http://localhost:8080/health >/dev/null 2>&1; then
+    echo "Deployment successful!"
+    echo "Access at: http://localhost:8080"
+else
+    echo "Deployment failed - check logs"
+    podman logs screen-dreams-nginx-dev
+    exit 1
+fi
 ```
 
 ### Migration from Docker
