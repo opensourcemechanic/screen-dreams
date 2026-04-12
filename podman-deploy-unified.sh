@@ -292,7 +292,7 @@ print_status "Starting nginx reverse proxy..."
 podman run -d --name screen-dreams-nginx-dev \
     --pod screen-dreams-pod \
     --restart unless-stopped \
-    -v $(pwd)/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro \
+    -v $(pwd)/docker/nginx/default-dev.conf:/etc/nginx/conf.d/default.conf:ro \
     -v $(pwd)/static:/var/www/static:ro \
     $NGINX_IMAGE
 
