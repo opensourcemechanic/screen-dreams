@@ -279,6 +279,8 @@ podman run -d --name screen-dreams-dev \
     -e AI_PROVIDER=ollama \
     -e OLLAMA_BASE_URL=http://ollama-dev:11434 \
     -e OLLAMA_MODEL=llama2 \
+    -e UPLOAD_FOLDER=/app/uploads \
+    -e SCREENPLAY_FOLDER=/app/screenplays \
     -v $(pwd):/app \
     -v $(pwd)/uploads:/app/uploads \
     -v $(pwd)/screenplays:/app/screenplays \
