@@ -1,5 +1,60 @@
 # Screen Dreams Screenwriter - Deployment Guide
 
+## **Easiest Deployment: UVX (Recommended)**
+
+### **One-Command Local Deployment**
+
+Deploy Screen Dreams instantly on your computer with UVX:
+
+```bash
+# Install UV (one-time setup)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Deploy Screen Dreams instantly
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git
+```
+
+**Access at:** http://localhost:5000
+
+### **Why UVX is Recommended**
+
+- **Zero installation** - No git clone, no virtual environment setup
+- **Isolated environment** - Won't conflict with other Python projects
+- **Automatic dependencies** - Handles all package installation
+- **Cross-platform** - Works on Windows, macOS, Linux
+- **Private** - All data stays on your machine
+- **Fast** - Starts in seconds
+
+### **UVX with AI Features**
+
+```bash
+# With Ollama (local AI)
+uvx --env AI_PROVIDER=ollama git+https://github.com/opensourcemechanic/screen-dreams.git
+
+# With OpenAI
+uvx --env AI_PROVIDER=openai --env OPENAI_API_KEY=your-key git+https://github.com/opensourcemechanic/screen-dreams.git
+
+# With Anthropic Claude
+uvx --env AI_PROVIDER=anthropic --env ANTHROPIC_API_KEY=your-key git+https://github.com/opensourcemechanic/screen-dreams.git
+```
+
+### **UVX Configuration**
+
+```bash
+# Custom port
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git -- --port=8080
+
+# Production mode
+uvx --env FLASK_ENV=production git+https://github.com/opensourcemechanic/screen-dreams.git
+
+# With environment file
+uvx --env-file .env.uvx git+https://github.com/opensourcemechanic/screen-dreams.git
+```
+
+**For complete UVX documentation, see [UVX Quick Start](UVX-QUICK-START.md)**
+
+---
+
 ## Local Development Deployment
 
 ### Quick Start

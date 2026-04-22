@@ -1,33 +1,49 @@
 #!/usr/bin/env python3
 """
+Screen Dreams - Main entry point for UVX deployment
 Development runner with debug mode enabled
-Use this for active development and debugging
 """
 
 import os
 import sys
+from pathlib import Path
 
-# Set debug mode before importing the app
-os.environ['FLASK_DEBUG'] = 'True'
-
-# Import and run the app
-from app import create_app
-
-app = create_app()
+def main():
+    """Main entry point for UVX deployment"""
+    # Set debug mode before importing the app
+    os.environ['FLASK_DEBUG'] = 'True'
+    
+    # Create necessary directories
+    directories = ['uploads', 'screenplays', 'logs', 'static']
+    for directory in directories:
+        Path(directory).mkdir(exist_ok=True)
+    
+    # Import and run the app
+    try:
+        from app import create_app
+        app = create_app()
+        
+        print("Screen Dreams - AI Screenwriting Application")
+        print("=" * 50)
+        print("Mode: Development")
+        print("Server: http://localhost:5000")
+        print("Debug mode: ENABLED")
+        print("Auto-reload: ENABLED")
+        print("Interactive debugger: ENABLED")
+        print("=" * 50)
+        print("For production mode, use: screen-dreams-prod")
+        print()
+        
+        # Run with debug enabled
+        app.run(debug=True, host='0.0.0.0', port=5000)
+        
+    except ImportError as e:
+        print(f"Import error: {e}")
+        print("Please ensure all dependencies are installed")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Startup error: {e}")
+        sys.exit(1)
 
 if __name__ == '__main__':
-    # Create screenplays folder if it doesn't exist
-    os.makedirs('screenplays', exist_ok=True)
-    
-    print("🔧 Development Mode (Debug ON)")
-    print("=" * 40)
-    print("🐛 Debug mode: ENABLED")
-    print("🌐 Server: http://127.0.0.1:5000")
-    print("📝 Auto-reload: ENABLED")
-    print("🔍 Interactive debugger: ENABLED")
-    print("=" * 40)
-    print("💡 For production mode, use: python run.py")
-    print()
-    
-    # Run with debug enabled
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    main()

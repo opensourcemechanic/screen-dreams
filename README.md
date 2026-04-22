@@ -46,6 +46,32 @@ The application is designed primarily for desktop and horizontal mobile use. Whi
 3. **Enable auto-rotation** for best experience
 4. **Consider using tablet** for extended writing sessions
 
+## Quick Start (Easiest Method)
+
+### **One-Command Local Deployment with UVX** 
+
+Deploy Screen Dreams instantly on your computer with a single command:
+
+```bash
+# Install UV (one-time setup)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Deploy Screen Dreams instantly
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git
+
+# Open your browser to http://localhost:5000
+```
+
+**That's it!** Screen Dreams is now running locally on your machine with:
+- Complete web interface
+- Local data storage (all files saved on your computer)
+- AI features (if configured)
+- Privacy (no data leaves your machine)
+
+For detailed UVX instructions, see [UVX Quick Start](UVX-QUICK-START.md).
+
+---
+
 ## Installation
 
 ### Option 1: Using uv (Recommended - Fast & Modern)
