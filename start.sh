@@ -15,11 +15,15 @@ echo "=========================="
 
 if command -v uvx &>/dev/null; then
     echo "Starting with uvx on port $PORT..."
+    # Create temporary env file for uvx
+    env_file=$(mktemp)
+    echo "PORT=$PORT" > "$env_file"
     if [ "$MODE" = "dev" ]; then
-        exec env PORT="$PORT" uvx --from . screen-dreams --debug
+        exec uvx --from . --env-file "$env_file" screen-dreams --debug
     else
-        exec env PORT="$PORT" uvx --from . screen-dreams
+        exec uvx --from . --env-file "$env_file" screen-dreams
     fi
+    rm -f "$env_file"  # Cleanup (shouldn't be reached due to exec)
 
 elif command -v podman &>/dev/null; then
     echo "uvx not found. Starting with Podman on port $PORT..."
