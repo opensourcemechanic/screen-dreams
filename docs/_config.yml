@@ -4,6 +4,9 @@ description: AI-powered screenwriting application with professional tools
 baseurl: /screen-dreams
 url: https://opensourcemechanic.github.io
 
+# Build timestamp for cache clearing
+timestamp: 2026-04-23-17-30
+
 # Build settings
 markdown: kramdown
 highlighter: rouge
