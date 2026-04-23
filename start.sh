@@ -16,9 +16,9 @@ echo "=========================="
 if command -v uvx &>/dev/null; then
     echo "Starting with uvx on port $PORT..."
     if [ "$MODE" = "dev" ]; then
-        exec uvx --from . screen-dreams --debug --port "$PORT"
+        exec env PORT="$PORT" uvx --from . screen-dreams --debug
     else
-        exec uvx --from . screen-dreams --port "$PORT"
+        exec env PORT="$PORT" uvx --from . screen-dreams
     fi
 
 elif command -v podman &>/dev/null; then
