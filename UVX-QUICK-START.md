@@ -59,10 +59,10 @@ uvx git+https://github.com/opensourcemechanic/screen-dreams.git
 uvx git+https://github.com/opensourcemechanic/screen-dreams.git[ai]
 ```
 
-### **Method 3: Custom Configuration**
+### **Method 3: Custom Port**
 ```bash
-# Deploy with custom settings
-uvx git+https://github.com/opensourcemechanic/screen-dreams.git -- --host=0.0.0.0 --port=8080
+# Deploy on a custom port (default is 8080)
+PORT=3000 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 ```
 
 ---
@@ -71,8 +71,11 @@ uvx git+https://github.com/opensourcemechanic/screen-dreams.git -- --host=0.0.0.
 
 ### **Web Interface**
 Once deployed, access Screen Dreams at:
-- **Primary**: http://localhost:5000
-- **Alternative**: http://127.0.0.1:5000
+- **Primary**: http://localhost:8080 (production/default)
+- **Dev mode**: http://localhost:5000 (only when using `screen-dreams-dev`)
+
+> **Port convention**: The default `screen-dreams` entry point runs gunicorn on port **8080**.
+> The `screen-dreams-dev` entry point runs Flask dev server on port **5000** (fixed, required for auto-reload).
 
 ### **What You Get**
 - **Complete web interface** - Full-featured screenwriting application
@@ -124,26 +127,25 @@ uvx --env AI_PROVIDER=anthropic --env ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY git+h
 # Set AI provider
 uvx --env AI_PROVIDER=ollama git+https://github.com/opensourcemechanic/screen-dreams.git
 
-# Set custom port
-uvx --env PORT=8080 git+https://github.com/opensourcemechanic/screen-dreams.git
+# Set custom port (production mode, default is 8080)
+PORT=3000 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 
 # Set database location
 uvx --env DATABASE_URL=sqlite:///my-screenplays.db git+https://github.com/opensourcemechanic/screen-dreams.git
 
 # Multiple settings
-uvx --env AI_PROVIDER=ollama --env PORT=8080 --env FLASK_ENV=production git+https://github.com/opensourcemechanic/screen-dreams.git
+uvx --env AI_PROVIDER=ollama --env DATABASE_URL=sqlite:///my-screenplays.db git+https://github.com/opensourcemechanic/screen-dreams.git
 ```
 
-### **Command Line Arguments**
+### **Entry Points**
 ```bash
-# Custom host and port
-uvx git+https://github.com/opensourcemechanic/screen-dreams.git -- --host=0.0.0.0 --port=8080
+# Production mode — gunicorn on port 8080 (default)
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git
+# or explicitly:
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 
-# Debug mode
-uvx git+https://github.com/opensourcemechanic/screen-dreams.git -- --debug
-
-# Production mode
-uvx git+https://github.com/opensourcemechanic/screen-dreams.git -- --no-debug
+# Development mode — Flask dev server on port 5000 (auto-reload)
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-dev
 ```
 
 ---
@@ -193,8 +195,11 @@ uvx --python 3.11 git+https://github.com/opensourcemechanic/screen-dreams.git
 
 #### **"Port already in use"**
 ```bash
-# Use a different port
-uvx git+https://github.com/opensourcemechanic/screen-dreams.git -- --port=8080
+# Stop all running instances first
+./stop.sh
+
+# Or use a different port
+PORT=3000 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 ```
 
 #### **"Permission denied"**

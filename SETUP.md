@@ -234,13 +234,18 @@ uv pip install -e .
 
 ### Port Already in Use
 ```bash
-# Kill processes using port 5000
-lsof -ti:5000 | xargs kill -9
+# Stop all Screen Dreams instances cleanly
+./stop.sh
 
-# Or use a different port
-export FLASK_RUN_PORT=5001
-python3 run.py
+# Or kill by port manually
+lsof -ti:8080 | xargs kill -9  # production default
+lsof -ti:5000 | xargs kill -9  # dev mode
+
+# Or start on a different port
+PORT=3000 ./start.sh
 ```
+
+> **Port convention**: Production (gunicorn) defaults to **8080**. Dev mode (Flask) always uses **5000**.
 
 ## Production Deployment
 
