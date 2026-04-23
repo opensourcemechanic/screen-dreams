@@ -6,6 +6,7 @@ from app.screenplay import FountainParser
 from app.pdf_generator import ScreenplayPDFGenerator
 from app.ai_assistant import AIAssistant
 import os
+import re
 from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
