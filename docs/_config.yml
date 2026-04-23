@@ -5,7 +5,7 @@ baseurl: /screen-dreams
 url: https://opensourcemechanic.github.io
 
 # Build timestamp for cache clearing
-timestamp: 2026-04-23-17-30
+timestamp: 2026-04-23-19-40
 
 # Build settings
 markdown: kramdown
