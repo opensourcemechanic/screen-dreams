@@ -1,9 +1,14 @@
 import re
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 class FountainParser:
     """Parser for Fountain screenplay format"""
     
+    ANNOTATION_PREFIX_DESC = '[[DESCRIPTION:'
+    ANNOTATION_PREFIX_ARC  = '[[ARC:'
+    ANNOTATION_SUFFIX      = ']]'
+    ANNOTATION_PATTERN     = re.compile(r'^\[\[(DESCRIPTION|ARC):(.*)\]\]\s*$', re.IGNORECASE)
+
     def __init__(self):
         self.scene_heading_pattern = re.compile(r'^(INT|EXT|EST|INT\./EXT|INT/EXT|I/E)[\.\s]', re.IGNORECASE)
         self.character_pattern = re.compile(r'^[A-Za-z][A-Za-z\s]+$')
@@ -143,6 +148,69 @@ class FountainParser:
                 characters.add(name)
         
         return sorted(list(characters))
+
+    def read_annotations(self, text: str, character_name: str) -> Dict[str, str]:
+        """Read [[DESCRIPTION:...]] and [[ARC:...]] annotations for a character from screenplay text."""
+        name_upper = character_name.strip().upper()
+        lines = text.split('\n')
+        result = {'description': '', 'arc_notes': ''}
+        i = 0
+        while i < len(lines):
+            stripped = lines[i].strip()
+            if stripped.upper() == name_upper:
+                # Look ahead for annotation lines immediately following this cue
+                j = i + 1
+                while j < len(lines):
+                    ann = lines[j].strip()
+                    m = self.ANNOTATION_PATTERN.match(ann)
+                    if m:
+                        key = m.group(1).upper()
+                        val = m.group(2).strip()
+                        if key == 'DESCRIPTION':
+                            result['description'] = val
+                        elif key == 'ARC':
+                            result['arc_notes'] = val
+                        j += 1
+                    else:
+                        break
+                break
+            i += 1
+        return result
+
+    def write_annotations(self, text: str, character_name: str,
+                          description: str = '', arc_notes: str = '') -> str:
+        """Insert/update [[DESCRIPTION:...]] and [[ARC:...]] lines after the first
+        occurrence of character_name as a cue line in the screenplay text.
+        Existing annotation lines for that character are replaced; screenplay text
+        is otherwise unchanged."""
+        name_upper = character_name.strip().upper()
+        lines = text.split('\n')
+        result = []
+        i = 0
+        written = False
+        while i < len(lines):
+            stripped = lines[i].strip()
+            if not written and stripped.upper() == name_upper:
+                result.append(lines[i])  # keep the cue line as-is
+                i += 1
+                # Skip any existing annotation lines immediately after
+                while i < len(lines) and self.ANNOTATION_PATTERN.match(lines[i].strip()):
+                    i += 1
+                # Insert updated annotations (omit empty ones to keep text clean)
+                if description.strip():
+                    result.append(f'{self.ANNOTATION_PREFIX_DESC} {description.strip()}{self.ANNOTATION_SUFFIX}')
+                if arc_notes.strip():
+                    result.append(f'{self.ANNOTATION_PREFIX_ARC} {arc_notes.strip()}{self.ANNOTATION_SUFFIX}')
+                written = True
+                continue
+            result.append(lines[i])
+            i += 1
+        return '\n'.join(result)
+
+    def strip_annotations(self, text: str) -> str:
+        """Return screenplay text with all [[...]] annotation lines removed (for PDF export)."""
+        lines = text.split('\n')
+        return '\n'.join(l for l in lines if not self.ANNOTATION_PATTERN.match(l.strip()))
     
     def format_screenplay_content(self, text: str) -> str:
         """Format screenplay content with uppercase character names while preserving original formatting"""
@@ -151,18 +219,27 @@ class FountainParser:
         
         for i, line in enumerate(lines):
             stripped_line = line.strip()
+
+            # Preserve annotation lines exactly
+            if self.ANNOTATION_PATTERN.match(stripped_line):
+                formatted_lines.append(line)
+                continue
             
             # Check if this line is a character name using the same logic as the parser
-            # Character names must be followed by dialogue or parenthetical
+            # Character names must be followed by dialogue, annotation, or parenthetical
             is_character = False
             if (self.character_pattern.match(stripped_line) and 
                 not self.scene_heading_pattern.match(stripped_line) and
                 not self.transition_pattern.match(stripped_line) and
                 not self.parenthetical_pattern.match(stripped_line)):
                 
-                # Check if next line exists and could be dialogue or parenthetical
+                # Check if next non-annotation line exists and could be dialogue or parenthetical
                 if i + 1 < len(lines):
-                    next_line = lines[i + 1].strip()
+                    # Skip past any annotation lines to find what follows
+                    j = i + 1
+                    while j < len(lines) and self.ANNOTATION_PATTERN.match(lines[j].strip()):
+                        j += 1
+                    next_line = lines[j].strip() if j < len(lines) else ''
                     if (next_line.startswith('(') or 
                         (next_line and not self.scene_heading_pattern.match(next_line) and
                          not self.character_pattern.match(next_line))):

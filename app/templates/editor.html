@@ -62,6 +62,11 @@
                     <strong>Transition:</strong>
                     <code>FADE OUT.</code>
                 </div>
+                <div class="syntax-item annotation-syntax-hint">
+                    <strong>Character note:</strong>
+                    <code class="annotation-code">[[DESCRIPTION: ...]]</code><br>
+                    <code class="annotation-code">[[ARC: ...]]</code>
+                </div>
             </div>
             
             <div class="ai-panel" id="ai-panel">
@@ -73,7 +78,9 @@
         </div>
         
         <div class="editor-main">
-            <textarea id="screenplay-content" class="screenplay-textarea" placeholder="Start writing your screenplay using Fountain format...
+            <div class="screenplay-editor-wrap">
+                <div id="screenplay-highlight" class="screenplay-highlight" aria-hidden="true"></div>
+                <textarea id="screenplay-content" class="screenplay-textarea screenplay-textarea--overlay" placeholder="Start writing your screenplay using Fountain format...
 
 Example:
 
@@ -91,6 +98,7 @@ Over here!
 John walks to Mary's table.
 
 FADE OUT.">{{ screenplay.content }}</textarea>
+            </div>
             
             <div class="editor-stats">
                 <span id="char-count">Characters: 0</span>
@@ -188,8 +196,9 @@ async function loadScreenplay() {
             // Update save status
             document.getElementById('save-status').textContent = 'Loaded';
             
-            // Update stats
+            // Update stats and annotation highlight
             updateStats();
+            syncHighlight();
         } else {
             document.getElementById('save-status').textContent = 'Error loading';
         }
@@ -303,6 +312,51 @@ async function checkAIStatus() {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Annotation highlighting overlay
+// ---------------------------------------------------------------------------
+const ANNOTATION_RE = /^\[\[(DESCRIPTION|ARC):/i;
+
+function escapeHtml(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function syncHighlight() {
+    const ta = document.getElementById('screenplay-content');
+    const hl = document.getElementById('screenplay-highlight');
+    if (!ta || !hl) return;
+    const lines = ta.value.split('\n');
+    const html = lines.map(line => {
+        const safe = escapeHtml(line);
+        if (ANNOTATION_RE.test(line.trim())) {
+            return '<span class="annotation-line">' + safe + '</span>';
+        }
+        return '<span class="plain-line">' + safe + '</span>';
+    }).join('\n');
+    // Trailing newline needed to keep scroll sync on last blank line
+    hl.innerHTML = html + '\n';
+}
+
+function syncScroll() {
+    const ta = document.getElementById('screenplay-content');
+    const hl = document.getElementById('screenplay-highlight');
+    if (!ta || !hl) return;
+    hl.scrollTop = ta.scrollTop;
+    hl.scrollLeft = ta.scrollLeft;
+}
+
+(function initHighlight() {
+    const ta = document.getElementById('screenplay-content');
+    if (!ta) return;
+    syncHighlight();
+    ta.addEventListener('input', syncHighlight);
+    ta.addEventListener('scroll', syncScroll);
+    ta.addEventListener('keyup', syncHighlight);
+})();
+
 // Initialize
 updateStats();
 checkAIStatus();
@@ -333,6 +387,87 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* ---- Annotation highlight overlay ---- */
+.screenplay-editor-wrap {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--content-bg, #fff);
+}
+
+.screenplay-highlight,
+.screenplay-textarea--overlay {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12pt;
+    line-height: 1.5;
+    padding: 2rem;
+    margin: 0;
+    border: none;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    tab-size: 4;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.screenplay-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: auto;
+    color: transparent;
+    background: transparent;
+    z-index: 1;
+}
+
+.screenplay-textarea--overlay {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    background: transparent;
+    color: inherit;
+    caret-color: var(--content-text, #333);
+    resize: none;
+    outline: none;
+}
+
+.screenplay-textarea--overlay:focus {
+    outline: none;
+}
+
+.annotation-line {
+    background-color: rgba(90, 40, 160, 0.12);
+    color: #7b3fa0;
+    font-style: italic;
+    border-radius: 2px;
+    display: inline-block;
+    width: 100%;
+}
+
+.plain-line {
+    display: inline-block;
+    width: 100%;
+    color: transparent;
+}
+
+.annotation-syntax-hint {
+    margin-top: 0.5rem;
+    border-top: 1px solid rgba(123, 63, 160, 0.25);
+    padding-top: 0.5rem;
+}
+
+.annotation-code {
+    color: #7b3fa0;
+    font-style: italic;
+}
+
+/* ---- AI status ---- */
 .ai-status {
     padding: 4px 8px;
     border-radius: 4px;

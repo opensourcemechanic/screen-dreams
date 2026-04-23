@@ -178,16 +178,27 @@ def api_parse_screenplay(screenplay_id):
         
         # Extract characters
         character_names = parser.extract_characters(screenplay.content)
-        existing_characters = {c.name for c in screenplay.characters}
+        existing_characters = {c.name: c for c in screenplay.characters}
         
-        # Add new characters
+        # Upsert characters: add new ones, read annotations into existing empty fields
         for name in character_names:
+            annotations = parser.read_annotations(screenplay.content, name)
             if name not in existing_characters:
                 character = Character(
                     screenplay_id=screenplay_id,
-                    name=name
+                    name=name,
+                    description=annotations['description'],
+                    arc_notes=annotations['arc_notes']
                 )
                 db.session.add(character)
+            else:
+                existing = existing_characters[name]
+                existing.updated_at = datetime.utcnow()
+                # Only populate DB fields from annotations if the DB field is currently empty
+                if not existing.description and annotations['description']:
+                    existing.description = annotations['description']
+                if not existing.arc_notes and annotations['arc_notes']:
+                    existing.arc_notes = annotations['arc_notes']
         
         db.session.commit()
         
@@ -216,7 +227,7 @@ def api_generate_pdf(screenplay_id):
     screenplay_data = {
         'title': screenplay.title,
         'author': current_user.username,
-        'content': screenplay.content
+        'content': parser.strip_annotations(screenplay.content)
     }
     
     pdf_buffer = pdf_generator.create_pdf(screenplay_data)
@@ -285,13 +296,25 @@ def api_character(character_id):
     character.name = data.get('name', character.name)
     character.description = data.get('description', character.description)
     character.arc_notes = data.get('arc_notes', character.arc_notes)
+
+    # Sync description and arc_notes back into screenplay text as inline annotations
+    screenplay = character.screenplay
+    updated_content = parser.write_annotations(
+        screenplay.content,
+        character.name,
+        description=character.description or '',
+        arc_notes=character.arc_notes or ''
+    )
+    screenplay.content = updated_content
+
     db.session.commit()
     
     return jsonify({
         'id': character.id,
         'name': character.name,
         'description': character.description,
-        'arc_notes': character.arc_notes
+        'arc_notes': character.arc_notes,
+        'content_updated': True
     })
 
 @main.route('/api/ai/character-arc', methods=['POST'])
