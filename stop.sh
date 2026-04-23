@@ -43,6 +43,7 @@ stop_processes "gunicorn (screen-dreams)" "gunicorn.*app:create_app"
 # Flask dev server
 stop_processes "Flask dev server" "python.*run_dev\.py"
 stop_processes "Flask server"     "python.*run\.py"
+stop_processes "Flask run"        "python.*flask.*run"
 
 # Podman containers
 if command -v podman &>/dev/null; then

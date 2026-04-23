@@ -64,7 +64,7 @@ Documentation = "https://github.com/opensourcemechanic/screen-dreams#readme"
 [project.scripts]
 screen-dreams = "app.run_dev:main"
 screen-dreams-dev = "app.run_dev:main"
-screen-dreams-prod = "app.run:main"
+screen-dreams-prod = "app.run_prod:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
