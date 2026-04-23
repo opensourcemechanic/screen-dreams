@@ -153,17 +153,20 @@ The `start.sh` script auto-detects your environment and starts the server using 
 | **Python** | Last resort — creates `.venv`, installs dependencies, runs directly |
 
 ```bash
-# Production mode on port 5000 (default)
+# Production mode on port 8080 (default external port)
 ./start.sh
 
 # Development mode with auto-reload on port 5000
 ./start.sh dev
 
-# Production mode on a custom port (gunicorn binds to this port)
-PORT=8080 ./start.sh
+# Production mode on a custom port
+PORT=3000 ./start.sh
 
-# Dev mode always runs Flask on port 5000 (required for auto-reload)
-./start.sh dev
+# One-command via uvx (production, port 8080)
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git
+
+# One-command via uvx on custom port
+PORT=9000 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 ```
 
 ### `stop.sh` — Universal Stopper

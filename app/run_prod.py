@@ -17,7 +17,7 @@ def main():
         Path(directory).mkdir(exist_ok=True)
     
     # Get port from environment variable
-    port = os.environ.get('PORT', '5000')
+    port = os.environ.get('PORT', '8080')
     
     print("Screen Dreams - AI Screenwriting Application")
     print("=" * 50)
