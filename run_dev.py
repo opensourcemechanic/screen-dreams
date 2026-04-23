@@ -6,18 +6,19 @@ Development runner with debug mode enabled
 
 import os
 import sys
-from pathlib import Path
 
 def main():
     """Main entry point for UVX deployment"""
     # Set debug mode before importing the app
     os.environ['FLASK_DEBUG'] = 'True'
     
-    # Create necessary directories
-    directories = ['uploads', 'screenplays', 'logs', 'static']
-    for directory in directories:
-        Path(directory).mkdir(exist_ok=True)
-    
+    # Dev mode always runs on port 5000 (Flask auto-reload requires a fixed port)
+    port = 5000
+    data_dir = os.environ.get(
+        'DATA_DIR',
+        os.path.join(os.path.expanduser('~'), '.local', 'share', 'screen-dreams')
+    )
+
     # Import and run the app
     try:
         from app import create_app
@@ -25,10 +26,9 @@ def main():
         
         print("Screen Dreams - AI Screenwriting Application")
         print("=" * 50)
-        port = int(os.environ.get('PORT', 5000))
-        
         print("Mode: Development")
         print(f"Server: http://localhost:{port}")
+        print(f"Data dir: {data_dir}")
         print("Debug mode: ENABLED")
         print("Auto-reload: ENABLED")
         print("Interactive debugger: ENABLED")

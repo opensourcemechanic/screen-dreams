@@ -11,6 +11,27 @@ mail = Mail()
 login_manager = LoginManager()
 principal = Principal()
 
+def _data_dir() -> str:
+    """
+    Resolve the persistent data directory.
+
+    Priority:
+      1. DATA_DIR environment variable (explicit override)
+      2. ~/.local/share/screen-dreams  (XDG default — survives uvx re-runs)
+
+    Never use os.getcwd() so that uvx's ephemeral working directory
+    does not cause a fresh database on every invocation.
+    """
+    path = os.environ.get(
+        'DATA_DIR',
+        os.path.join(os.path.expanduser('~'), '.local', 'share', 'screen-dreams')
+    )
+    os.makedirs(path, exist_ok=True)
+    os.makedirs(os.path.join(path, 'screenplays'), exist_ok=True)
+    os.makedirs(os.path.join(path, 'uploads'), exist_ok=True)
+    return path
+
+
 def create_app():
     _pkg_dir = os.path.dirname(__file__)
     _tmpl = os.path.join(_pkg_dir, 'templates')
@@ -18,12 +39,16 @@ def create_app():
     app = Flask(__name__,
                 template_folder=_tmpl,
                 static_folder=_static)
-    
+
+    data_dir = _data_dir()
+
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///screen_dreams.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(data_dir, 'screen_dreams.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SCREENPLAY_FOLDER'] = os.path.join(os.getcwd(), 'screenplays')
+    app.config['SCREENPLAY_FOLDER'] = os.path.join(data_dir, 'screenplays')
+    app.config['UPLOAD_FOLDER'] = os.path.join(data_dir, 'uploads')
+    app.config['DATA_DIR'] = data_dir
     app.config['AUTO_SAVE_INTERVAL'] = int(os.environ.get('AUTO_SAVE_INTERVAL', '15'))  # Default 15 seconds
     
     # Flask-Login configuration

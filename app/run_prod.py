@@ -11,18 +11,17 @@ from pathlib import Path
 
 def main():
     """Production entry point using gunicorn"""
-    # Create necessary directories
-    directories = ['uploads', 'screenplays', 'logs', 'static']
-    for directory in directories:
-        Path(directory).mkdir(exist_ok=True)
-    
-    # Get port from environment variable
     port = os.environ.get('PORT', '8080')
-    
+    data_dir = os.environ.get(
+        'DATA_DIR',
+        os.path.join(os.path.expanduser('~'), '.local', 'share', 'screen-dreams')
+    )
+
     print("Screen Dreams - AI Screenwriting Application")
     print("=" * 50)
     print("Mode: Production")
     print(f"Server: http://localhost:{port}")
+    print(f"Data dir: {data_dir}")
     print("Debug mode: DISABLED")
     print("Web Server: Gunicorn")
     print("=" * 50)

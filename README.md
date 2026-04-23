@@ -169,6 +169,25 @@ uvx git+https://github.com/opensourcemechanic/screen-dreams.git
 PORT=9000 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 ```
 
+### Persistent Data Storage
+
+All user accounts, screenplays, and uploads are stored in a **single persistent directory** that survives across `uvx` re-runs, upgrades, and restarts:
+
+| Platform | Default location |
+|---|---|
+| Linux / macOS | `~/.local/share/screen-dreams/` |
+| Override | Set `DATA_DIR=/your/path` |
+
+```bash
+# Use default location (~/.local/share/screen-dreams)
+uvx git+https://github.com/opensourcemechanic/screen-dreams.git
+
+# Use a custom location (e.g. a shared drive or Docker volume)
+DATA_DIR=/mnt/data/screen-dreams uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
+```
+
+The startup banner always prints the active data directory so you can confirm where data is being stored.
+
 ### `stop.sh` — Universal Stopper
 
 Stops all running Screen Dreams instances regardless of how they were started:

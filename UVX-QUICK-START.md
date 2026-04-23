@@ -153,22 +153,30 @@ uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-de
 ## **Data and Storage**
 
 ### **Where Your Data is Stored**
-All data is stored locally in the current directory:
+Data is stored in a **persistent directory** that survives across `uvx` re-runs, upgrades, and cache clears:
+
 ```
-screen-dreams/
+~/.local/share/screen-dreams/
   uploads/           # User uploaded files
-  screenplays/       # Generated screenplays
-  logs/             # Application logs
+  screenplays/       # Saved screenplays
   screen_dreams.db   # SQLite database (user accounts, projects)
+```
+
+The startup banner prints the active data directory on every run so you can confirm it.
+
+Override the location with `DATA_DIR`:
+```bash
+DATA_DIR=/my/custom/path uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 ```
 
 ### **Backup Your Data**
 ```bash
 # Create a backup of all your work
-tar -czf screen-dreams-backup-$(date +%Y%m%d).tar.gz uploads/ screenplays/ screen_dreams.db
+tar -czf screen-dreams-backup-$(date +%Y%m%d).tar.gz \
+  ~/.local/share/screen-dreams/
 
 # Restore from backup
-tar -xzf screen-dreams-backup-YYYYMMDD.tar.gz
+tar -xzf screen-dreams-backup-YYYYMMDD.tar.gz -C ~/
 ```
 
 ---
