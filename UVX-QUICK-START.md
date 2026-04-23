@@ -61,7 +61,7 @@ uvx git+https://github.com/opensourcemechanic/screen-dreams.git[ai]
 
 ### **Method 3: Custom Port**
 ```bash
-# Deploy on a custom port (default is 8080)
+# Deploy on a custom port (default is 5000)
 PORT=3000 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod
 ```
 
@@ -71,11 +71,11 @@ PORT=3000 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen
 
 ### **Web Interface**
 Once deployed, access Screen Dreams at:
-- **Primary**: http://localhost:8080 (production/default)
-- **Dev mode**: http://localhost:5000 (only when using `screen-dreams-dev`)
+- **Primary**: http://localhost:5000 (default for both prod and dev)
+- **Custom port**: http://localhost:8080 when using `PORT=8080`
 
-> **Port convention**: The default `screen-dreams` entry point runs gunicorn on port **8080**.
-> The `screen-dreams-dev` entry point runs Flask dev server on port **5000** (fixed, required for auto-reload).
+> **Port convention**: Default port is **5000** for both production (gunicorn) and development (Flask).
+> Override with: `PORT=8080 uvx git+... screen-dreams-prod`
 
 ### **What You Get**
 - **Complete web interface** - Full-featured screenwriting application
@@ -139,7 +139,7 @@ uvx --env AI_PROVIDER=ollama --env DATABASE_URL=sqlite:///my-screenplays.db git+
 
 ### **Entry Points**
 ```bash
-# Production mode — gunicorn on port 8080 (default)
+# Production mode — gunicorn on port 5000 (default)
 uvx git+https://github.com/opensourcemechanic/screen-dreams.git
 # or explicitly:
 uvx git+https://github.com/opensourcemechanic/screen-dreams.git screen-dreams-prod

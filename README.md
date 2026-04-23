@@ -153,16 +153,16 @@ The `start.sh` script auto-detects your environment and starts the server using 
 | **Python** | Last resort — creates `.venv`, installs dependencies, runs directly |
 
 ```bash
-# Production mode on port 8080 (default external port)
+# Production mode on port 5000 (default)
 ./start.sh
 
 # Development mode with auto-reload on port 5000
 ./start.sh dev
 
 # Production mode on a custom port
-PORT=3000 ./start.sh
+PORT=8080 ./start.sh
 
-# One-command via uvx (production, port 8080)
+# One-command via uvx (production, port 5000)
 uvx git+https://github.com/opensourcemechanic/screen-dreams.git
 
 # One-command via uvx on custom port
@@ -205,7 +205,7 @@ Handles all deployment modes:
 - Docker Compose services
 
 ### Access the Application
-1. Open your browser to `http://localhost:5000` (or your custom `$PORT`)
+1. Open your browser to `http://localhost:5000` (default) or `http://localhost:<PORT>` if you set a custom port
 2. Login with the demo account:
    - Email: `demo@example.com`
    - Password: `demo123`

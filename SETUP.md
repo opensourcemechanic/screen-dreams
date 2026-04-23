@@ -238,14 +238,14 @@ uv pip install -e .
 ./stop.sh
 
 # Or kill by port manually
-lsof -ti:8080 | xargs kill -9  # production default
-lsof -ti:5000 | xargs kill -9  # dev mode
+lsof -ti:5000 | xargs kill -9  # default for both modes
 
 # Or start on a different port
-PORT=3000 ./start.sh
+PORT=8080 ./start.sh
 ```
 
-> **Port convention**: Production (gunicorn) defaults to **8080**. Dev mode (Flask) always uses **5000**.
+> **Port convention**: Default port is **5000** for both production (gunicorn) and development (Flask).
+> Override with: `PORT=8080 ./start.sh`
 
 ## Production Deployment
 

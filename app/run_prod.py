@@ -11,7 +11,7 @@ from pathlib import Path
 
 def main():
     """Production entry point using gunicorn"""
-    port = os.environ.get('PORT', '8080')
+    port = os.environ.get('PORT', '5000')
     data_dir = os.environ.get(
         'DATA_DIR',
         os.path.join(os.path.expanduser('~'), '.local', 'share', 'screen-dreams')

@@ -1,17 +1,17 @@
 #!/bin/bash
 # Screen Dreams - Quick Start
 # Usage: ./start.sh [dev]
-#   (no args)  production mode, gunicorn binds to PORT (default 8080)
+#   (no args)  production mode, gunicorn binds to PORT (default: 5000)
 #   dev        development mode with Flask auto-reload on port 5000
 #
-# Flask always runs internally on port 5000.
-# In production mode, gunicorn binds to $PORT (default 8080) for external access.
-# In dev mode, Flask debug server runs on port 5000 (auto-reload requires this).
+# Default port is 5000 for both modes.
+# Override with:  PORT=8080 ./start.sh
+# Dev mode always uses port 5000 (Flask auto-reload requires a fixed port).
 
 set -e
 
 MODE=${1:-prod}
-PORT=${PORT:-8080}
+PORT=${PORT:-5000}
 
 echo "Screen Dreams Screenwriter"
 echo "=========================="
