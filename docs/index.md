@@ -6,8 +6,10 @@ show_downloads: true
 ---
 
 # Screen Dreams Documentation
+![Screen Dreams screenwriting editor]({{ '/assets/images/screen_dreams.jpg'}})
 
 Welcome to the complete documentation for Screen Dreams, the AI-powered screenwriting application.
+
 
 ## Quick Start
 
