@@ -25,8 +25,10 @@ def main():
         
         print("Screen Dreams - AI Screenwriting Application")
         print("=" * 50)
+        port = int(os.environ.get('PORT', 5000))
+        
         print("Mode: Development")
-        print("Server: http://localhost:5000")
+        print(f"Server: http://localhost:{port}")
         print("Debug mode: ENABLED")
         print("Auto-reload: ENABLED")
         print("Interactive debugger: ENABLED")
@@ -35,7 +37,7 @@ def main():
         print()
         
         # Run with debug enabled
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        app.run(debug=True, host='0.0.0.0', port=port)
         
     except ImportError as e:
         print(f"Import error: {e}")

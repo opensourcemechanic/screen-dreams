@@ -21,11 +21,12 @@ def main():
         
         # Debug mode controlled by environment variable (default: False)
         debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+        port = int(os.environ.get('PORT', 5000))
         
         print("Screen Dreams - AI Screenwriting Application")
         print("=" * 50)
         print("Mode: Production")
-        print("Server: http://localhost:5000")
+        print(f"Server: http://localhost:{port}")
         print(f"Debug mode: {'ON' if debug_mode else 'OFF'}")
         if not debug_mode:
             print("Enable debug mode with: export FLASK_DEBUG=True")
@@ -33,7 +34,7 @@ def main():
         print()
         
         # Run the application
-        app.run(debug=debug_mode, host='0.0.0.0', port=5000)
+        app.run(debug=debug_mode, host='0.0.0.0', port=port)
         
     except ImportError as e:
         print(f"Import error: {e}")
