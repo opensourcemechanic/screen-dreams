@@ -210,6 +210,104 @@ class ScreenplayPDFGenerator:
         )
         return Paragraph(text.upper(), style)
     
+    def create_character_bible_pdf(self, screenplay_data: dict, characters: list) -> BytesIO:
+        """Create a Character Bible PDF listing all characters with descriptions and arc notes"""
+        buffer = BytesIO()
+
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=letter,
+            leftMargin=1.25 * inch,
+            rightMargin=1.25 * inch,
+            topMargin=1.0 * inch,
+            bottomMargin=1.0 * inch
+        )
+
+        title_style = ParagraphStyle(
+            'BibleTitle',
+            fontName='Courier-Bold',
+            fontSize=16,
+            alignment=TA_CENTER,
+            spaceAfter=6
+        )
+        subtitle_style = ParagraphStyle(
+            'BibleSubtitle',
+            fontName='Courier',
+            fontSize=11,
+            alignment=TA_CENTER,
+            spaceAfter=4
+        )
+        char_name_style = ParagraphStyle(
+            'CharName',
+            fontName='Courier-Bold',
+            fontSize=13,
+            alignment=TA_LEFT,
+            spaceBefore=18,
+            spaceAfter=4
+        )
+        label_style = ParagraphStyle(
+            'Label',
+            fontName='Courier-Bold',
+            fontSize=11,
+            alignment=TA_LEFT,
+            spaceBefore=8,
+            spaceAfter=2
+        )
+        body_style = ParagraphStyle(
+            'BibleBody',
+            fontName='Courier',
+            fontSize=11,
+            alignment=TA_LEFT,
+            leftIndent=0.25 * inch,
+            spaceAfter=4,
+            leading=16
+        )
+        none_style = ParagraphStyle(
+            'NoneStyle',
+            fontName='Courier',
+            fontSize=11,
+            alignment=TA_LEFT,
+            leftIndent=0.25 * inch,
+            textColor='#888888',
+            spaceAfter=4
+        )
+
+        story = []
+
+        # Cover section
+        title = screenplay_data.get('title', 'Untitled')
+        author = screenplay_data.get('author', '')
+        story.append(Spacer(1, 1.5 * inch))
+        story.append(Paragraph(f'<b>{title.upper()}</b>', title_style))
+        story.append(Paragraph('Character Bible', subtitle_style))
+        if author:
+            story.append(Paragraph(f'by {author}', subtitle_style))
+        story.append(Spacer(1, 0.5 * inch))
+
+        # Horizontal rule via a thin black rectangle drawn via a Paragraph hack
+        rule_style = ParagraphStyle('Rule', fontName='Courier', fontSize=1, spaceAfter=24)
+        story.append(Paragraph('_' * 72, rule_style))
+
+        if not characters:
+            story.append(Paragraph('No characters found. Run Parse on your screenplay first.', body_style))
+        else:
+            for char in characters:
+                story.append(Paragraph(char['name'], char_name_style))
+
+                story.append(Paragraph('Description:', label_style))
+                desc = (char.get('description') or '').strip()
+                story.append(Paragraph(desc if desc else '<i>(none)</i>', body_style))
+
+                story.append(Paragraph('Arc Notes:', label_style))
+                arc = (char.get('arc_notes') or '').strip()
+                story.append(Paragraph(arc if arc else '<i>(none)</i>', body_style))
+
+                story.append(Spacer(1, 6))
+
+        doc.build(story, onFirstPage=self._add_page_number, onLaterPages=self._add_page_number)
+        buffer.seek(0)
+        return buffer
+
     def _add_page_number(self, canvas, doc):
         """Add page number to each page"""
         page_num = canvas.getPageNumber()

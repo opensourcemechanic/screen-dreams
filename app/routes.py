@@ -239,6 +239,36 @@ def api_generate_pdf(screenplay_id):
         download_name=f"{screenplay.title.replace(' ', '_')}.pdf"
     )
 
+@main.route('/api/screenplay/<int:screenplay_id>/character-bible-pdf', methods=['GET'])
+@login_required
+def api_generate_character_bible_pdf(screenplay_id):
+    """Generate Character Bible PDF for screenplay (user must own it)"""
+    screenplay = Screenplay.query.filter_by(id=screenplay_id, user_id=current_user.id).first_or_404()
+
+    characters = Character.query.filter_by(screenplay_id=screenplay_id).order_by(Character.name).all()
+    characters_data = [{
+        'name': c.name,
+        'description': c.description or '',
+        'arc_notes': c.arc_notes or ''
+    } for c in characters]
+
+    screenplay_data = {
+        'title': screenplay.title,
+        'author': current_user.username,
+    }
+
+    pdf_buffer = pdf_generator.create_character_bible_pdf(screenplay_data, characters_data)
+
+    safe_title = re.sub(r'[^\w\s-]', '', screenplay.title).strip().replace(' ', '_')
+    filename = f"{safe_title}_char_bible.pdf"
+
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=filename
+    )
+
 @main.route('/api/characters/<int:screenplay_id>', methods=['GET', 'POST'])
 @login_required
 def api_characters(screenplay_id):

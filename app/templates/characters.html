@@ -8,6 +8,7 @@
         <h1>Characters - {{ screenplay.title }}</h1>
         <div>
             <button onclick="addCharacter()" class="btn btn-primary">Add Character</button>
+            <a href="/api/screenplay/{{ screenplay.id }}/character-bible-pdf" class="btn btn-secondary">Export Character Bible PDF</a>
             <a href="/screenplay/{{ screenplay.id }}" class="btn btn-secondary">Back to Editor</a>
         </div>
     </div>
