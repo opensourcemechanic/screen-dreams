@@ -141,47 +141,53 @@ ollama run llama2
 
 ## Quick Start
 
-### Production Mode (Default - Debug Disabled)
+### `start.sh` — Universal Launcher
+
+The `start.sh` script auto-detects your environment and starts the server using the best available runtime:
+
+| Runtime | Used when |
+|---|---|
+| **uvx** (recommended) | `uvx` is installed — dev mode uses Flask, prod mode uses gunicorn |
+| **Podman** | `uvx` not found — maps `$PORT` on the host to port 5000 in the container |
+| **gunicorn** | Podman not found but `gunicorn` is installed |
+| **Python** | Last resort — creates `.venv`, installs dependencies, runs directly |
+
 ```bash
-# Start the application (debug disabled for better performance)
-python3 run.py
+# Production mode on port 5000 (default)
+./start.sh
 
-# Or use the quick start script
-./start.sh prod
-```
-
-### Development Mode (Debug Enabled)
-```bash
-# For active development with debugging
-python3 run_dev.py
-
-# Or use the quick start script
+# Development mode with auto-reload on port 5000
 ./start.sh dev
 
-# Or enable debug via environment variable
-export FLASK_DEBUG=True
-python3 run.py
+# Production mode on a custom port (gunicorn binds to this port)
+PORT=8080 ./start.sh
+
+# Dev mode always runs Flask on port 5000 (required for auto-reload)
+./start.sh dev
 ```
 
+### `stop.sh` — Universal Stopper
+
+Stops all running Screen Dreams instances regardless of how they were started:
+
+```bash
+./stop.sh
+```
+
+Handles all deployment modes:
+- uvx / screen-dreams entry point processes
+- gunicorn workers
+- Flask dev server (`run_dev.py`, `run.py`)
+- Podman containers (by image or name)
+- Docker containers (by image or name)
+- Docker Compose services
+
 ### Access the Application
-1. Open your browser to `http://localhost:5000`
+1. Open your browser to `http://localhost:5000` (or your custom `$PORT`)
 2. Login with the demo account:
    - Email: `demo@example.com`
    - Password: `demo123`
 3. Create your first screenplay!
-
-### Debug Mode Features
-When debug mode is enabled (`FLASK_DEBUG=True`):
-- **Auto-reload**: Server restarts when code changes
-- **Interactive debugger**: Detailed error pages with console
-- **Performance impact**: ~50% slower response times
-- **Use for**: Active development and debugging
-
-### Performance Mode
-When debug mode is disabled (default):
-- **Better performance**: ~2x faster response times
-- **Lower memory usage**
-- **Use for**: Testing, demos, and production-like scenarios
 
 ## Fountain Format Quick Reference
 

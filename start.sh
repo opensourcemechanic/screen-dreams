@@ -1,9 +1,12 @@
 #!/bin/bash
 # Screen Dreams - Quick Start
-# Tries uvx (recommended), then podman, then plain Python as fallback.
 # Usage: ./start.sh [dev]
-#   (no args) - production mode on port 5000
-#   dev        - development mode with auto-reload
+#   (no args)  production mode, binds to PORT (default 5000)
+#   dev        development mode with Flask auto-reload on port 5000
+#
+# Flask always runs internally on port 5000.
+# In production mode, gunicorn binds to $PORT so you can use any port.
+# In dev mode, Flask debug server runs on port 5000 (auto-reload requires this).
 
 set -e
 
@@ -13,20 +16,44 @@ PORT=${PORT:-5000}
 echo "Screen Dreams Screenwriter"
 echo "=========================="
 
+run_gunicorn() {
+    echo "Starting with gunicorn on port $PORT..."
+    exec gunicorn \
+        --bind "0.0.0.0:${PORT}" \
+        --workers 2 \
+        --timeout 30 \
+        --access-logfile - \
+        "app:create_app()"
+}
+
+run_flask_dev() {
+    echo "Starting Flask dev server on port 5000..."
+    exec python3 -c "
+import os, sys
+os.environ['FLASK_DEBUG'] = 'True'
+sys.path.insert(0, '.')
+from app import create_app
+app = create_app()
+print('Server: http://localhost:5000')
+app.run(debug=True, host='0.0.0.0', port=5000)
+"
+}
+
 if command -v uvx &>/dev/null; then
-    echo "Starting with uvx on port $PORT..."
-    # Create temporary env file for uvx
-    env_file=$(mktemp)
-    echo "PORT=$PORT" > "$env_file"
     if [ "$MODE" = "dev" ]; then
-        exec uvx --from . --env-file "$env_file" screen-dreams --debug
+        exec uvx --from . screen-dreams --debug
     else
-        exec uvx --from . --env-file "$env_file" screen-dreams
+        # Use gunicorn via uvx for production port binding
+        exec uvx --from . --with gunicorn -- gunicorn \
+            --bind "0.0.0.0:${PORT}" \
+            --workers 2 \
+            --timeout 30 \
+            --access-logfile - \
+            "app:create_app()"
     fi
-    rm -f "$env_file"  # Cleanup (shouldn't be reached due to exec)
 
 elif command -v podman &>/dev/null; then
-    echo "uvx not found. Starting with Podman on port $PORT..."
+    echo "Starting with Podman, mapping host:$PORT -> container:5000..."
     exec podman run --rm -it \
         -p "${PORT}:5000" \
         -e SECRET_KEY="${SECRET_KEY:-change-me-in-production}" \
@@ -34,16 +61,24 @@ elif command -v podman &>/dev/null; then
         -v "$(pwd)/instance:/app/instance" \
         ghcr.io/opensourcemechanic/screen-dreams:latest
 
+elif command -v gunicorn &>/dev/null; then
+    if [ "$MODE" = "dev" ]; then
+        run_flask_dev
+    else
+        run_gunicorn
+    fi
+
 elif command -v python3 &>/dev/null; then
-    echo "uvx and podman not found. Starting with Python directly..."
-    if [ ! -f ".venv/bin/python3" ]; then
+    echo "Installing dependencies..."
+    if [ ! -f ".venv/bin/activate" ]; then
         python3 -m venv .venv
         .venv/bin/pip install -e . -q
     fi
+    source .venv/bin/activate
     if [ "$MODE" = "dev" ]; then
-        exec .venv/bin/python3 run_dev.py
+        run_flask_dev
     else
-        exec .venv/bin/python3 run.py
+        run_gunicorn
     fi
 
 else

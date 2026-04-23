@@ -1,63 +1,89 @@
 #!/bin/bash
 # Screen Dreams - Stop Script
-# Stops all running instances of Screen Dreams
+# Stops all running Screen Dreams instances regardless of how they were started:
+#   - uvx (screen-dreams entry point)
+#   - gunicorn (production)
+#   - Flask dev server (run_dev.py)
+#   - Podman containers
+#   - Docker containers
+# Usage: ./stop.sh
 
-set -e
+STOPPED=0
 
 echo "Screen Dreams - Stop"
 echo "===================="
 
-# Function to stop processes by name
-stop_by_name() {
-    local process_name="$1"
-    local pids=$(pgrep -f "$process_name" 2>/dev/null || true)
-    
+# Gracefully terminate matching processes, force-kill if needed
+stop_processes() {
+    local label="$1"
+    local pattern="$2"
+    local pids
+    pids=$(pgrep -f "$pattern" 2>/dev/null || true)
     if [ -n "$pids" ]; then
-        echo "Stopping $process_name processes..."
+        echo "Stopping $label..."
         echo "$pids" | xargs kill -TERM 2>/dev/null || true
-        sleep 2
-        
-        # Force kill if still running
-        pids=$(pgrep -f "$process_name" 2>/dev/null || true)
+        sleep 1
+        # Force-kill any survivors
+        pids=$(pgrep -f "$pattern" 2>/dev/null || true)
         if [ -n "$pids" ]; then
-            echo "Force stopping remaining $process_name processes..."
             echo "$pids" | xargs kill -KILL 2>/dev/null || true
         fi
-        echo "✓ Stopped $process_name"
-    else
-        echo "No $process_name processes found"
+        echo "  Stopped $label"
+        STOPPED=$((STOPPED + 1))
     fi
 }
 
-# Stop uvx processes
-stop_by_name "uvx.*screen-dreams"
+# uvx / screen-dreams entry point
+stop_processes "uvx screen-dreams"     "uvx.*screen-dreams"
+stop_processes "screen-dreams (entry)" "screen-dreams"
 
-# Stop python processes running screen dreams
-stop_by_name "python.*run_dev.py"
-stop_by_name "python.*run.py"
+# gunicorn workers
+stop_processes "gunicorn (screen-dreams)" "gunicorn.*app:create_app"
 
-# Stop podman containers
-echo "Checking for Podman containers..."
-containers=$(podman ps -q --filter "name=screen-dreams" 2>/dev/null || true)
-if [ -n "$containers" ]; then
-    echo "Stopping Podman containers..."
-    echo "$containers" | xargs podman stop 2>/dev/null || true
-    echo "✓ Stopped Podman containers"
-else
-    echo "No Podman containers found"
+# Flask dev server
+stop_processes "Flask dev server" "python.*run_dev\.py"
+stop_processes "Flask server"     "python.*run\.py"
+
+# Podman containers
+if command -v podman &>/dev/null; then
+    containers=$(podman ps -q --filter "ancestor=ghcr.io/opensourcemechanic/screen-dreams" 2>/dev/null || true)
+    # Also catch containers started by name or compose
+    named=$(podman ps -q --filter "name=screen-dreams" 2>/dev/null || true)
+    containers=$(echo -e "$containers\n$named" | sort -u | grep -v '^$' || true)
+    if [ -n "$containers" ]; then
+        echo "Stopping Podman containers..."
+        echo "$containers" | xargs podman stop 2>/dev/null || true
+        echo "  Stopped Podman containers"
+        STOPPED=$((STOPPED + 1))
+    fi
 fi
 
-# Stop docker containers
-echo "Checking for Docker containers..."
-containers=$(docker ps -q --filter "name=screen-dreams" 2>/dev/null || true)
-if [ -n "$containers" ]; then
-    echo "Stopping Docker containers..."
-    echo "$containers" | xargs docker stop 2>/dev/null || true
-    echo "✓ Stopped Docker containers"
-else
-    echo "No Docker containers found"
+# Docker containers
+if command -v docker &>/dev/null; then
+    containers=$(docker ps -q --filter "ancestor=ghcr.io/opensourcemechanic/screen-dreams" 2>/dev/null || true)
+    named=$(docker ps -q --filter "name=screen-dreams" 2>/dev/null || true)
+    containers=$(echo -e "$containers\n$named" | sort -u | grep -v '^$' || true)
+    if [ -n "$containers" ]; then
+        echo "Stopping Docker containers..."
+        echo "$containers" | xargs docker stop 2>/dev/null || true
+        echo "  Stopped Docker containers"
+        STOPPED=$((STOPPED + 1))
+    fi
+fi
+
+# Docker Compose (if compose files exist)
+if command -v docker &>/dev/null && [ -f docker-compose.yml ]; then
+    if docker compose ps -q 2>/dev/null | grep -q .; then
+        echo "Stopping Docker Compose services..."
+        docker compose down 2>/dev/null || true
+        echo "  Stopped Docker Compose services"
+        STOPPED=$((STOPPED + 1))
+    fi
 fi
 
 echo ""
-echo "All Screen Dreams instances stopped."
-echo "Ports 5000, 8080, 3000 should now be free."
+if [ "$STOPPED" -eq 0 ]; then
+    echo "No running Screen Dreams instances found."
+else
+    echo "Done. All Screen Dreams instances stopped."
+fi
