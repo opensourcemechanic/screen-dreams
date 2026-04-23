@@ -36,6 +36,8 @@ That's it! Screen Dreams is now running locally on your machine with:
 - **Fountain Format Support** - Industry-standard screenplay markup
 - **Character Management** - Track characters and their development
 - **Scene Organization** - Automatic scene parsing and organization
+({{ '/assets/images/scenes.jpg' | relative_url }})
+
 - **PDF Export** - Professional PDFs with proper formatting
 
 ### AI-Powered Assistance
