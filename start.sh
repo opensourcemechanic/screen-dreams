@@ -1,30 +1,50 @@
 #!/bin/bash
+# Screen Dreams - Quick Start
+# Tries uvx (recommended), then podman, then plain Python as fallback.
+# Usage: ./start.sh [dev]
+#   (no args) - production mode on port 5000
+#   dev        - development mode with auto-reload
 
-# Quick start script for the Awen Screenplay Editor
-# Usage: ./start.sh [dev|prod]
+set -e
 
 MODE=${1:-prod}
+PORT=${PORT:-5000}
 
-echo "🎬 Awen Screenplay Editor - Quick Start"
-echo "======================================"
+echo "Screen Dreams Screenwriter"
+echo "=========================="
 
-case $MODE in
-    "dev"|"debug")
-        echo "🔧 Starting in DEVELOPMENT mode (debug enabled)..."
-        export FLASK_DEBUG=True
-        python3 run_dev.py
-        ;;
-    "prod"|"production")
-        echo "🚀 Starting in PRODUCTION mode (debug disabled)..."
-        export FLASK_DEBUG=False
-        python3 run.py
-        ;;
-    *)
-        echo "❌ Unknown mode: $MODE"
-        echo "Usage: $0 [dev|prod]"
-        echo ""
-        echo "  dev   - Development mode with debug enabled"
-        echo "  prod  - Production mode with debug disabled (default)"
-        exit 1
-        ;;
-esac
+if command -v uvx &>/dev/null; then
+    echo "Starting with uvx on port $PORT..."
+    if [ "$MODE" = "dev" ]; then
+        exec uvx --from . screen-dreams --debug --port "$PORT"
+    else
+        exec uvx --from . screen-dreams --port "$PORT"
+    fi
+
+elif command -v podman &>/dev/null; then
+    echo "uvx not found. Starting with Podman on port $PORT..."
+    exec podman run --rm -it \
+        -p "${PORT}:5000" \
+        -e SECRET_KEY="${SECRET_KEY:-change-me-in-production}" \
+        -e FLASK_DEBUG="$([ "$MODE" = "dev" ] && echo True || echo False)" \
+        -v "$(pwd)/instance:/app/instance" \
+        ghcr.io/opensourcemechanic/screen-dreams:latest
+
+elif command -v python3 &>/dev/null; then
+    echo "uvx and podman not found. Starting with Python directly..."
+    if [ ! -f ".venv/bin/python3" ]; then
+        python3 -m venv .venv
+        .venv/bin/pip install -e . -q
+    fi
+    if [ "$MODE" = "dev" ]; then
+        exec .venv/bin/python3 run_dev.py
+    else
+        exec .venv/bin/python3 run.py
+    fi
+
+else
+    echo "Error: No suitable runtime found."
+    echo "Please install uvx (recommended): pip install uvx"
+    echo "Or see UVX-QUICK-START.md for full instructions."
+    exit 1
+fi
