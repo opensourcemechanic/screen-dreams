@@ -157,13 +157,13 @@ screen-dreams/
   uploads/           # User uploaded files
   screenplays/       # Generated screenplays
   logs/             # Application logs
-  screenwriter.db   # SQLite database (user accounts, projects)
+  screen_dreams.db   # SQLite database (user accounts, projects)
 ```
 
 ### **Backup Your Data**
 ```bash
 # Create a backup of all your work
-tar -czf screen-dreams-backup-$(date +%Y%m%d).tar.gz uploads/ screenplays/ screenwriter.db
+tar -czf screen-dreams-backup-$(date +%Y%m%d).tar.gz uploads/ screenplays/ screen_dreams.db
 
 # Restore from backup
 tar -xzf screen-dreams-backup-YYYYMMDD.tar.gz
@@ -290,7 +290,7 @@ uvx --clear git+https://github.com/opensourcemechanic/screen-dreams.git
 # Remove the UVX installation (doesn't delete your data)
 uvx uninstall git+https://github.com/opensourcemechanic/screen-dreams.git
 
-# Your data in uploads/, screenplays/, and screenwriter.db remains
+# Your data in uploads/, screenplays/, and screen_dreams.db remains
 ```
 
 ---

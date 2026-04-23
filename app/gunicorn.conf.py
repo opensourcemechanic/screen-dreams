@@ -1,4 +1,4 @@
-# Gunicorn configuration file for Screen Dreams
+# Gunicorn configuration file for Screen Dreams Screenwriter
 import multiprocessing
 import os
 

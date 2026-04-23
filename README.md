@@ -1,4 +1,4 @@
-# Screen Dreams Screenwriter
+# Screen Dreams
 
 A simplified Python-based screenplay editor with Fountain format support, professional PDF output, and enhanced backup management.
 
@@ -85,7 +85,6 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Clone and setup
 git clone https://github.com/opensourcemechanic/screen-dreams.git
 cd screen-dreams
-# Note: The app is branded as "Screen Dreams Screenwriter" inside
 
 # Create virtual environment and install dependencies
 uv venv
@@ -103,9 +102,8 @@ Traditional setup using Python's built-in virtual environment:
 
 ```bash
 # Clone and setup
-git clone https://github.com/opensourcemechanic/awen-screenplay-editor.git
-cd awen-screenplay-editor
-# Note: The app is branded as "Screen Dreams Screenwriter" inside
+git clone https://github.com/opensourcemechanic/screen-dreams.git
+cd screen-dreams
 
 # Create virtual environment
 python3 -m venv .venv
@@ -212,19 +210,19 @@ FADE OUT.
 ## Project Structure
 
 ```
-screenwriter/
+screen-dreams/
 ├── app/
 │   ├── __init__.py          # Flask app initialization
 │   ├── models.py            # Database models
 │   ├── routes.py            # API routes
 │   ├── screenplay.py        # Fountain parser
 │   ├── pdf_generator.py     # PDF generation with ReportLab
-│   └── ai_assistant.py      # Ollama AI integration
-├── templates/               # HTML templates
-├── static/                  # CSS and JavaScript
-├── screenplays/            # Saved screenplay files
-├── requirements.txt        # Python dependencies
-└── run.py                  # Application entry point
+│   ├── ai_assistant.py      # Ollama AI integration
+│   ├── templates/           # HTML templates (canonical)
+│   └── static/              # CSS and JavaScript (canonical)
+├── screenplays/             # Saved screenplay files
+├── requirements.txt         # Python dependencies
+└── pyproject.toml           # Package configuration
 ```
 
 ## API Endpoints

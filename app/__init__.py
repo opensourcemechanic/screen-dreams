@@ -12,15 +12,18 @@ login_manager = LoginManager()
 principal = Principal()
 
 def create_app():
-    app = Flask(__name__, 
-                template_folder='../templates',
-                static_folder='../static')
+    _pkg_dir = os.path.dirname(__file__)
+    _tmpl = os.path.join(_pkg_dir, 'templates')
+    _static = os.path.join(_pkg_dir, 'static')
+    app = Flask(__name__,
+                template_folder=_tmpl,
+                static_folder=_static)
     
     # Configuration
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///screen_dreams.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SCREENPLAY_FOLDER'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'screenplays')
+    app.config['SCREENPLAY_FOLDER'] = os.path.join(os.getcwd(), 'screenplays')
     app.config['AUTO_SAVE_INTERVAL'] = int(os.environ.get('AUTO_SAVE_INTERVAL', '15'))  # Default 15 seconds
     
     # Flask-Login configuration

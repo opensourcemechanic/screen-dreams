@@ -30,7 +30,7 @@ podman run -d --name screen-dreams-redis-dev \
 
 podman run -d --name screen-dreams-dev \
   -p 5000:5000 \
-  -e DATABASE_URL=sqlite:///screenwriter_dev.db \
+  -e DATABASE_URL=sqlite:///screen_dreams.db \
   -e SECRET_KEY=your-secret-key \
   -e AI_PROVIDER=ollama \
   -v $(pwd):/app \
@@ -105,7 +105,7 @@ podman run -d --name screen-dreams-redis-dev \
 echo "Starting application..."
 podman run -d --name screen-dreams-dev \
   --pod screen-dreams-pod \
-  -e DATABASE_URL=sqlite:///screenwriter_dev.db \
+  -e DATABASE_URL=sqlite:///screen_dreams.db \
   -e SECRET_KEY=your-secret-key \
   -e AI_PROVIDER=ollama \
   -v $(pwd):/app \

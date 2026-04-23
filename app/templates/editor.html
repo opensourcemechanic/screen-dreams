@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}{{ screenplay.title }} - Screen Dreams Screenwriter{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+    <div class="editor-header">
+        <div class="editor-title">
+            <input type="text" id="screenplay-title" value="{{ screenplay.title }}" class="title-input">
+            <input type="text" id="screenplay-author" value="{{ screenplay.author or '' }}" placeholder="Author" class="author-input">
+        </div>
+        <div class="editor-actions">
+            <div class="import-export-controls">
+                <div class="export-dropdown">
+                    <button class="btn btn-export">Export ▼</button>
+                    <div class="export-menu" id="export-menu">
+                        <button class="export-menu-item" data-export="fountain" data-screenplay-id="{{ screenplay.id }}">Fountain (.fountain)</button>
+                        <button class="export-menu-item" data-export="plain_text" data-screenplay-id="{{ screenplay.id }}">Plain Text (.txt)</button>
+                        <button class="export-menu-item" data-export="final_draft" data-screenplay-id="{{ screenplay.id }}">Final Draft (.fdx)</button>
+                        <button class="export-menu-item" data-export="backup" data-screenplay-id="{{ screenplay.id }}">Backup (.json)</button>
+                    </div>
+                </div>
+                <button class="btn btn-import" data-import>Import</button>
+                <button class="btn btn-backup" data-backup data-screenplay-id="{{ screenplay.id }}">Backup</button>
+                <button class="btn btn-secondary" data-restore>Restore</button>
+                <button class="btn btn-secondary" onclick="showBackupSettings()">⚙️ Settings</button>
+            </div>
+            <button onclick="saveScreenplay()" class="btn btn-primary">Save</button>
+            <button onclick="parseScreenplay()" class="btn btn-secondary">Parse</button>
+            <button onclick="downloadPDF()" class="btn btn-secondary">Export PDF</button>
+            <a href="/characters/{{ screenplay.id }}" class="btn btn-secondary">Characters</a>
+            <a href="/scenes/{{ screenplay.id }}" class="btn btn-secondary">Scenes</a>
+            <a href="/" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+    
+    <div class="editor-layout">
+        <div class="editor-sidebar">
+            <h3>Fountain Syntax Guide</h3>
+            <div class="syntax-guide">
+                <div class="syntax-item">
+                    <strong>Scene Heading:</strong>
+                    <code>INT. LOCATION - DAY</code>
+                </div>
+                <div class="syntax-item">
+                    <strong>Character:</strong>
+                    <code>CHARACTER NAME</code>
+                </div>
+                <div class="syntax-item">
+                    <strong>Dialogue:</strong>
+                    <code>Text after character</code>
+                </div>
+                <div class="syntax-item">
+                    <strong>Parenthetical:</strong>
+                    <code>(action)</code>
+                </div>
+                <div class="syntax-item">
+                    <strong>Action:</strong>
+                    <code>Regular text</code>
+                </div>
+                <div class="syntax-item">
+                    <strong>Transition:</strong>
+                    <code>FADE OUT.</code>
+                </div>
+            </div>
+            
+            <div class="ai-panel" id="ai-panel">
+                <h3>AI Assistant</h3>
+                <div id="ai-suggestions"></div>
+                <button onclick="getPlotSuggestion()" class="btn btn-secondary btn-sm">Plot Suggestion</button>
+                <a href="/screenplay/{{ screenplay.id }}/prompt-editor" class="btn btn-secondary btn-sm">Edit Prompts</a>
+            </div>
+        </div>
+        
+        <div class="editor-main">
+            <textarea id="screenplay-content" class="screenplay-textarea" placeholder="Start writing your screenplay using Fountain format...
+
+Example:
+
+INT. COFFEE SHOP - DAY
+
+John enters and looks around nervously.
+
+JOHN
+(whispering)
+Is anyone here?
+
+MARY
+Over here!
+
+John walks to Mary's table.
+
+FADE OUT.">{{ screenplay.content }}</textarea>
+            
+            <div class="editor-stats">
+                <span id="char-count">Characters: 0</span>
+                <span id="word-count">Words: 0</span>
+                <span id="page-count">Pages: ~0</span>
+                <span class="save-status" id="save-status">Saved</span>
+                <span id="ai-status" class="ai-status ai-offline">🤖 AI Offline</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/import-export.css') }}">
+<script src="{{ url_for('static', filename='js/import-export.js') }}"></script>
+<script>
+const screenplayId = {{ screenplay.id }};
+let autoSaveTimer = null;
+let autoSaveInterval = 15000; // Default 15 seconds, will be updated from config
+let lastSavedContent = document.getElementById('screenplay-content').value;
+
+// Load configuration on page load
+loadConfig();
+
+// Auto-save functionality
+document.getElementById('screenplay-content').addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    document.getElementById('save-status').textContent = 'Unsaved changes...';
+    
+    autoSaveTimer = setTimeout(() => {
+        saveScreenplay(true);
+    }, autoSaveInterval);
+    
+    updateStats();
+});
+
+document.getElementById('screenplay-title').addEventListener('change', () => saveScreenplay(true));
+document.getElementById('screenplay-author').addEventListener('change', () => saveScreenplay(true));
+
+async function loadConfig() {
+    try {
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        autoSaveInterval = config.auto_save_interval * 1000; // Convert to milliseconds
+        console.log(`Auto-save interval set to ${config.auto_save_interval} seconds`);
+    } catch (error) {
+        console.error('Error loading config:', error);
+        autoSaveInterval = 15000; // Fallback to 15 seconds
+    }
+}
+
+async function saveScreenplay(isAutoSave = false) {
+    const title = document.getElementById('screenplay-title').value;
+    const author = document.getElementById('screenplay-author').value;
+    const content = document.getElementById('screenplay-content').value;
+    
+    if (content === lastSavedContent && isAutoSave) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/screenplay/${screenplayId}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ title, author, content })
+        });
+        
+        if (response.ok) {
+            lastSavedContent = content;
+            document.getElementById('save-status').textContent = isAutoSave ? 'Auto-saved' : 'Saved';
+        } else {
+            document.getElementById('save-status').textContent = 'Error saving';
+        }
+    } catch (error) {
+        document.getElementById('save-status').textContent = 'Error saving';
+    }
+}
+
+async function loadScreenplay() {
+    try {
+        const response = await fetch(`/api/screenplay/${screenplayId}`);
+        
+        if (response.ok) {
+            const screenplay = await response.json();
+            
+            // Update form fields
+            document.getElementById('screenplay-title').value = screenplay.title;
+            document.getElementById('screenplay-author').value = screenplay.author || '';
+            document.getElementById('screenplay-content').value = screenplay.content;
+            
+            // Update last saved content
+            lastSavedContent = screenplay.content;
+            
+            // Update save status
+            document.getElementById('save-status').textContent = 'Loaded';
+            
+            // Update stats
+            updateStats();
+        } else {
+            document.getElementById('save-status').textContent = 'Error loading';
+        }
+    } catch (error) {
+        document.getElementById('save-status').textContent = 'Error loading';
+    }
+}
+
+async function parseScreenplay() {
+    try {
+        const response = await fetch(`/api/screenplay/${screenplayId}/parse`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            let message = `Parsed ${result.scenes} scenes and ${result.characters} characters`;
+            
+            if (result.content_updated) {
+                message += '\n\nCharacter names have been formatted to uppercase for consistency.';
+                
+                // Reload the screenplay content to show updated character names
+                await loadScreenplay();
+            }
+            
+            alert(message);
+        } else {
+            // Show detailed error message
+            let errorMessage = 'Failed to parse screenplay';
+            if (result.error) {
+                errorMessage += ': ' + result.error;
+            }
+            if (result.details) {
+                errorMessage += '\n\nDetails: ' + result.details;
+            }
+            alert(errorMessage);
+        }
+    } catch (error) {
+        console.error('Error parsing screenplay:', error);
+        alert('Failed to parse screenplay: ' + error.message);
+    }
+}
+
+function downloadPDF() {
+    window.location.href = `/api/screenplay/${screenplayId}/pdf`;
+}
+
+function updateStats() {
+    const content = document.getElementById('screenplay-content').value;
+    const charCount = content.length;
+    const wordCount = content.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const pageCount = Math.ceil(charCount / 1800); // Rough estimate: ~1800 chars per page
+    
+    document.getElementById('char-count').textContent = `Characters: ${charCount}`;
+    document.getElementById('word-count').textContent = `Words: ${wordCount}`;
+    document.getElementById('page-count').textContent = `Pages: ~${pageCount}`;
+}
+
+async function getPlotSuggestion() {
+    const aiPanel = document.getElementById('ai-suggestions');
+    aiPanel.innerHTML = '<p>Generating suggestion...</p>';
+    
+    try {
+        const response = await fetch('/api/ai/plot-development', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                scenes: ['Current screenplay content'],
+                characters: []
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            aiPanel.innerHTML = `<p><strong>Suggestion:</strong> ${result.suggestion || 'AI assistant not available'}</p>`;
+        } else {
+            aiPanel.innerHTML = '<p>AI assistant not available. Make sure Ollama is running.</p>';
+        }
+    } catch (error) {
+        aiPanel.innerHTML = '<p>AI assistant not available.</p>';
+    }
+}
+
+// Check AI status on load
+async function checkAIStatus() {
+    try {
+        const response = await fetch('/api/ai/status');
+        const result = await response.json();
+        const statusEl = document.getElementById('ai-status');
+        if (statusEl) {
+            if (result.available && result.model_available) {
+                statusEl.textContent = '🤖 AI Ready';
+                statusEl.className = 'ai-status ai-online';
+            } else if (result.available && !result.model_available) {
+                statusEl.textContent = '🤖 Model Missing';
+                statusEl.className = 'ai-status ai-warning';
+            } else {
+                statusEl.textContent = '🤖 AI Offline';
+                statusEl.className = 'ai-status ai-offline';
+            }
+            console.log('AI Status:', result);
+        }
+    } catch (error) {
+        console.error('Error checking AI status:', error);
+        const statusEl = document.getElementById('ai-status');
+        if (statusEl) {
+            statusEl.textContent = '🤖 AI Error';
+            statusEl.className = 'ai-status ai-offline';
+        }
+    }
+}
+
+// Initialize
+updateStats();
+checkAIStatus();
+setInterval(checkAIStatus, 30000); // Check every 30 seconds
+
+// Initialize import/export functionality
+setCurrentScreenplayForBackup(screenplayId);
+
+// Export dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const exportButton = document.querySelector('.btn-export');
+    const exportMenu = document.getElementById('export-menu');
+    
+    if (exportButton && exportMenu) {
+        exportButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            exportMenu.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!exportButton.contains(e.target) && !exportMenu.contains(e.target)) {
+                exportMenu.classList.remove('show');
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.ai-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-left: 1rem;
+}
+
+.ai-online {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.ai-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.ai-offline {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.editor-stats {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.875rem;
+    color: #666;
+}
+</style>
+{% endblock %}

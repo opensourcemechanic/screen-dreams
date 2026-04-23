@@ -1,0 +1,869 @@
+/* Enhanced CSS with theme support and accessibility features */
+
+/* CSS Variables for theming */
+:root {
+    /* Default Light Theme */
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --bg-navbar: #2c3e50;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-navbar: #ffffff;
+    --accent-color: #3498db;
+    --accent-hover: #2980b9;
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    
+    /* Content-specific colors */
+    --content-bg: #ffffff;
+    --content-border: #ecf0f1;
+    --content-text: #555555;
+    --content-secondary: #7f8c8d;
+    
+    /* Button colors */
+    --btn-primary-bg: #3498db;
+    --btn-primary-hover: #2980b9;
+    --btn-secondary-bg: #95a5a6;
+    --btn-secondary-hover: #7f8c8d;
+    --btn-danger-bg: #e74c3c;
+    --btn-danger-hover: #c0392b;
+    --btn-success-bg: #27ae60;
+    --btn-success-hover: #229954;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-navbar: #0d1117;
+    --text-primary: #f0f0f0;
+    --text-secondary: #b8b8b8;
+    --text-navbar: #ffffff;
+    --accent-color: #58a6ff;
+    --accent-hover: #4492f7;
+    --border-color: #404040;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    
+    /* Content-specific colors */
+    --content-bg: #2d2d2d;
+    --content-border: #404040;
+    --content-text: #f0f0f0;
+}
+
+/* Dark Theme Main Content */
+[data-theme="dark"] .main-content {
+    background-image: url('../images/themes/dark/body-bg.webp');
+}
+
+/* Dark Theme Container */
+[data-theme="dark"] .container {
+    background-color: rgba(45, 45, 45, 0.4);
+}
+
+/* Dark Theme Navbar */
+[data-theme="dark"] .navbar {
+    background-image: url('../images/themes/dark/navbar-bg.webp');
+}
+
+/* High Contrast Theme */
+[data-theme="high-contrast"] {
+    --bg-primary: #000000;
+    --bg-secondary: #1a1a1a;
+    --bg-navbar: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #ffff00;
+    --text-navbar: #ffffff;
+    --accent-color: #00ff00;
+    --accent-hover: #00cc00;
+    --border-color: #ffffff;
+    --shadow-color: rgba(255, 255, 255, 0.2);
+    
+    /* Content-specific colors */
+    --content-bg: #1a1a1a;
+    --content-border: #ffffff;
+    --content-text: #ffffff;
+    --content-secondary: #ffff00;
+}
+
+/* High Contrast Theme Main Content */
+[data-theme="high-contrast"] .main-content {
+    background-image: url('../images/themes/high-contrast/body-bg.webp');
+}
+
+/* High Contrast Theme Container */
+[data-theme="high-contrast"] .container {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* High Contrast Theme Navbar */
+[data-theme="high-contrast"] .navbar {
+    background-image: url('../images/themes/high-contrast/navbar-bg.webp');
+}
+
+/* Evening Theme */
+[data-theme="evening"] {
+    --bg-primary: #2c1810;
+    --bg-secondary: #3d241a;
+    --bg-navbar: #1a0e08;
+    --text-primary: #f4e4d4;
+    --text-secondary: #d4a574;
+    --text-navbar: #f4e4d4;
+    --accent-color: #d4a574;
+    --accent-hover: #b8935f;
+    --border-color: #8b6914;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    
+    /* Content-specific colors */
+    --content-bg: #3d241a;
+    --content-border: #8b6914;
+    --content-text: #f4e4d4;
+    --content-secondary: #d4a574;
+}
+
+/* Evening Theme Main Content */
+[data-theme="evening"] .main-content {
+    background-image: url('../images/themes/evening/body-bg.webp');
+}
+
+/* Evening Theme Container */
+[data-theme="evening"] .container {
+    background-color: rgba(61, 36, 26, 0.4);
+}
+
+/* Evening Theme Navbar */
+[data-theme="evening"] .navbar {
+    background-image: url('../images/themes/evening/navbar-bg.webp');
+}
+
+/* Night Theme */
+[data-theme="night"] {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1a1a2e;
+    --bg-navbar: #0f0f23;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --text-navbar: #ffffff;
+    --accent-color: #4a9eff;
+    --accent-hover: #3d8bfe;
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    
+    /* Content-specific colors */
+    --content-bg: #1a1a2e;
+    --content-border: #333333;
+    --content-text: #e0e0e0;
+    --content-secondary: #a0a0a0;
+}
+
+/* Night Theme Main Content */
+[data-theme="night"] .main-content {
+    background-image: url('../images/themes/night/body-bg.webp');
+}
+
+/* Night Theme Container */
+[data-theme="night"] .container {
+    background-color: rgba(26, 26, 46, 0.4);
+}
+
+/* Night Theme Navbar */
+[data-theme="night"] .navbar {
+    background-image: url('../images/themes/night/navbar-bg.webp');
+}
+
+/* Night Theme */
+[data-theme="night"] {
+    --bg-primary: #2d2d2d;
+    --bg-secondary: #404040;
+    --bg-navbar: #4a4a4a;
+    --text-primary: #f0f0f0;
+    --text-secondary: #b8b8b8;
+    --text-navbar: #ffffff;
+    --accent-color: #66b3ff;
+    --accent-hover: #4da6ff;
+    --border-color: #5a5a5a;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    
+    /* Content-specific colors */
+    --content-bg: #4a4a4a;
+    --content-border: #5a5a5a;
+    --content-text: #f0f0f0;
+    --content-secondary: #b8b8b8;
+    
+    --btn-primary-bg: #66b3ff;
+    --btn-primary-hover: #4da6ff;
+    --btn-secondary-bg: #6e7681;
+    --btn-secondary-hover: #5a6370;
+    --btn-danger-bg: #ff6b6b;
+    --btn-danger-hover: #ff5252;
+    --btn-success-bg: #51cf66;
+    --btn-success-hover: #40c057;
+}
+
+/* Enhanced header styling for themes */
+.header h1 {
+    color: var(--text-primary) !important;
+    border-bottom: 2px solid var(--accent-color) !important;
+    padding-bottom: 0.5rem;
+}
+
+/* Brighter colors for dark themes */
+[data-theme="dark"] .header h1 {
+    color: #ffffff !important;
+    border-bottom-color: #58a6ff !important;
+}
+
+[data-theme="high-contrast"] .header h1 {
+    color: #ffffff !important;
+    border-bottom-color: #0000ff !important;
+}
+
+/* Base styles with variables - force application */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Force theme application on main elements */
+.main-content {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.container {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Navbar styles */
+.navbar {
+    background-color: var(--bg-navbar);
+    color: var(--text-navbar);
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: background-color 0.3s ease;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-navbar);
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1rem;
+}
+
+.user-welcome {
+    color: var(--btn-secondary-bg) !important; /* Same color as logout button */
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.demo-badge {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Button styles */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.btn:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.btn-primary {
+    background-color: var(--btn-primary-bg);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.btn-secondary {
+    background-color: var(--btn-secondary-bg);
+    color: white;
+    margin-left: 0.5rem;
+}
+
+.btn-secondary:hover {
+    background-color: var(--btn-secondary-hover);
+}
+
+.btn-danger {
+    background-color: var(--btn-danger-bg);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: var(--btn-danger-hover);
+}
+
+.btn-success {
+    background-color: var(--btn-success-bg);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: var(--btn-success-hover);
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+/* Theme Switcher */
+.theme-switcher {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    display: flex;
+    gap: 0.5rem;
+    background-color: var(--bg-secondary);
+    padding: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.theme-btn {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.theme-btn:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.theme-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Keyboard Shortcuts Panel */
+.shortcuts-panel {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    max-width: 300px;
+    transform: translateY(calc(100% + 2rem));
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.shortcuts-panel.visible {
+    transform: translateY(0);
+}
+
+.shortcuts-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+}
+
+.shortcut-key {
+    background-color: var(--bg-primary);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: monospace;
+    border: 1px solid var(--border-color);
+}
+
+/* Accessibility improvements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus indicators */
+*:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* High contrast focus indicators */
+[data-theme="high-contrast"] *:focus {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--accent-color);
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Form improvements */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Content Cards Theming */
+.scene-card {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+    box-shadow: 0 2px 8px var(--shadow-color) !important;
+}
+
+.scene-content {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+}
+
+.scene-content pre {
+    color: var(--content-text) !important;
+}
+
+.scene-heading {
+    color: var(--text-primary) !important;
+}
+
+.scene-details {
+    color: var(--content-secondary) !important;
+}
+
+.character-card {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+    box-shadow: 0 2px 8px var(--shadow-color) !important;
+}
+
+.screenplay-card {
+    background-color: var(--content-bg) !important;
+    border-color: var(--content-border) !important;
+    box-shadow: 0 2px 8px var(--shadow-color) !important;
+}
+
+.screenplay-info h3 {
+    color: var(--text-primary) !important;
+}
+
+.screenplay-info .author,
+.screenplay-info .meta {
+    color: var(--content-secondary) !important;
+}
+
+/* Checkbox improvements */
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-check-input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+.form-check-label {
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+/* AI Suggestion Box */
+#ai-suggestion-group {
+    background-color: var(--content-bg);
+    border: 1px solid var(--content-border);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+#ai-suggestion-group label {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.ai-suggestion {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--content-bg, white);
+}
+
+/* Theme-specific AI suggestion background colors */
+[data-theme="dark"] .ai-suggestion {
+    background-color: #081b2d;
+}
+
+[data-theme="night"] .ai-suggestion {
+    background-color: #041018;
+}
+
+[data-theme="high-contrast"] .ai-suggestion {
+    background-color: #081b2d;
+}
+
+/* ========================================
+   COMPREHENSIVE CHARACTER PAGE THEMING
+   Ensures adequate contrast across all 5 themes
+   ======================================== */
+
+/* LIGHT THEME (Theme 1) - Default styling */
+[data-theme="light"] .character-card h3,
+:root .character-card h3 {
+    color: #2c3e50 !important;
+}
+
+[data-theme="light"] .character-card p,
+:root .character-card p {
+    color: #555555 !important;
+}
+
+[data-theme="light"] .character-arc strong,
+:root .character-arc strong {
+    color: #2c3e50 !important;
+}
+
+[data-theme="light"] .character-arc p,
+:root .character-arc p {
+    color: #555555 !important;
+}
+
+[data-theme="light"] .ai-suggestion-box p,
+[data-theme="light"] .ai-suggestion-text,
+:root .ai-suggestion-box p,
+:root .ai-suggestion-text {
+    color: #333333 !important;
+}
+
+/* DARK THEME (Theme 2) */
+[data-theme="dark"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .character-card p {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .character-arc strong {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .character-arc p {
+    color: #f0f0f0 !important;
+}
+
+[data-theme="dark"] .ai-suggestion-box p,
+[data-theme="dark"] .ai-suggestion-text {
+    color: #ffffff !important;
+}
+
+/* HIGH-CONTRAST THEME (Theme 3) */
+[data-theme="high-contrast"] .character-card {
+    background-color: #2a2a2a !important;
+}
+
+[data-theme="high-contrast"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="high-contrast"] .character-card p {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="high-contrast"] .character-arc {
+    background-color: #1a1a1a !important;
+}
+
+[data-theme="high-contrast"] .character-arc strong {
+    color: #c4e138 !important;
+}
+
+[data-theme="high-contrast"] .character-arc p {
+    color: #c4e138 !important;
+}
+
+[data-theme="high-contrast"] .ai-suggestion {
+    background-color: #050a0f !important;
+}
+
+[data-theme="high-contrast"] .ai-suggestion-box {
+    background-color: #050a0f !important;
+}
+
+[data-theme="high-contrast"] .ai-suggestion-box p,
+[data-theme="high-contrast"] .ai-suggestion-text {
+    color: #c4e138 !important;
+    font-weight: 500 !important;
+}
+
+/* NIGHT THEME (Theme 4) */
+[data-theme="night"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="night"] .character-card p {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="night"] .character-arc strong {
+    color: #ffffff !important;
+}
+
+[data-theme="night"] .character-arc p {
+    color: #f0f0f0 !important;
+}
+
+[data-theme="night"] .ai-suggestion-box p,
+[data-theme="night"] .ai-suggestion-text {
+    color: #1a4d1a !important;
+}
+
+/* EVENING THEME (Theme 5) */
+[data-theme="evening"] .character-card h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="evening"] .character-card p {
+    color: #e8e8e8 !important;
+}
+
+[data-theme="evening"] .character-arc strong {
+    color: #ffffff !important;
+}
+
+[data-theme="evening"] .character-arc p {
+    color: #e8e8e8 !important;
+}
+
+[data-theme="evening"] .ai-suggestion-box p,
+[data-theme="evening"] .ai-suggestion-text {
+    color: #ffffff !important;
+}
+
+/* ======================================== */
+
+.ai-suggestion-box {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--content-border);
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.ai-suggestion-box p {
+    margin: 0 0 1rem 0;
+    color: #ffffff;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+/* Theme-specific AI suggestion text colors for maximum contrast */
+[data-theme="dark"] .ai-suggestion-box p {
+    color: #ffffff;
+}
+
+[data-theme="night"] .ai-suggestion-box p {
+    color: #ffffff;
+}
+
+[data-theme="high-contrast"] .ai-suggestion-box p {
+    color: #ffffff;
+}
+
+.ai-suggestion-box .ai-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* AI Suggestions History */
+.ai-suggestions-history {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    background-color: var(--bg-secondary);
+}
+
+.ai-suggestion-entry {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ai-suggestion-entry:last-child {
+    border-bottom: none;
+}
+
+.ai-suggestion-timestamp {
+    font-size: 0.8rem;
+    color: var(--content-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.ai-suggestion-text {
+    white-space: pre-wrap;
+    line-height: 1.4;
+    color: #ffffff;
+}
+
+/* Theme-specific AI suggestion history text for maximum contrast */
+[data-theme="dark"] .ai-suggestion-text {
+    color: #ffffff;
+}
+
+[data-theme="night"] .ai-suggestion-text {
+    color: #ffffff;
+}
+
+[data-theme="high-contrast"] .ai-suggestion-text {
+    color: #ffffff;
+}
+
+/* Character arc text styling for dark themes */
+[data-theme="dark"] .character-arc strong,
+[data-theme="night"] .character-arc strong,
+[data-theme="high-contrast"] .character-arc strong {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .character-arc p,
+[data-theme="night"] .character-arc p,
+[data-theme="high-contrast"] .character-arc p {
+    color: #f0f0f0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .theme-switcher {
+        top: auto;
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    .shortcuts-panel {
+        bottom: 5rem;
+        right: 1rem;
+        max-width: 250px;
+    }
+    
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .user-info {
+        margin-right: 0;
+    }
+}

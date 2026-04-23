@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Prompt Editor - {{ screenplay.title }} - Screen Dreams Screenwriter{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>AI Prompt Editor</h1>
+        <div>
+            <a href="/screenplay/{{ screenplay.id }}" class="btn btn-secondary">Back to Editor</a>
+        </div>
+    </div>
+    
+    <div class="prompt-editor-container">
+        <div class="prompt-settings">
+            <h2>Settings</h2>
+            <div class="form-group">
+                <label for="max-characters">Maximum Characters in Context:</label>
+                <input type="number" id="max-characters" name="max_characters" value="{{ config.max_characters or 2000 }}" min="100" max="10000" step="100">
+                <small>Maximum number of characters to include from screenplay context (100-10000)</small>
+            </div>
+        </div>
+        
+        <div class="prompt-templates">
+            <h2>Prompt Templates</h2>
+            
+            <div class="prompt-template">
+                <h3>Character Arc Suggestion</h3>
+                <div class="template-controls">
+                    <button class="btn btn-secondary" onclick="loadDefaultPrompt('character_arc')">Load Default</button>
+                    <button class="btn btn-secondary" onclick="savePrompt('character_arc')">Save Custom</button>
+                </div>
+                <div class="character-counter">
+                    <span id="character-arc-char-count">0</span> / 2000 characters
+                </div>
+                <textarea id="character-arc-prompt" name="character_arc_prompt" placeholder="Enter custom prompt for character arc suggestions..." oninput="updateCharCount('character-arc')">{{ config.character_arc_prompt or '' }}</textarea>
+                <div class="prompt-help">
+                    <h4>Available Variables:</h4>
+                    <ul>
+                        <li><code>{character_name}</code> - The character's name</li>
+                        <li><code>{character_description}</code> - The character's description</li>
+                        <li><code>{context}</code> - Screenplay context (limited by max characters)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="prompt-template">
+                <h3>Plot Development Suggestion</h3>
+                <div class="template-controls">
+                    <button class="btn btn-secondary" onclick="loadDefaultPrompt('plot_development')">Load Default</button>
+                    <button class="btn btn-secondary" onclick="savePrompt('plot_development')">Save Custom</button>
+                </div>
+                <div class="character-counter">
+                    <span id="plot-development-char-count">0</span> / 2000 characters
+                </div>
+                <textarea id="plot-development-prompt" name="plot_development_prompt" placeholder="Enter custom prompt for plot development suggestions..." oninput="updateCharCount('plot-development')">{{ config.plot_development_prompt or '' }}</textarea>
+                <div class="prompt-help">
+                    <h4>Available Variables:</h4>
+                    <ul>
+                        <li><code>{scenes}</code> - List of recent scenes</li>
+                        <li><code>{characters}</code> - List of characters</li>
+                        <li><code>{context}</code> - Screenplay context (limited by max characters)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="prompt-template">
+                <h3>Dialogue Enhancement</h3>
+                <div class="template-controls">
+                    <button class="btn btn-secondary" onclick="loadDefaultPrompt('dialogue_enhancement')">Load Default</button>
+                    <button class="btn btn-secondary" onclick="savePrompt('dialogue_enhancement')">Save Custom</button>
+                </div>
+                <div class="character-counter">
+                    <span id="dialogue-enhancement-char-count">0</span> / 2000 characters
+                </div>
+                <textarea id="dialogue-enhancement-prompt" name="dialogue_enhancement_prompt" placeholder="Enter custom prompt for dialogue enhancement..." oninput="updateCharCount('dialogue-enhancement')">{{ config.dialogue_enhancement_prompt or '' }}</textarea>
+                <div class="prompt-help">
+                    <h4>Available Variables:</h4>
+                    <ul>
+                        <li><code>{character_name}</code> - The character's name</li>
+                        <li><code>{dialogue}</code> - Current dialogue text</li>
+                        <li><code>{context}</code> - Scene context (limited by max characters)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-actions">
+        <button onclick="saveAllPrompts()" class="btn btn-primary">Save All Changes</button>
+        <button onclick="resetToDefaults()" class="btn btn-secondary">Reset to Defaults</button>
+        <a href="/screenplay/{{ screenplay.id }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const screenplayId = {{ screenplay.id }};
+const defaultPrompts = {
+    character_arc: `You are a professional screenplay consultant. Analyze the following character and suggest a compelling character arc.
+
+Character: {character_name}
+Description: {character_description}
+
+Context from screenplay:
+{context}
+
+Provide a brief character arc suggestion (3-5 sentences) focusing on:
+1. Character's starting point
+2. Key transformation
+3. Final state
+
+Make the suggestion specific to the character and the story context. Consider:
+- The character's personality traits
+- Their current situation in the story
+- Potential conflicts they might face
+- How they can grow or change
+
+Suggestion:`,
+    plot_development: `You are a professional screenplay consultant. Based on the following scenes and characters, suggest the next plot development.
+
+Characters: {characters}
+
+Recent scenes:
+{scenes}
+
+Provide a brief plot suggestion (3-5 sentences) for what could happen next, considering:
+1. Character motivations
+2. Conflict escalation
+3. Story structure
+
+Suggestion:`,
+    dialogue_enhancement: `You are a professional screenplay dialogue coach. Improve the following dialogue while maintaining the character's voice.
+
+Character: {character_name}
+Current dialogue: {dialogue}
+
+{context}
+
+Provide an improved version of the dialogue that is:
+1. More natural and authentic
+2. Character-specific
+3. Concise and impactful
+
+Improved dialogue:`
+};
+
+function updateCharCount(promptType) {
+    const textarea = document.getElementById(`${promptType}-prompt`);
+    const counter = document.getElementById(`${promptType}-char-count`);
+    const maxChars = 2000; // Default since we removed the settings pane
+    
+    const count = textarea.value.length;
+    counter.textContent = count;
+    
+    // Update color based on limit
+    if (count > maxChars) {
+        counter.style.color = '#e74c3c';
+    } else if (count > maxChars * 0.8) {
+        counter.style.color = '#f39c12';
+    } else {
+        counter.style.color = '#27ae60';
+    }
+}
+
+function loadDefaultPrompt(type) {
+    const textarea = document.getElementById(`${type.replace('_', '-')}-prompt`);
+    textarea.value = defaultPrompts[type];
+    updateCharCount(type.replace('_', '-'));
+}
+
+function savePrompt(type) {
+    // This would save to the server
+    console.log(`Saving ${type} prompt`);
+}
+
+function saveAllPrompts() {
+    const data = {
+        character_arc_prompt: document.getElementById('character-arc-prompt').value,
+        plot_development_prompt: document.getElementById('plot-development-prompt').value,
+        dialogue_enhancement_prompt: document.getElementById('dialogue-enhancement-prompt').value
+    };
+    
+    fetch(`/screenplay/${screenplayId}/prompt-editor`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert('Prompt configuration saved successfully!');
+        } else {
+            alert('Error saving prompt configuration');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error saving prompt configuration');
+    });
+}
+
+function resetToDefaults() {
+    if (confirm('Are you sure you want to reset all prompts to defaults?')) {
+        loadDefaultPrompt('character_arc');
+        loadDefaultPrompt('plot_development');
+        loadDefaultPrompt('dialogue_enhancement');
+    }
+}
+
+// Initialize character counts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCharCount('character-arc');
+    updateCharCount('plot-development');
+    updateCharCount('dialogue-enhancement');
+});
+</script>
+
+<style>
+.prompt-editor-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.prompt-templates h2 {
+    color: var(--text-primary) !important;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.prompt-template {
+    background: var(--content-bg);
+    border: 1px solid var(--content-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.prompt-template h3 {
+    color: var(--text-primary) !important;
+    margin-bottom: 1rem;
+}
+
+.template-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.character-counter {
+    text-align: right;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary) !important;
+}
+
+.prompt-template textarea {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border: 1px solid var(--content-border);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    resize: vertical;
+}
+
+.prompt-help {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    border: 1px solid var(--content-border);
+}
+
+.prompt-help h4 {
+    margin-bottom: 0.5rem;
+    color: var(--text-primary) !important;
+}
+
+.prompt-help ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: var(--text-secondary) !important;
+}
+
+.prompt-help code {
+    background: var(--bg-primary);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    color: var(--text-primary) !important;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--content-border);
+}
+
+@media (max-width: 768px) {
+    .prompt-editor-container {
+        gap: 1rem;
+        margin: 1rem;
+    }
+    
+    .template-controls {
+        flex-direction: column;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}

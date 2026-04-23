@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Scenes - {{ screenplay.title }} - Screen Dreams Screenwriter{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Scenes - {{ screenplay.title }}</h1>
+        <div>
+            <button onclick="parseScenes()" class="btn btn-primary">Parse Scenes</button>
+            <a href="/screenplay/{{ screenplay.id }}" class="btn btn-secondary">Back to Editor</a>
+        </div>
+    </div>
+    
+    <div class="scenes-list" id="scenes-list">
+        {% if screenplay.scenes %}
+            {% for scene in screenplay.scenes|sort(attribute='scene_number') %}
+            <div class="scene-card">
+                <div class="scene-header">
+                    <span class="scene-number">Scene {{ scene.scene_number }}</span>
+                    <span class="scene-heading">{{ scene.heading }}</span>
+                </div>
+                <div class="scene-details">
+                    <span class="scene-location">📍 {{ scene.location }}</span>
+                    <span class="scene-time">🕐 {{ scene.time_of_day }}</span>
+                </div>
+                <div class="scene-content">
+                    <pre>{{ scene.content }}</pre>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No scenes parsed yet. Click "Parse Scenes" to extract scenes from your screenplay.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const screenplayId = {{ screenplay.id }};
+
+async function parseScenes() {
+    try {
+        const response = await fetch(`/api/screenplay/${screenplayId}/parse`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            alert(`Parsed ${result.scenes} scenes and ${result.characters} characters`);
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error('Error parsing scenes:', error);
+        alert('Failed to parse scenes');
+    }
+}
+</script>
+{% endblock %}

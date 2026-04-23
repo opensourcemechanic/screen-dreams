@@ -3,7 +3,7 @@ name = "screen-dreams"
 version = "1.0.0"
 description = "A simplified Python-based screenplay editor with Fountain format support, professional PDF output, and enhanced backup management"
 authors = [
-    {name = "Screen Dreams Screenwriter", email = "noreply@screendreams.com"}
+    {name = "Screen Dreams", email = "noreply@screendreams.com"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
@@ -62,9 +62,29 @@ Issues = "https://github.com/opensourcemechanic/screen-dreams/issues"
 Documentation = "https://github.com/opensourcemechanic/screen-dreams#readme"
 
 [project.scripts]
-screen-dreams = "run_dev:main"
-screen-dreams-dev = "run_dev:main"
-screen-dreams-prod = "run:main"
+screen-dreams = "app.run_dev:main"
+screen-dreams-dev = "app.run_dev:main"
+screen-dreams-prod = "app.run:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+exclude = [
+    "app/__pycache__/**/*",
+    "app/*.backup",
+    "app/*.tfstate",
+]
+
+[tool.hatch.build.targets.sdist]
+packages = ["app"]
+exclude = [
+    "app/__pycache__/**/*",
+    "app/*.backup",
+    "app/*.tfstate",
+    "tests/**/*",
+    "docs/**/*",
+    "dist/**/*",
+    "build/**/*",
+]
 
 [build-system]
 requires = ["hatchling"]

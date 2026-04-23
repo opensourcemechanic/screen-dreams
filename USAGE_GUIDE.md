@@ -211,7 +211,7 @@ Currently supports:
 - Fountain format (for sharing/backup)
 
 ### Database
-All screenplays are stored in a SQLite database (`screenwriter.db`) in the project directory.
+All screenplays are stored in a SQLite database (`screen_dreams.db`) in the project directory.
 
 ## Best Practices
 

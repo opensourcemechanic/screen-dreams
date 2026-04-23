@@ -1,0 +1,454 @@
+/* Import/Export UI Styles */
+
+/* Progress Overlay */
+.progress-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.progress-content {
+    background-color: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    color: var(--text-primary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Button state styles */
+.btn.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.btn.success {
+    background-color: var(--btn-success-bg) !important;
+    color: white !important;
+    transition: background-color 0.3s ease;
+}
+
+.btn.error {
+    background-color: var(--btn-danger-bg) !important;
+    color: white !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Enhanced backup display */
+.backup-timestamp {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0.25rem 0;
+}
+
+.backup-meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0;
+}
+
+.backup-versions {
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    font-weight: 500;
+    margin: 0.25rem 0;
+}
+
+/* Import/Export Buttons */
+.import-export-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-export, .btn-import, .btn-backup {
+    background-color: var(--btn-primary-bg);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-export:hover, .btn-import:hover, .btn-backup:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.btn-export {
+    background-color: var(--btn-success-bg);
+}
+
+.btn-export:hover {
+    background-color: var(--btn-success-hover);
+}
+
+.btn-import {
+    background-color: var(--btn-secondary-bg);
+}
+
+.btn-import:hover {
+    background-color: var(--btn-secondary-hover);
+}
+
+.btn-backup {
+    background-color: var(--btn-secondary-bg);
+}
+
+.btn-backup:hover {
+    background-color: var(--btn-secondary-hover);
+}
+
+/* Dropdown Menu for Export Options */
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.export-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    min-width: 200px;
+    z-index: 1000;
+    display: none;
+}
+
+.export-menu.show {
+    display: block;
+}
+
+.export-menu-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.export-menu-item:hover {
+    background-color: var(--bg-primary);
+}
+
+.export-menu-item:first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.export-menu-item:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
+/* Import Modal */
+.import-form {
+    max-width: 500px;
+}
+
+.import-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.import-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.import-form input,
+.import-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.import-form input:focus,
+.import-form select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.import-form input[type="file"] {
+    padding: 0.5rem;
+}
+
+/* Backup List */
+.backup-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.backup-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    background-color: var(--bg-primary);
+}
+
+.backup-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.backup-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.backup-info p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.backup-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Notification Styles */
+.notification {
+    padding: 15px 20px;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification-success {
+    background-color: var(--btn-success-bg);
+    color: white;
+}
+
+.notification-error {
+    background-color: var(--btn-danger-bg);
+    color: white;
+}
+
+.notification-info {
+    background-color: var(--btn-info-bg);
+    color: white;
+}
+
+.notification-warning {
+    background-color: #f39c12;
+    color: white;
+}
+
+/* Settings Panel */
+.backup-settings {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.backup-settings h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+.setting-group {
+    margin-bottom: 1rem;
+}
+
+.setting-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.setting-group input[type="checkbox"] {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.setting-group select {
+    margin-left: 1rem;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .import-export-controls {
+        flex-direction: column;
+    }
+    
+    .btn-export, .btn-import, .btn-backup {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .backup-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .backup-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .export-dropdown .export-menu {
+        min-width: 150px;
+    }
+}
+
+/* Theme-specific adjustments */
+[data-theme="dark"] .progress-content {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+[data-theme="high-contrast"] .progress-content {
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--text-primary);
+}
+
+/* File input styling */
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    background-color: var(--btn-primary-bg);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.file-input-wrapper:hover {
+    background-color: var(--btn-primary-hover);
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Loading state for buttons */
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Format indicators */
+.format-indicator {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.format-fountain {
+    background-color: #27ae60;
+    color: white;
+}
+
+.format-plain-text {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.format-final-draft {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.format-backup {
+    background-color: #f39c12;
+    color: white;
+}

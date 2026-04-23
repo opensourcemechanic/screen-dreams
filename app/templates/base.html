@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Screen Dreams Screenwriter{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-style.css') }}">
+</head>
+<body>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="light" aria-label="Light theme">☀️</button>
+        <button class="theme-btn" data-theme="dark" aria-label="Dark theme">🌙</button>
+        <button class="theme-btn" data-theme="high-contrast" aria-label="High contrast theme">🔆</button>
+        <button class="theme-btn" data-theme="evening" aria-label="Evening theme">🌆</button>
+        <button class="theme-btn" data-theme="night" aria-label="Night theme">🌃</button>
+    </div>
+    
+    <!-- Keyboard Shortcuts Panel -->
+    <div class="shortcuts-panel" id="shortcuts-panel">
+        <div class="shortcuts-title">⌨️ Keyboard Shortcuts</div>
+        <div class="shortcut-item">
+            <span>Toggle Theme</span>
+            <span class="shortcut-key">Ctrl + T</span>
+        </div>
+        <div class="shortcut-item">
+            <span>Show Shortcuts</span>
+            <span class="shortcut-key">Ctrl + ?</span>
+        </div>
+        <div class="shortcut-item">
+            <span>New Screenplay</span>
+            <span class="shortcut-key">Ctrl + N</span>
+        </div>
+        <div class="shortcut-item">
+            <span>Save</span>
+            <span class="shortcut-key">Ctrl + S</span>
+        </div>
+        <div class="shortcut-item">
+            <span>Focus Editor</span>
+            <span class="shortcut-key">Ctrl + E</span>
+        </div>
+        <div class="shortcut-item">
+            <span>AI Suggestion</span>
+            <span class="shortcut-key">Ctrl + G</span>
+        </div>
+    </div>
+    
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1><a href="{{ url_for('main.index') }}">Screen Dreams Screenwriter</a></h1>
+            </div>
+            <div class="nav-links">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-sm">Home</a>
+                    <div class="user-info">
+                        <span class="user-welcome">Welcome, {{ current_user.username or current_user.email }}</span>
+                        {% if current_user.email == 'demo@example.com' %}
+                            <span class="demo-badge">Demo</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-secondary btn-sm">Create Account</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <main class="main-content" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <script src="{{ url_for('static', filename='js/simple-theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/enhanced-ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

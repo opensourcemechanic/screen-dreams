@@ -1,4 +1,4 @@
-# Screen Dreams Screenwriter - Deployment Guide
+# Screen Dreams - Deployment Guide
 
 ## **Easiest Deployment: UVX (Recommended)**
 
@@ -107,10 +107,10 @@ The development server uses Flask's built-in server:
 Development uses SQLite:
 ```bash
 # Database file location
-screenwriter.db
+screen_dreams.db
 
 # Reset database
-rm screenwriter.db
+rm screen_dreams.db
 python3 run.py  # Will recreate automatically
 ```
 
@@ -209,7 +209,7 @@ FLASK_ENV=development
 SECRET_KEY=dev-secret-key-change-in-production
 
 # Database Configuration
-DATABASE_URL=sqlite:///screenwriter_dev.db
+DATABASE_URL=sqlite:///screen_dreams.db
 
 # Redis Configuration
 REDIS_URL=redis://redis-dev:6379/0
@@ -685,7 +685,7 @@ podman run -d --name screen-dreams-dev \
     --pod screen-dreams-pod \
     --restart unless-stopped \
     --memory=1g \
-    -e DATABASE_URL=sqlite:///screenwriter_dev.db \
+    -e DATABASE_URL=sqlite:///screen_dreams.db \
     -e REDIS_URL=redis://redis-dev:6379/0 \
     -e RATELIMIT_STORAGE_URL=redis://redis-dev:6379/0 \
     -e SECRET_KEY=your-secret-key-here \
@@ -731,7 +731,7 @@ FLASK_ENV=production
 SECRET_KEY=your-very-secure-secret-key-here
 
 # Database Configuration
-DATABASE_URL=sqlite:///screenwriter_prod.db
+DATABASE_URL=sqlite:///screen_dreams.db
 
 # Redis Configuration
 REDIS_URL=redis://redis-dev:6379/0
@@ -1131,7 +1131,7 @@ Create `/etc/systemd/system/screen-dreams.service`:
 
 ```ini
 [Unit]
-Description=Screen Dreams Screenwriter Web Application
+Description=Screen Dreams Web Application
 After=network.target
 Wants=network.target
 
@@ -1184,8 +1184,8 @@ sudo systemctl status screen-dreams
 nssm install ScreenDreams "C:\opt\screen-dreams\venv\Scripts\gunicorn.exe"
 nssm set ScreenDreams Arguments "--config gunicorn.conf.py run:app"
 nssm set ScreenDreams Directory "C:\opt\screen-dreams"
-nssm set ScreenDreams DisplayName "Screen Dreams Screenwriter"
-nssm set ScreenDreams Description "Screen Dreams Screenwriter Web Application"
+nssm set ScreenDreams DisplayName "Screen Dreams"
+nssm set ScreenDreams Description "Screen Dreams Web Application"
 nssm set ScreenDreams Start SERVICE_AUTO_START
 nssm set ScreenDreams AppEnvironmentExtra "PYTHONPATH=C:\opt\screen-dreams"
 
@@ -1395,8 +1395,8 @@ FLASK_ENV=production
 SECRET_KEY=your-very-secure-secret-key-here
 
 # Database Configuration
-# For SQLite: sqlite:///screenwriter.db
-# For PostgreSQL: postgresql://user:password@localhost/screenwriter
+# For SQLite: sqlite:///screen_dreams.db
+# For PostgreSQL: postgresql://user:password@localhost/screen_dreams
 
 # Application Settings
 SCREENPLAY_FOLDER=/opt/screen-dreams/screenplays
@@ -1445,7 +1445,7 @@ def create_app(config_name=None):
         app.config['DEBUG'] = False
         app.config['TESTING'] = False
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///screenwriter.db')
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///screen_dreams.db')
         app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
             'pool_size': 10,
             'pool_recycle': 120,
@@ -1454,7 +1454,7 @@ def create_app(config_name=None):
     else:
         # Development configuration
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///screenwriter.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///screen_dreams.db'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.config['SCREENPLAY_FOLDER'] = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'screenplays')
     
@@ -1473,7 +1473,7 @@ def create_app(config_name=None):
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
         app.logger.setLevel(logging.INFO)
-        app.logger.info('Screen Dreams Screenwriter startup')
+        app.logger.info('Screen Dreams startup')
     
     # Register blueprints
     from app.routes import main
@@ -1518,14 +1518,14 @@ Create backup script `/opt/screen-dreams/backup.sh`:
 
 BACKUP_DIR="/opt/backups/screen-dreams"
 DATE=$(date +%Y%m%d_%H%M%S)
-DB_FILE="/opt/screen-dreams/screenwriter.db"
+DB_FILE="/opt/screen-dreams/screen_dreams.db"
 SCREENPLAYS_DIR="/opt/screen-dreams/screenplays"
 
 # Create backup directory
 mkdir -p "$BACKUP_DIR"
 
 # Backup database
-cp "$DB_FILE" "$BACKUP_DIR/screenwriter_$DATE.db"
+cp "$DB_FILE" "$BACKUP_DIR/screen_dreams_$DATE.db"
 
 # Backup screenplays
 if [ -d "$SCREENPLAYS_DIR" ]; then
