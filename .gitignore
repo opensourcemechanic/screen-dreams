@@ -61,3 +61,27 @@ htmlcov/
 
 # Logs
 *.log
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.plan
+*.auto.tfvars
+terraform.tfvars
+
+# Terraform deployment files
+app-deployment.zip
+
+# Environment and secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.crt
+
+# Sensitive configuration files
+secrets/
+credentials/
+config/secrets/
