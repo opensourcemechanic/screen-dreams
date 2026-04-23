@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title | escape }}</title>
+    <meta name="description" content="{{ page.excerpt | default: site.description }}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="{{ '/assets/css/syntax.css' | relative_url }}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ '/assets/css/docs.css' | relative_url }}">
+    
+    {% seo %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ '/' | relative_url }}">
+                <i class="fas fa-film me-2"></i>Screen Dreams
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% assign pages = site.docs | sort: "title" %}
+                    {% for doc in pages %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if page.url == doc.url %}active{% endif %}" 
+                           href="{{ doc.url | relative_url }}">{{ doc.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-light ms-2" 
+                           href="https://github.com/{{ site.github_username }}/screen-dreams">
+                            <i class="fab fa-github me-1"></i>GitHub
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    {% if page.title == "Getting Started" %}
+    <section class="hero-section">
+        <div class="container text-center">
+            <div class="hero-content">
+                <h1 class="display-4 fw-bold text-white mb-4">
+                    <i class="fas fa-film me-3"></i>{{ page.title }}
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    {{ page.description | default: site.description }}
+                </p>
+            </div>
+        </div>
+        <div class="hero-background"></div>
+    </section>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content {% unless page.title == "Getting Started" %}pt-5{% endunless %}">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar -->
+                {% unless page.title == "Getting Started" %}
+                <div class="col-lg-3 docs-sidebar">
+                    <nav class="docs-nav sticky-top">
+                        <div class="nav-section">
+                            <h6 class="nav-title">Documentation</h6>
+                            <ul class="nav flex-column">
+                                {% for doc in pages %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if page.url == doc.url %}active{% endif %}" 
+                                       href="{{ doc.url | relative_url }}">
+                                        {% if doc.title == "Getting Started" %}
+                                            <i class="fas fa-rocket me-2"></i>
+                                        {% elsif doc.title == "Features" %}
+                                            <i class="fas fa-star me-2"></i>
+                                        {% elsif doc.title == "AI Assistant" %}
+                                            <i class="fas fa-robot me-2"></i>
+                                        {% elsif doc.title == "Mobile Guide" %}
+                                            <i class="fas fa-mobile-alt me-2"></i>
+                                        {% endif %}
+                                        {{ doc.title }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                {% endunless %}
+                
+                <!-- Content -->
+                <div class="{% unless page.title == "Getting Started" %}col-lg-9{% else %}col-12{% endunless %}">
+                    <div class="docs-content">
+                        {% if page.title != "Getting Started" %}
+                        <h1>{{ page.title }}</h1>
+                        {% endif %}
+                        
+                        {{ content }}
+                        
+                        {% if page.show_downloads %}
+                        <div class="downloads-section mt-5">
+                            <h3>Download Screen Dreams</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="download-card">
+                                        <h5><i class="fas fa-rocket me-2"></i>UVX (Recommended)</h5>
+                                        <p>One-command deployment</p>
+                                        <code class="d-block bg-light p-2 rounded">uvx git+https://github.com/{{ site.github_username }}/screen-dreams.git</code>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="download-card">
+                                        <h5><i class="fab fa-github me-2"></i>Source Code</h5>
+                                        <p>Download from GitHub</p>
+                                        <a href="https://github.com/{{ site.github_username }}/screen-dreams" class="btn btn-primary">View on GitHub</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Screen Dreams</h5>
+                    <p class="text-muted">{{ site.description }}</p>
+                    <div class="social-links">
+                        <a href="https://github.com/{{ site.github_username }}/screen-dreams" class="text-light me-3">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ '/' | relative_url }}" class="text-light">Home</a></li>
+                        <li><a href="https://github.com/{{ site.github_username }}/screen-dreams" class="text-light">GitHub Repository</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <div class="text-center">
+                <p class="text-muted mb-0">© {{ site.time | date: "%Y" }} Screen Dreams. Open source under MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ '/assets/js/docs.js' | relative_url }}"></script>
+</body>
+</html>

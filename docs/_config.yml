@@ -1,0 +1,70 @@
+# Site settings
+title: Screen Dreams Documentation
+description: AI-powered screenwriting application with professional tools
+baseurl: /screen-dreams
+url: https://opensourcemechanic.github.io
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - README.md
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Navigation
+navigation:
+  - title: Getting Started
+    url: /docs/getting-started/
+  - title: Features
+    url: /docs/features/
+  - title: AI Assistant
+    url: /docs/ai-assistant/
+  - title: Mobile Guide
+    url: /docs/mobile/
+
+# Social links
+github_username: opensourcemechanic
+
+# Google Analytics (optional)
+google_analytics: UA-XXXXXXXXX-X
+
+# Markdown extensions
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+
+# Sass configuration
+sass:
+  style: compressed
+  sass_dir: _sass
+
+# Default values
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "docs"
+      author: "Screen Dreams Team"
+      show_downloads: true
