@@ -41,6 +41,7 @@ That's it! Screen Dreams is now running locally on your machine with:
 ![Scene organization example]({{ '/assets/images/scenes.jpg' | relative_url }})
 
 - **PDF Export** - Professional PDFs with proper formatting
+![PDF Export example]({{ '/assets/images/pdf_export.jpg' | relative_url }})
 
 ### AI-Powered Assistance
 - **Multiple AI Providers** - Choose from Ollama, OpenAI, or Anthropic
