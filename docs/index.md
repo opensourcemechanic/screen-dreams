@@ -35,6 +35,8 @@ That's it! Screen Dreams is now running locally on your machine with:
 ### Professional Screenwriting Tools
 - **Fountain Format Support** - Industry-standard screenplay markup
 - **Character Management** - Track characters and their development
+![Character Management example]({{ '/assets/images/characters.jpg' | relative_url }})
+
 - **Scene Organization** - Automatic scene parsing and organization
 ![Scene organization example]({{ '/assets/images/scenes.jpg' | relative_url }})
 
