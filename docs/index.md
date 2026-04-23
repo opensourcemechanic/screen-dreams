@@ -90,6 +90,13 @@ That's it! Screen Dreams is now running locally on your machine with:
 - Best practices
 - Troubleshooting
 
+### [Character Synchronization]({{ '/docs/CHARACTER_SYNC.md' | relative_url }})
+- Two-way character editor ↔ main editor sync
+- Inline Fountain annotations for character data
+- Idempotent parsing that preserves character information
+- Character Bible PDF export
+- Professional workflow for character management
+
 ### [Mobile Guide]({{ '/docs/mobile/' | relative_url }})
 - Mobile compatibility
 - Recommended setup
