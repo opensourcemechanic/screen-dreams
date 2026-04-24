@@ -1,5 +1,7 @@
 # Screen Dreams License
 
+Copyright (c) 2026 Brian Nitz
+
 ## Modified MIT License - Commercial Use Provisions
 
 This software is licensed under a modified MIT license with the following provisions:
