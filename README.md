@@ -1,6 +1,6 @@
 # <span style="color: #ff3366;">Screen Dreams</span>
 
-A simplified Python-based screenplay editor with Fountain format support, professional PDF output, and enhanced backup management.
+A  Python-based screenplay editor with Fountain format support, professional PDF output, backup management and AI support.
 
 ## Features
 
